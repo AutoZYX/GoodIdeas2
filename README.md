@@ -86,6 +86,15 @@ GoodIdeas2/
 2. **L判断**（200字）— 这个场景下该介入到什么等级？
 3. **AI实践**（300字）— 一个Prompt + 预期效果
 
+## 作者 | Author
+
+**[张玉新 / Yuxin Zhang](https://autozyx.com)** — 吉林大学副教授 | 卓驭科技首席安全专家 | 驭研科技联合创始人 & CEO
+
+- **个人主页**: [autozyx.com](https://autozyx.com)
+- **LinkedIn**: [linkedin.com/in/zhangyuxin](https://www.linkedin.com/in/zhangyuxin/)
+- **Google Scholar**: [Scholar Profile](https://scholar.google.com.au/citations?user=W8YoarEAAAAJ&hl=en)
+- **公众号**: 张玉新-AutoZYX
+
 ## 许可
 
 Apache 2.0
