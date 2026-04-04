@@ -2,6 +2,8 @@
 
 > Good Ideas 2.0: A Self-Driving Engineer's Field Notes on Parenting
 
+**在线阅读 | Read Online：** [https://autozyx.github.io/GoodIdeas2/](https://autozyx.github.io/GoodIdeas2/)
+
 一个研究自动驾驶的中国父亲，独自带娃一年，发现育儿和自动驾驶是同一件事——都是在一个个不可预测的场景中，学会什么时候介入，什么时候放手。
 
 ## 这是什么？
@@ -53,7 +55,8 @@ GoodIdeas2/
 ├── README.md                              # 本文件
 ├── GoodIdeas2.0-重构方案-V2-20260403.md   # 战略设计文档
 ├── book/                                  # 书稿（按章节）
-│   ├── ch01.md
+│   ├── ch01.md                            # Ch1 中文版
+│   ├── ch01-en.md                         # Ch1 English
 │   └── ...
 ├── 原书英文/                               # Rosen + Khan 原书
 ├── 原书中文/                               # 中文翻译
@@ -70,10 +73,10 @@ GoodIdeas2/
 - [x] Khan《Brave New Words》结构化摘要
 - [x] Rosen背景资料索引（25个来源）
 - [x] 4篇公众号文章（素材库）
-- [ ] **Ch1 初稿** ← 当前
-- [ ] Ch2-Ch15
+- [x] **Ch1 初稿**（中文 + 英文）
+- [x] GitHub仓库创建 + 中英文网站上线
+- [ ] Ch2-Ch15 ← 当前
 - [ ] 附录A-C
-- [ ] GitHub仓库创建 + 开源发布
 
 ## 每章格式
 
@@ -83,4 +86,4 @@ GoodIdeas2/
 
 ## 许可
 
-Apache 2.0（计划）
+Apache 2.0
