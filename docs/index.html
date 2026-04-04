@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Good Ideas 2.0 — 好主意2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf9f5;
+  --bg2: #f3f1eb;
+  --text: #1a1a18;
+  --text2: #5a5a52;
+  --text3: #8a8a80;
+  --accent: #c85a3a;
+  --border: #e0ded6;
+  --card: #ffffff;
+  --green: #2d7a4f;
+  --amber: #a67c2e;
+  --blue: #2a6496;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif; color:var(--text); background:var(--bg); line-height:1.75; -webkit-font-smoothing:antialiased; font-size:1.25rem; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.wrap { max-width:1100px; margin:0 auto; padding:0 40px; }
+
+/* Language toggle */
+.lang { position:fixed; top:24px; right:48px; z-index:99; display:flex; border:1px solid var(--border); border-radius:6px; overflow:hidden; background:rgba(250,249,245,0.92); backdrop-filter:blur(8px); }
+.lang button { padding:7px 16px; border:none; cursor:pointer; font-size:12px; font-weight:600; background:transparent; color:var(--text3); transition:.15s; font-family:inherit; }
+.lang button.on { background:var(--text); color:var(--bg); }
+span.en, p.en, div.en, h2.en, h3.en, li.en, td.en, th.en, .en-link { display:none; }
+body.E span.cn, body.E p.cn, body.E div.cn, body.E h2.cn, body.E h3.cn, body.E li.cn, body.E td.cn, body.E th.cn, body.E .cn-link { display:none!important; }
+body.E span.en { display:inline!important; }
+body.E p.en, body.E div.en, body.E h2.en, body.E h3.en { display:block!important; }
+body.E li.en, body.E td.en, body.E th.en { display:table-cell!important; }
+body.E li.en { display:list-item!important; }
+body.E .en-link { display:inline-block!important; }
+
+/* Header */
+header { padding:100px 32px 72px; text-align:center; border-bottom:1px solid var(--border); }
+header h1 { font-family:'Playfair Display',Georgia,serif; font-size:6vw; font-weight:800; letter-spacing:0.04em; margin-bottom:8px; color:var(--accent); line-height:1.1; }
+header .sub { font-family:'Inter',sans-serif; font-size:1.6vw; color:var(--text3); margin-bottom:24px; letter-spacing:3px; text-transform:uppercase; font-weight:500; }
+header .tagline { font-size:clamp(1.3rem,1.1rem+0.6vw,1.8rem); color:var(--text2); max-width:800px; margin:0 auto 40px; line-height:1.8; }
+header .actions { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+.btn { display:inline-block; padding:16px 36px; border-radius:4px; font-size:1.2rem; font-weight:600; transition:.2s; font-family:inherit; }
+.btn-primary { background:var(--accent); color:white; }
+.btn-primary:hover { background:#b04e30; text-decoration:none; }
+.btn-secondary { border:1.5px solid var(--border); color:var(--text); background:transparent; }
+.btn-secondary:hover { border-color:var(--text3); text-decoration:none; }
+
+/* Section */
+section { padding:56px 0; }
+section + section { border-top:1px solid var(--border); }
+.sec-title { font-family:'Playfair Display',Georgia,serif; font-size:2.2rem; font-weight:700; margin-bottom:8px; }
+.sec-sub { color:var(--text3); font-size:1.1rem; margin-bottom:28px; }
+
+/* Concept cards */
+.concepts { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-bottom:32px; }
+.concept { background:var(--card); border:1px solid var(--border); border-radius:6px; padding:28px 22px; transition:box-shadow .2s; }
+.concept:hover { box-shadow:0 2px 16px rgba(0,0,0,0.06); }
+.concept-icon { font-size:2rem; margin-bottom:12px; }
+.concept h3 { font-size:1.3rem; font-weight:700; margin-bottom:8px; line-height:1.4; }
+.concept p { font-size:1.1rem; color:var(--text2); line-height:1.7; }
+@media(max-width:800px) { .concepts { grid-template-columns:1fr; } }
+
+/* Levels */
+.levels { display:flex; flex-direction:column; gap:0; margin-bottom:32px; }
+.level { display:flex; align-items:stretch; border:1px solid var(--border); border-bottom:none; background:var(--card); }
+.level:first-child { border-radius:6px 6px 0 0; }
+.level:last-child { border-bottom:1px solid var(--border); border-radius:0 0 6px 6px; }
+.level-bar { width:6px; flex-shrink:0; }
+.level-body { flex:1; padding:16px 24px; display:flex; align-items:center; gap:20px; }
+.level-tag { font-size:1.4rem; font-weight:800; min-width:40px; }
+.level-driving { font-size:1.05rem; color:var(--text2); min-width:180px; }
+.level-parenting { font-size:1.05rem; color:var(--text); flex:1; }
+@media(max-width:640px) { .level-body { flex-direction:column; align-items:flex-start; gap:4px; } .level-driving { min-width:auto; } }
+
+/* TOC */
+.toc { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.toc-part { background:var(--card); border:1px solid var(--border); border-radius:6px; padding:24px; }
+.toc-part h3 { font-size:1.2rem; font-weight:700; margin-bottom:12px; color:var(--accent); }
+.toc-part ul { list-style:none; padding:0; }
+.toc-part li { padding:6px 0; font-size:1.05rem; color:var(--text2); border-bottom:1px solid var(--bg2); }
+.toc-part li:last-child { border-bottom:none; }
+.toc-part li .ch-num { font-weight:700; color:var(--text); margin-right:6px; }
+.toc-part li .done { color:var(--green); font-size:0.85rem; margin-left:6px; }
+@media(max-width:640px) { .toc { grid-template-columns:1fr; } }
+
+/* Author */
+.author-card { display:flex; gap:32px; align-items:flex-start; background:var(--card); border:1px solid var(--border); border-radius:6px; padding:32px; }
+.author-card .avatar { width:100px; height:100px; border-radius:50%; background:var(--bg2); display:flex; align-items:center; justify-content:center; font-size:2.5rem; flex-shrink:0; }
+.author-card .info h3 { font-size:1.4rem; font-weight:700; margin-bottom:4px; }
+.author-card .info .role { font-size:1.05rem; color:var(--text3); margin-bottom:12px; }
+.author-card .info p { font-size:1.05rem; color:var(--text2); line-height:1.7; }
+@media(max-width:640px) { .author-card { flex-direction:column; align-items:center; text-align:center; } }
+
+/* Footer */
+footer { border-top:1px solid var(--border); padding:40px 32px; text-align:center; color:var(--text3); font-size:0.85rem; }
+footer p { margin-bottom:5px; }
+footer a { color:var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- Language Toggle -->
+<div class="lang">
+  <button id="btnCN" class="on" onclick="setLang('C')">中文</button>
+  <button id="btnEN" onclick="setLang('E')">EN</button>
+</div>
+
+<!-- Header -->
+<header>
+  <h1>Good Ideas 2.0</h1>
+  <div class="sub">
+    <span class="cn">一个自动驾驶工程师的场景育儿笔记</span>
+    <span class="en">A Self-Driving Engineer's Field Notes on Parenting</span>
+  </div>
+  <div class="tagline">
+    <span class="cn">育儿和自动驾驶是同一件事——都是在一个个不可预测的场景中，学会什么时候介入，什么时候放手。</span>
+    <span class="en">Parenting and self-driving are the same thing — learning when to intervene and when to let go, one unpredictable scenario at a time.</span>
+  </div>
+  <div class="actions">
+    <a href="https://github.com/AutoZYX/GoodIdeas2" class="btn btn-primary">
+      <span class="cn">GitHub 仓库</span>
+      <span class="en">GitHub Repo</span>
+    </a>
+    <a href="#toc" class="btn btn-secondary">
+      <span class="cn">阅读目录</span>
+      <span class="en">Table of Contents</span>
+    </a>
+  </div>
+</header>
+
+<!-- Three Layers -->
+<section>
+<div class="wrap">
+  <h2 class="sec-title">
+    <span class="cn">三层价值叠加</span>
+    <span class="en">Three Layers of Value</span>
+  </h2>
+  <p class="sec-sub">
+    <span class="cn">Michael Rosen 的经典理念 × 自动驾驶的场景方法 × AI 时代的新工具</span>
+    <span class="en">Michael Rosen's classic ideas × scenario-driven methods from self-driving × AI-age tools</span>
+  </p>
+  <div class="concepts">
+    <div class="concept">
+      <div class="concept-icon">&#128218;</div>
+      <h3>
+        <span class="cn">Rosen 的四个关键词</span>
+        <span class="en">Rosen's Four Keywords</span>
+      </h3>
+      <p>
+        <span class="cn">探究 (Investigation)、解读 (Interpretation)、发明 (Invention)、合作 (Co-operation)。来自英国桂冠儿童诗人 Michael Rosen 的经典育儿理念。</span>
+        <span class="en">Investigation, Interpretation, Invention, Co-operation. Classic parenting philosophy from UK Children's Laureate Michael Rosen.</span>
+      </p>
+    </div>
+    <div class="concept">
+      <div class="concept-icon">&#128663;</div>
+      <h3>
+        <span class="cn">场景驱动的育儿</span>
+        <span class="en">Scenario-Driven Parenting</span>
+      </h3>
+      <p>
+        <span class="cn">不是用一套"正确理论"套用到所有时刻，而是在每个具体场景中观察、判断、回应——就像自动驾驶的场景测试方法一样。</span>
+        <span class="en">Instead of applying one "correct theory" to every moment, observe, assess, and respond in each specific scenario — just like scenario-based testing in autonomous driving.</span>
+      </p>
+    </div>
+    <div class="concept">
+      <div class="concept-icon">&#129302;</div>
+      <h3>
+        <span class="cn">AI：第三个学习伙伴</span>
+        <span class="en">AI: The Third Learning Partner</span>
+      </h3>
+      <p>
+        <span class="cn">不是"AI取代父母"，而是"父母 + 孩子 + AI"的三角关系。每章附带可直接使用的 AI Prompt。</span>
+        <span class="en">Not "AI replacing parents," but a triangle of parent + child + AI. Each chapter includes a ready-to-use AI prompt.</span>
+      </p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- L0-L5 -->
+<section>
+<div class="wrap">
+  <h2 class="sec-title">
+    <span class="cn">自动化等级 × 育儿</span>
+    <span class="en">Automation Levels × Parenting</span>
+  </h2>
+  <p class="sec-sub">
+    <span class="cn">每个父母每天都在做"场景判断"：这个场景下，我该介入到什么程度？</span>
+    <span class="en">Every parent makes "scenario judgments" daily: how much should I intervene in this situation?</span>
+  </p>
+  <div class="levels">
+    <div class="level"><div class="level-bar" style="background:#b83a3a"></div><div class="level-body">
+      <div class="level-tag" style="color:#b83a3a">L0</div>
+      <div class="level-driving"><span class="cn">人类全程驾驶</span><span class="en">Full human driving</span></div>
+      <div class="level-parenting"><span class="cn">你替孩子做一切决定</span><span class="en">You make every decision for the child</span></div>
+    </div></div>
+    <div class="level"><div class="level-bar" style="background:#c87a3a"></div><div class="level-body">
+      <div class="level-tag" style="color:#c87a3a">L1</div>
+      <div class="level-driving"><span class="cn">辅助驾驶</span><span class="en">Driver assistance</span></div>
+      <div class="level-parenting"><span class="cn">你扶着他骑自行车</span><span class="en">You hold the bike while they ride</span></div>
+    </div></div>
+    <div class="level"><div class="level-bar" style="background:var(--amber)"></div><div class="level-body">
+      <div class="level-tag" style="color:var(--amber)">L2</div>
+      <div class="level-driving"><span class="cn">部分自动</span><span class="en">Partial automation</span></div>
+      <div class="level-parenting"><span class="cn">他自己做作业，你在旁边看着</span><span class="en">They do homework; you watch nearby</span></div>
+    </div></div>
+    <div class="level"><div class="level-bar" style="background:var(--blue)"></div><div class="level-body">
+      <div class="level-tag" style="color:var(--blue)">L3</div>
+      <div class="level-driving"><span class="cn">有条件自动</span><span class="en">Conditional automation</span></div>
+      <div class="level-parenting"><span class="cn">他自己去便利店买酸奶</span><span class="en">They go to the corner shop alone</span></div>
+    </div></div>
+    <div class="level"><div class="level-bar" style="background:var(--green)"></div><div class="level-body">
+      <div class="level-tag" style="color:var(--green)">L4</div>
+      <div class="level-driving"><span class="cn">高度自动</span><span class="en">High automation</span></div>
+      <div class="level-parenting"><span class="cn">他自己安排周末怎么过</span><span class="en">They plan their own weekend</span></div>
+    </div></div>
+    <div class="level"><div class="level-bar" style="background:#1a6b3a"></div><div class="level-body">
+      <div class="level-tag" style="color:#1a6b3a">L5</div>
+      <div class="level-driving"><span class="cn">完全自主</span><span class="en">Full autonomy</span></div>
+      <div class="level-parenting"><span class="cn">他成年了，完全独立决策</span><span class="en">They're grown up, fully independent</span></div>
+    </div></div>
+  </div>
+</div>
+</section>
+
+<!-- Table of Contents -->
+<section id="toc">
+<div class="wrap">
+  <h2 class="sec-title">
+    <span class="cn">目录</span>
+    <span class="en">Table of Contents</span>
+  </h2>
+  <p class="sec-sub">
+    <span class="cn">15个场景 + 3个附录 | 持续更新中</span>
+    <span class="en">15 scenarios + 3 appendices | Work in progress</span>
+  </p>
+  <div class="toc">
+    <div class="toc-part">
+      <h3><span class="cn">Part 1: 我们的"操作系统"</span><span class="en">Part 1: Our Operating System</span></h3>
+      <ul>
+        <li class="cn"><span class="ch-num">Ch1</span> 一个自动驾驶专家，突然要独自带娃了 <span class="done">&#10003; 已完成</span></li>
+        <li class="en"><span class="ch-num">Ch1</span> A self-driving expert suddenly has to solo-parent <span class="done">&#10003; Done</span></li>
+        <li class="cn"><span class="ch-num">Ch2</span> 四个关键词 &times; 五个等级</li>
+        <li class="en"><span class="ch-num">Ch2</span> Four keywords &times; five levels</li>
+        <li class="cn"><span class="ch-num">Ch3</span> AI：第三个学习伙伴</li>
+        <li class="en"><span class="ch-num">Ch3</span> AI: the third learning partner</li>
+      </ul>
+    </div>
+    <div class="toc-part">
+      <h3><span class="cn">Part 2: 场景库 &mdash; 日常篇</span><span class="en">Part 2: Scenarios &mdash; At Home</span></h3>
+      <ul>
+        <li class="cn"><span class="ch-num">Ch4</span> 孩子问了一个你答不上来的问题</li>
+        <li class="en"><span class="ch-num">Ch4</span> Your child asks a question you can't answer</li>
+        <li class="cn"><span class="ch-num">Ch5</span> 周末下雨了，孩子说"好无聊"</li>
+        <li class="en"><span class="ch-num">Ch5</span> It's raining and they say "I'm bored"</li>
+        <li class="cn"><span class="ch-num">Ch6</span> 你在做饭，孩子说"我也要帮忙！"</li>
+        <li class="en"><span class="ch-num">Ch6</span> You're cooking; they want to help</li>
+        <li class="cn"><span class="ch-num">Ch7</span> 孩子沉迷屏幕，你想"夺回遥控器"</li>
+        <li class="en"><span class="ch-num">Ch7</span> Screen addiction: take back the remote?</li>
+        <li class="cn"><span class="ch-num">Ch8</span> 孩子把玩具拆了</li>
+        <li class="en"><span class="ch-num">Ch8</span> They took the toy apart</li>
+      </ul>
+    </div>
+    <div class="toc-part">
+      <h3><span class="cn">Part 3: 场景库 &mdash; 出门篇</span><span class="en">Part 3: Scenarios &mdash; Out & About</span></h3>
+      <ul>
+        <li class="cn"><span class="ch-num">Ch9</span> 在街上走路，孩子突然蹲下来不走了</li>
+        <li class="en"><span class="ch-num">Ch9</span> Walking — they suddenly squat and won't move</li>
+        <li class="cn"><span class="ch-num">Ch10</span> 长途旅行，"还有多远？？？"</li>
+        <li class="en"><span class="ch-num">Ch10</span> Road trip: "Are we there yet???"</li>
+        <li class="cn"><span class="ch-num">Ch11</span> 博物馆里，"好无聊，我想走了"</li>
+        <li class="en"><span class="ch-num">Ch11</span> At the museum: "I'm bored, let's go"</li>
+        <li class="cn"><span class="ch-num">Ch12</span> 孩子不想上学了</li>
+        <li class="en"><span class="ch-num">Ch12</span> They don't want to go to school</li>
+      </ul>
+    </div>
+    <div class="toc-part">
+      <h3><span class="cn">Part 4: 放手的艺术</span><span class="en">Part 4: The Art of Letting Go</span></h3>
+      <ul>
+        <li class="cn"><span class="ch-num">Ch13</span> 从 L1 到 L5：一个父亲的"放手"路线图</li>
+        <li class="en"><span class="ch-num">Ch13</span> From L1 to L5: a father's roadmap for letting go</li>
+        <li class="cn"><span class="ch-num">Ch14</span> 开源育儿：让AI帮你写你的"好主意"</li>
+        <li class="en"><span class="ch-num">Ch14</span> Open-source parenting: let AI help write your own "good ideas"</li>
+        <li class="cn"><span class="ch-num">Ch15</span> 后记：2026年7月，我们要离开英国了</li>
+        <li class="en"><span class="ch-num">Ch15</span> Epilogue: July 2026, we're leaving the UK</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- About -->
+<section>
+<div class="wrap">
+  <h2 class="sec-title">
+    <span class="cn">关于作者</span>
+    <span class="en">About the Author</span>
+  </h2>
+  <div class="author-card">
+    <div class="avatar">&#128104;&#8205;&#128187;</div>
+    <div class="info">
+      <h3>
+        <span class="cn">张玉新</span>
+        <span class="en">Yuxin Zhang</span>
+      </h3>
+      <div class="role">
+        <span class="cn">吉林大学副教授 | 自动驾驶安全研究者 | Lucky的爸爸</span>
+        <span class="en">Associate Professor, Jilin University | AD Safety Researcher | Lucky's Dad</span>
+      </div>
+      <p>
+        <span class="cn">研究自动驾驶安全的人，在英国独自带娃一年后，发现育儿和自动驾驶是同一件事。白天在实验室研究"车在什么场景下该由人接管"，晚上在家琢磨"孩子在什么场景下该由我介入"。这本书是他和5岁儿子Lucky在纽卡斯尔这一年的探究日志。</span>
+        <span class="en">A researcher in autonomous driving safety who, after a year of solo parenting in the UK, realized that parenting and self-driving are the same problem. By day he studies when a car should hand control to the human; by night he figures out when to step in with his kid. This book is the field journal of his year in Newcastle with his 5-year-old son Lucky.</span>
+      </p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Open Source -->
+<section>
+<div class="wrap">
+  <h2 class="sec-title">
+    <span class="cn">这是一个开源项目</span>
+    <span class="en">This Is an Open-Source Project</span>
+  </h2>
+  <p class="sec-sub">
+    <span class="cn">Apache 2.0 许可 | 欢迎贡献你的场景</span>
+    <span class="en">Apache 2.0 License | Your scenarios are welcome</span>
+  </p>
+  <div class="concepts" style="grid-template-columns:repeat(2,1fr);">
+    <div class="concept">
+      <div class="concept-icon">&#128214;</div>
+      <h3>
+        <span class="cn">每个家庭都有自己的场景库</span>
+        <span class="en">Every family has its own scenario library</span>
+      </h3>
+      <p>
+        <span class="cn">你的经验也许正是另一个父母最需要的。在 GitHub 提交你的育儿场景，成为这本书的一部分。</span>
+        <span class="en">Your experience might be exactly what another parent needs. Submit your parenting scenario on GitHub and become part of this book.</span>
+      </p>
+    </div>
+    <div class="concept">
+      <div class="concept-icon">&#127911;</div>
+      <h3>
+        <span class="cn">音频优先</span>
+        <span class="en">Audio First</span>
+      </h3>
+      <p>
+        <span class="cn">作者因角膜移植需要控制屏幕时间，因此每章都提供音频版——这也是忙碌父母最实用的阅读方式。</span>
+        <span class="en">The author limits screen time due to a corneal transplant, so every chapter comes with an audio version — also the most practical format for busy parents.</span>
+      </p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer>
+<div class="wrap">
+  <p>
+    <span class="cn">Good Ideas 2.0 &copy; 2026 <a href="https://www.linkedin.com/in/zhangyuxin/" target="_blank">Yuxin Zhang</a> | Apache 2.0 许可</span>
+    <span class="en">Good Ideas 2.0 &copy; 2026 <a href="https://www.linkedin.com/in/zhangyuxin/" target="_blank">Yuxin Zhang</a> | Apache 2.0 License</span>
+  </p>
+  <p>
+    <span class="cn">灵感来源：Michael Rosen《Good Ideas》(2014) &amp; Salman Khan《Brave New Words》(2024)</span>
+    <span class="en">Inspired by Michael Rosen's <em>Good Ideas</em> (2014) &amp; Salman Khan's <em>Brave New Words</em> (2024)</span>
+  </p>
+</div>
+</footer>
+
+<script>
+function setLang(l){
+  document.body.className = l==='E'?'E':'';
+  document.getElementById('btnCN').className = l==='E'?'':'on';
+  document.getElementById('btnEN').className = l==='E'?'on':'';
+  localStorage.setItem('gi2lang',l);
+}
+(function(){var s=localStorage.getItem('gi2lang');if(s)setLang(s);})();
+</script>
+</body>
+</html>

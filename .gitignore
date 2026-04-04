@@ -1,0 +1,18 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Original books (copyright - do not distribute)
+原书英文/*.pdf
+
+# Working files
+参考材料/
+样板章节/
+已发表文章/
+原书中文/
+GoodIdeas2.0-重构方案*.md
+项目概要及样板章节*.md
