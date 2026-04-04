@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch14: 开源育儿 | Good Ideas 2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<!-- Language toggle -->
+<div class="lang">
+  <button id="btnCN" class="on" onclick="setLang('C')">CN</button>
+  <button id="btnEN" onclick="setLang('E')">EN</button>
+</div>
+
+<!-- Top nav bar -->
+<div class="chapter-nav">
+  <a href="ch05.html">
+    <span class="cn">&larr; 上一章</span>
+    <span class="en">&larr; Previous</span>
+  </a>
+  <a href="index.html">
+    <span class="cn">返回目录 &rarr;</span>
+    <span class="en">Contents &rarr;</span>
+  </a>
+</div>
+
+<!-- Chinese chapter content -->
+<div class="cn">
+  <article class="chapter">
+    <div class="chapter-label">Chapter 14</div>
+    <h1 class="chapter-title">开源育儿：让AI帮你写你的"好主意"</h1>
+
+    <h2>场景</h2>
+    <p>这本书快要结束了。但在写最后几章的时候，我在杜伦大学遇到了一个人，让我觉得：这本书不是终点，而是起点。</p>
+    <p>那是杜伦大学计算机系的一场博士交流会。杜伦离纽卡斯尔不远，坐火车四十分钟。我去旁听一个关于AI辅助教育的研讨，没指望有太大收获——毕竟我的主业是自动驾驶安全，不是教育学。</p>
+    <p>然后我注意到了他。</p>
+    <p>他看起来五十出头，头发灰白，坐在一群二十多岁的博士生中间，毫不违和。他的微信名叫"英国奶爸"。交谈之后我才知道：他二十多年前读完计算机硕士，在英国各行各业摸爬滚打了半辈子，有一儿一女。五十岁，他决定重返校园，在计算机和教育学双导师的指导下攻读博士。</p>
+    <p>他的研究方向是：如何用AI技术辅助在家上学。</p>
+    <p>而他的两个孩子，就是他的"研究对象"——他们没有在传统学校读书，而是Homeschooling，在家上学。</p>
+    <p>我把自己刚发的关于"Nice爷爷"的文章发给他看。本来只是随口闲聊，没想到引出了一场让我兴奋了好几天的对话。</p>
+    <p>他说，在英国，Homeschooling有成熟的社区。孩子不是被关在家里，而是有自己的社交网络，家长不擅长的科目请专业导师来教，定期组织聚会和活动。这不是"宅"，是一种更主动、更精准的教育。</p>
+    <p>我当时脑子里跳出一个念头：这不就是罗森说的"世界就是教室"的终极形态吗？</p>
+    <p>罗森说，别把学习关在教室里。Homeschooling说，我们连教室都不要了——厨房是化学实验室，公园是生物课堂，超市是数学练习场，杜伦的极光是天文课。</p>
+    <p>那天晚上，杜伦罕见地出现了极光。这位五十岁的"大龄博士"背起相机就去追光了。</p>
+    <p>我后来在朋友圈看到他拍的照片，突然意识到：他本身就是对孩子最好的教育。他不需要给孩子讲什么大道理。他五十岁还在学新东西，追极光的时候跟二十岁一样兴奋——这本身就是一个"场景"，比任何课本都有力。</p>
+
+    <hr>
+
+    <p>然后我想到了自己。</p>
+    <p>我不是Homeschooling的践行者。Lucky在纽卡斯尔的小学读得好好的。但我有另一种限制：角膜移植。</p>
+    <p>医生反复叮嘱我控制屏幕时间。对于一个靠阅读论文和写代码吃饭的大学老师来说，这几乎等于被砍掉了一条腿。</p>
+    <p>于是我被迫学会了"不用眼睛工作"。</p>
+    <p>NotebookLM的Audio Overview功能成了我的救命稻草。我把十几篇论文的PDF扔进去，它自动生成一段二十分钟的"播客"——两个AI主持人对谈，把论文的核心观点、争议点、潜在应用讲得清清楚楚。我戴着耳机在公园推秋千的时候，就能"听"完一个领域的文献综述。</p>
+    <p>Claude成了我的写作搭档。我用语音输入把想法讲出来，它帮我整理成结构化的文字。这本书的很多章节，初稿就是我一边带Lucky逛超市、一边用语音"说"出来的。</p>
+    <p>我不是在炫技。我是在说：<strong>每个父母都有自己的限制条件</strong>。有人时间少，有人精力差，有人不擅长英语，有人数学头疼。AI不是万能的，但它确实可以帮你绕过一部分限制，把你从一个"单打独斗的司机"变成一个"有AI领航员的驾驶员"。</p>
+    <p>这就引出了这一章的核心想法：<strong>开源育儿</strong>。</p>
+    <p>这本书是一个场景库。但它是我的场景库——一个自动驾驶专家、在英国独自带娃、有角膜移植限制的中国父亲的场景库。你的场景库一定跟我不一样。</p>
+    <p>"英国奶爸"的场景库里，有Homeschooling社区的协作智慧、有AI辅助课程设计、有五十岁重返校园的勇气。</p>
+    <p>你的场景库里，也许有在北京地铁上给孩子讲历史的窍门，有在深圳996之后用半小时高质量陪伴的方法，有在农村老家让孩子跟着爷爷奶奶认植物的传统。</p>
+    <p>每个家庭都是独特的"运行设计域"。没有哪本书能覆盖所有场景。但如果我们每个人都贡献一两个场景，这个库就会越来越丰富——就像开源软件一样，每个人贡献一点，所有人都受益。</p>
+    <p>人生的极光，不会只出现在杜伦。但你得出门去追。</p>
+
+    <hr>
+
+    <h2>L判断</h2>
+    <p><strong>本章场景：一个父亲决定把自己的育儿笔记"开源"</strong>。</p>
+    <p>这一章的L判断，不是关于Lucky的。是关于我自己的。</p>
+    <p>前面十三章，L判断都在问：在这个场景下，我该对孩子介入到什么程度？这一章换一个方向——作为父母，我自己的"自动化等级"是多少？</p>
+    <p>刚到英国的时候，我是L0——纯手动操作。每天焦头烂额地处理一个又一个育儿"事件"，完全凭直觉和体力硬扛。</p>
+    <p>后来我开始用场景思维来整理混乱，相当于升级到了L1——有了辅助系统，但还是我在开。</p>
+    <p>现在，AI成了我的"副驾驶"。NotebookLM帮我听论文，Claude帮我整理思路，语音输入帮我绕过屏幕限制。我的工作模式大概在L2到L3之间——AI处理一部分标准化的任务，我专注于需要判断力的决策。</p>
+    <p>这不是偷懒。这是一个有限制条件的父亲，在自己的"运行设计域"里找到的最优解。</p>
+    <p>给读者的建议：花五分钟想一想，你的育儿"自动化等级"在哪？你有没有可能从L0升到L1？不需要一步到位。哪怕只是让AI帮你回答一个孩子问了但你答不上来的问题，那就已经是升级了。</p>
+
+    <hr>
+
+    <h2>AI实践</h2>
+    <p><strong>把这本书变成你自己的"好主意"</strong></p>
+
+    <p><strong>实践一：用NotebookLM把任何一本书变成音频</strong></p>
+    <p>把你正在读的育儿书（PDF或网页链接）上传到Google NotebookLM，点击"Audio Overview"。它会生成一段15-20分钟的对话式音频，适合在通勤、做饭、推秋千时收听。不用盯着屏幕，也能持续学习。</p>
+
+    <p><strong>实践二：创建你自己的"Good Ideas场景分析"</strong></p>
+    <blockquote>
+      <p><strong>Prompt</strong>："我的孩子今年[X]岁。今天发生了这样一个场景：[描述场景]。请从三个角度帮我分析：（1）罗森会怎么看这个场景？用他的四个关键词（探究、解读、发明、合作）中的哪一个最合适？（2）如果用自动驾驶的L0-L5分级，我的介入程度应该在哪个等级？为什么？（3）有没有一个我可以和孩子一起做的小实验或小活动，让这个场景变成一次学习机会？"</p>
+    </blockquote>
+
+    <p><strong>实践三：为开源育儿贡献你的场景</strong></p>
+    <p>这本书是一个开源项目。如果你有一个让你印象深刻的育儿场景，欢迎用上面的Prompt格式整理好，发送到本书的GitHub仓库或公众号后台。你的经验，也许正是另一个父母深夜搜索时最需要的那一页。</p>
+  </article>
+</div>
+
+<!-- English chapter content -->
+<div class="en">
+  <article class="chapter">
+    <div class="chapter-label">Chapter 14</div>
+    <h1 class="chapter-title">Open-Source Parenting — Let AI Help You Write Your Own "Good Ideas"</h1>
+
+    <h2>The Scenario</h2>
+    <p>This book is nearly over. But while writing these final chapters, I met someone at Durham University who made me realise: this book isn't the destination. It's the departure lounge.</p>
+    <p>It was a PhD exchange session in Durham's Computer Science department. Durham is a short train ride from Newcastle — forty minutes. I'd gone to sit in on a seminar about AI-assisted education, expecting little more than a pleasant afternoon. My actual expertise is autonomous driving safety, not pedagogy.</p>
+    <p>Then I noticed him.</p>
+    <p>He looked to be in his early fifties, grey-haired, sitting comfortably among a room of twenty-somethings. His WeChat handle was "British Dad." Over coffee I learned his story: he'd finished a computer science master's two decades ago, spent the next twenty-odd years drifting through various industries in the UK, and had two children. At fifty, he decided to go back. He enrolled as a part-time PhD candidate at Durham, supervised jointly by computer science and education faculties.</p>
+    <p>His research question: how can AI support homeschooling?</p>
+    <p>His two children were his living case study. They didn't attend a conventional school. They were homeschooled.</p>
+    <p>I sent him my recently published article about Michael Rosen — the "Nice Grandpa." What I'd intended as small talk turned into a conversation that kept me buzzing for days.</p>
+    <p>He explained that in the UK, homeschooling has a mature ecosystem. Children aren't isolated at home. They belong to social networks; parents hire specialist tutors for subjects they can't teach; families organise regular meetups and excursions. It isn't withdrawal. It's a more intentional, more precisely targeted form of education.</p>
+    <p>A thought hit me immediately: isn't this the logical extreme of what Rosen has been saying all along?</p>
+    <p>Rosen said: don't lock learning inside a classroom. Homeschooling said: we've dispensed with the classroom altogether. The kitchen is a chemistry lab. The park is a biology lesson. The supermarket is a maths exercise. And that night, the aurora borealis over Durham Cathedral was an astronomy class that no school could replicate.</p>
+    <p>That evening, Durham witnessed a rare display of the Northern Lights. The fifty-year-old "mature student" grabbed his camera and went chasing them.</p>
+    <p>When I saw his photos on social media the next morning, something clicked: he himself was the best education his children could receive. He didn't need to lecture them about lifelong learning. He was fifty, studying something new, and as thrilled by the aurora as any twenty-year-old. That, in itself, was a scenario — more powerful than anything in a textbook.</p>
+
+    <hr>
+
+    <p>Then I thought about myself.</p>
+    <p>I'm not a homeschooler. Lucky attends a perfectly good primary school in Newcastle. But I have a different constraint: a corneal transplant.</p>
+    <p>My doctor has told me — more than once — to limit screen time. For a university lecturer whose livelihood depends on reading papers and writing code, this is close to having a limb amputated.</p>
+    <p>So I was forced to learn how to work without my eyes.</p>
+    <p>NotebookLM's Audio Overview became my lifeline. I upload a dozen PDFs, and it generates a twenty-minute "podcast" — two AI hosts discussing the papers' core arguments, controversies, and potential applications. While pushing Lucky on the swings in the park, I can "listen" my way through an entire literature review.</p>
+    <p>Claude became my writing partner. I speak my ideas aloud using voice input; it organises them into structured prose. Many chapters of this book were first-drafted while Lucky and I wandered around the supermarket — me muttering into my phone, him inspecting the biscuit aisle.</p>
+    <p>I'm not showing off a tech stack. I'm making a simple point: <strong>every parent has constraints</strong>. Some are short on time. Some are low on energy. Some struggle with English. Some dread maths. AI isn't a silver bullet, but it can help you route around certain limitations — upgrading you from a solo operator white-knuckling the steering wheel to a driver with a capable co-pilot.</p>
+    <p>Which brings me to the core idea of this chapter: <strong>open-source parenting</strong>.</p>
+    <p>This book is a scenario library. But it is <em>my</em> scenario library — assembled by a Chinese father who researches autonomous driving safety, solo-parents in England, and has a corneal transplant restricting his screen time. Your library will be different.</p>
+    <p>"British Dad" has a library filled with the collaborative wisdom of the homeschooling community, AI-designed curricula, and the courage of returning to university at fifty.</p>
+    <p>Your library might contain tricks for teaching history on the Beijing metro, methods for making thirty minutes of post-996 time genuinely count, or the tradition of learning plant names from grandparents in a rural hometown.</p>
+    <p>Every family is a unique "operational design domain." No single book can cover every scenario. But if each of us contributes one or two, the library grows richer — just like open-source software, where small individual contributions compound into something far greater than any one person could build.</p>
+    <p>The aurora doesn't only appear over Durham. But you have to step outside to see it.</p>
+
+    <hr>
+
+    <h2>L-Rating</h2>
+    <p><strong>This chapter's scenario: a father decides to open-source his parenting notes.</strong></p>
+    <p>The L-Rating here isn't about Lucky. It's about me.</p>
+    <p>For the previous thirteen chapters, the question was always: how much should I intervene with my child in this scenario? This chapter flips the lens: as a parent, what is <em>my</em> own automation level?</p>
+    <p>When I first arrived in the UK, I was at L0 — fully manual. Every day was a chaotic sequence of parenting "events" handled on instinct and adrenaline alone.</p>
+    <p>Then I started applying scenario-based thinking to the chaos. That was an upgrade to L1 — I had a framework, but I was still doing all the driving.</p>
+    <p>Now, AI serves as my co-pilot. NotebookLM listens to papers for me. Claude organises my thinking. Voice input lets me bypass the screen. My working mode sits somewhere between L2 and L3 — AI handles a portion of the standardised tasks while I focus on the judgments that require human discernment.</p>
+    <p>This isn't laziness. It's a constrained parent finding the optimal solution within his own operational design domain.</p>
+    <p>A question for you: take five minutes and think about where your parenting "automation level" sits. Could you move from L0 to L1? You don't need to leap. Even letting AI answer one question your child asked that you couldn't — that's already an upgrade.</p>
+
+    <hr>
+
+    <h2>AI Practice</h2>
+    <p><strong>Turn this book into your own "Good Ideas"</strong></p>
+
+    <p><strong>Practice 1: Use NotebookLM to turn any book into audio</strong></p>
+    <p>Upload the parenting book you're currently reading (PDF or web link) to Google NotebookLM and click "Audio Overview." It will generate a 15-to-20-minute conversational audio summary — perfect for listening while commuting, cooking, or pushing a child on the swings. No screen required. Learning continues.</p>
+
+    <p><strong>Practice 2: Create your own "Good Ideas Scenario Analysis"</strong></p>
+    <blockquote>
+      <p><strong>Prompt</strong>: "My child is [X] years old. Here's a scenario that happened today: [describe the scenario]. Please analyse it from three angles: (1) How would Michael Rosen view this scenario? Which of his four keywords — Investigation, Interpretation, Invention, Co-operation — fits best? (2) Using the autonomous-driving L0-to-L5 scale, what intervention level should I be at, and why? (3) Is there a small experiment or activity I could do with my child to turn this scenario into a learning opportunity?"</p>
+    </blockquote>
+
+    <p><strong>Practice 3: Contribute your scenario to this open-source project</strong></p>
+    <p>This book is an open-source project. If you have a parenting scenario that left a mark on you, use the prompt format above to write it up and submit it to the book's GitHub repository or the WeChat account backend. Your experience might be exactly the page another parent is searching for late at night.</p>
+  </article>
+</div>
+
+<!-- Chapter footer with prev/next -->
+<div class="chapter-footer">
+  <a href="ch05.html">
+    <span class="cn">&larr; Ch5</span>
+    <span class="en">&larr; Ch5</span>
+  </a>
+  <a href="index.html">
+    <span class="cn">返回目录</span>
+    <span class="en">Contents</span>
+  </a>
+</div>
+
+<!-- Footer -->
+<footer>
+<div class="wrap">
+  <p>
+    <span class="cn">Good Ideas 2.0 &copy; 2026 <a href="https://www.linkedin.com/in/zhangyuxin/" target="_blank">Yuxin Zhang</a> | Apache 2.0 许可</span>
+    <span class="en">Good Ideas 2.0 &copy; 2026 <a href="https://www.linkedin.com/in/zhangyuxin/" target="_blank">Yuxin Zhang</a> | Apache 2.0 License</span>
+  </p>
+  <p>
+    <span class="cn">灵感来源：Michael Rosen《Good Ideas》(2014) &amp; Salman Khan《Brave New Words》(2024)</span>
+    <span class="en">Inspired by Michael Rosen's <em>Good Ideas</em> (2014) &amp; Salman Khan's <em>Brave New Words</em> (2024)</span>
+  </p>
+</div>
+</footer>
+
+<script>
+function setLang(l){
+  document.body.className = l==='E'?'E':'';
+  document.getElementById('btnCN').className = l==='E'?'':'on';
+  document.getElementById('btnEN').className = l==='E'?'on':'';
+  localStorage.setItem('gi2lang',l);
+}
+(function(){var s=localStorage.getItem('gi2lang');if(s)setLang(s);})();
+</script>
+</body>
+</html>

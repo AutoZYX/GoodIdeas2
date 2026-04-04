@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ch1: 一个自动驾驶专家，突然要独自带娃了 | Good Ideas 2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<!-- Language toggle -->
+<div class="lang">
+  <button id="btnCN" class="on" onclick="setLang('C')">CN</button>
+  <button id="btnEN" onclick="setLang('E')">EN</button>
+</div>
+
+<!-- Top nav bar -->
+<div class="chapter-nav">
+  <a href="index.html">
+    <span class="cn">&larr; 返回目录</span>
+    <span class="en">&larr; Back to Contents</span>
+  </a>
+  <a href="ch04.html">
+    <span class="cn">下一章 &rarr;</span>
+    <span class="en">Next &rarr;</span>
+  </a>
+</div>
+
+<!-- Chinese chapter content -->
+<div class="cn">
+  <article class="chapter">
+    <div class="chapter-label">Chapter 1</div>
+    <h1 class="chapter-title">一个自动驾驶专家，突然要独自带娃了</h1>
+
+    <h2>场景</h2>
+    <p>纽卡斯尔，三月末的一个傍晚。</p>
+    <p>送走Helen去机场的那天，我牵着Lucky的手走回公寓。他还不太理解"妈妈回中国了"意味着什么——他只是重复地问我："妈妈明天来接我吗？"</p>
+    <p>我说："妈妈要过一阵子才能来。接下来，就我们俩了。"</p>
+    <p>他点点头，似乎接受了。然后他问了一个跟这件事完全无关的问题："爸爸，为什么那辆公交车是红色的？"</p>
+    <p>从那天起，我的生活变成了这样：</p>
+    <p>凌晨4点多，我就醒了。不是失眠，是时差带来的礼物——这个时间正好是北京时间中午，国内的同事、学生、合作方都在线。我在Lucky还在熟睡的两三个小时里，处理邮件、回复消息、做一天的工作规划。这段安静的时间，意外地成了我效率最高的时段。</p>
+    <p>早上7点，Lucky醒了。接下来是每天的"第一场硬仗"：穿衣服、刷牙、吃早餐——这三件事加在一起，可以消耗45分钟到1个半小时不等，取决于他今天的"配合度"。</p>
+    <p>8点半，送他去学校。英国的Reception班（相当于中国的幼儿园大班和小学一年级之间的过渡），8:45开始。我目送他走进教室，然后快步回家。</p>
+    <p>9点到下午3点，是我的第二段工作时间。我是吉林大学的副教授，目前在英国做访问学者。我的研究方向是自动驾驶安全——具体来说，就是研究一辆自动驾驶的车，在各种复杂路况下，怎样才能安全地运行。</p>
+    <p>下午3点，准时出现在学校门口。然后，从3点到晚上8点半Lucky睡着，这五个半小时全部属于他。买菜、做饭、去公园、搭积木、看挖掘机视频、讲睡前故事、处理他的"我不想刷牙"和"我不想睡觉"。</p>
+    <p>晚上9点以后，如果精力允许，我再工作一两个小时。但因为我有角膜移植的病史，医生反复叮嘱我要控制屏幕时间。所以很多时候，我是戴着耳机"听"工作——用AI生成的音频来听论文摘要，用语音输入来写文章。</p>
+    <p>凌晨4点、上午9点、晚上9点——三段碎片化的工作时间，夹在带娃的缝隙里。这就是我在纽卡斯尔的日子。一个独自带娃的中国父亲。</p>
+
+    <h2>一个奇怪的发现</h2>
+    <p>我的日常工作是研究自动驾驶安全。简单来说，就是回答一个问题：一辆车如果要自己开，怎样才能在各种意想不到的情况下不出事？</p>
+    <p>这个领域的核心方法叫"场景驱动"。我们不是用一套万能规则让车在所有路况下跑，而是把真实世界拆解成一个个具体的<strong>场景</strong>：暴雨中的高速公路汇入、夜间行人突然横穿、冰雪路面的急弯……然后针对每个场景去分析：风险在哪？安全边界在哪？系统应该如何应对？</p>
+    <p>某天晚上，Lucky睡着以后，我坐在沙发上整理一天的思绪。白天在实验室讨论的是"在交叉路口场景下，自动驾驶系统如何判断行人意图"；晚上在家经历的是"在超市场景下，Lucky非要买一个巧克力蛋糕，我如何判断是妥协还是坚持"。</p>
+    <p>我突然意识到——<strong>这是同一件事</strong>。</p>
+    <p>育儿和自动驾驶，本质上面对的是同一个问题：在一个不可完全预测的环境中，一个"自主系统"（孩子/车辆）需要做出决策，而你作为"安全保障"（父母/监控系统），必须在每个具体的场景下判断：我该介入吗？介入到什么程度？还是该放手让他自己来？</p>
+    <p>自动驾驶行业有一个家喻户晓的分级——从L0到L5：</p>
+    <ul>
+      <li><span class="l-tag" style="color:#b83a3a">L0</span>：人类全程驾驶。对应育儿就是：你替孩子做一切决定。穿什么、吃什么、玩什么、和谁玩。</li>
+      <li><span class="l-tag" style="color:#c87a3a">L1</span>：辅助。车帮你保持车道，但你得握着方向盘。对应育儿：你扶着他骑自行车。</li>
+      <li><span class="l-tag" style="color:var(--amber)">L2</span>：部分自动。车能自己加减速和转向，但你得随时准备接管。对应育儿：他自己做作业，你在旁边看着。</li>
+      <li><span class="l-tag" style="color:var(--blue)">L3</span>：有条件自动。在特定场景下，车完全自己开。对应育儿：他自己去小区便利店买一瓶酸奶。</li>
+      <li><span class="l-tag" style="color:var(--green)">L4</span>：高度自动。绝大多数场景，车自己搞定。对应育儿：他自己安排周末怎么过。</li>
+      <li><span class="l-tag" style="color:#1a6b3a">L5</span>：完全自主。对应育儿：他成年了，完全独立。</li>
+    </ul>
+    <p>每个父母每天都在做"场景判断"：<strong>这个场景下，我该在哪个等级</strong>？</p>
+    <p>Lucky非要自己过马路——L0，你必须牢牢牵着他的手。<br>Lucky想自己倒牛奶——L2，你在旁边看着，准备接管那个摇摇欲坠的牛奶盒。<br>Lucky在公园里和一个陌生小朋友吵架——L3，你在远处观察，只有事态升级了才介入。</p>
+    <p>这不是比喻。这就是我每天同时在做的两件事——只不过一个在实验室的电脑屏幕上，一个在纽卡斯尔的街道和厨房里。</p>
+
+    <h2>Nice爷爷</h2>
+    <p>也就是在这段"独自带娃"的日子里，我在纽卡斯尔的图书馆偶遇了一位"老朋友"。</p>
+    <p>你一定在微信表情包里见过他。那个笑得一脸褶子、比着大拇指、说着"Nice!"的网红爷爷。</p>
+    <p>但在英国，我重新认识了他。他是迈克尔·罗森（Michael Rosen）——英国桂冠儿童诗人、BBC资深广播人、教育学教授。他写了那本几乎每个英国孩子都读过的绘本《<strong>我们要去捉狗熊</strong>》。</p>
+    <p>我手里拿到的，是他写给父母的一本书：<em>Good Ideas: How to Be Your Child's (and Your Own) Best Teacher</em>。</p>
+    <p>翻开目录，我就被吸引了。罗森没有把教育按"数学""语文""科学"来分，他按<strong>生活空间</strong>分：厨房、浴室、客厅、厕所、公园、街道、旅途……他的核心主张极其简单：</p>
+    <p><strong>真正的学习不应该被关在教室里。它应该发生在生活的每一个角落</strong>。</p>
+    <p>他给了父母四个关键词：<strong>探究</strong>（问你真正想知道的问题）、<strong>解读</strong>（不只是记住答案，而是形成自己的理解）、<strong>发明</strong>（动手做，而不是只看别人做）、<strong>合作</strong>（学习不是一个人的事，而是一起的事）。</p>
+    <p>他还说了一句改变我的话："当孩子问你一个你不知道答案的问题时，不要编一个答案。也不要说'去做作业'。说：<strong>我不知道。我们一起来想办法弄明白吧</strong>。"</p>
+    <p>我后来了解到，罗森写这本书时，他的大儿子Eddie已经去世了——18岁，脑膜炎。2020年，75岁的罗森自己又感染了COVID-19，昏迷了47天，差点没挺过来。</p>
+    <p>一个经历过丧子之痛和九死一生的人，依然在用"Nice!"的笑容面对世界。他写这本书，不是在"教"父母育儿。他是在说：<strong>和孩子在一起的每一刻，都是珍贵的</strong>。别浪费在焦虑上。用来探究、解读、发明、合作。</p>
+
+    <h2>为什么需要2.0？</h2>
+    <p>罗森的理念让我深深共鸣。但他的书写于2014年。</p>
+    <p>那是一个没有ChatGPT、没有短视频算法、没有智能家居的时代。</p>
+    <p>作为一个2026年的父亲，尤其是一个研究AI和自动驾驶的人，我发现原书有两个缺口：</p>
+    <p><strong>时代缺口</strong>。罗森教孩子用谷歌搜索。而现在，我和Lucky在厕所里讨论"为什么中国有蹲便器英国没有"的时候，我们可以直接问AI——然后AI不仅给了答案，还引发了更多我们俩都没想到的问题。AI不是敌人，它可以是亲子学习的<strong>第三个伙伴</strong>。</p>
+    <p><strong>文化缺口</strong>。罗森的案例是纯英国式的：逛城堡看盔甲、研究酒馆招牌。我们更熟悉的，是春节包饺子、小区门口的快递柜、高铁上的五个小时。</p>
+    <p>但最重要的缺口，其实是<strong>方法论</strong>。</p>
+    <p>罗森给了理念——探究、解读、发明、合作。这太棒了。但他没给一个框架来帮父母判断：在这个具体的场景下，我该怎么做？该介入还是该放手？介入到什么程度？</p>
+    <p>而这个框架，恰好是我每天在工作中使用的——<strong>场景驱动</strong>。</p>
+    <p>在自动驾驶开发中，我们把真实世界拆解成成千上万个场景，然后针对每个场景去设计、测试、验证。</p>
+    <p>育儿完全可以用同样的方式来思考：</p>
+    <p>不是学一套"正确的育儿理论"然后套用到所有时刻。而是在每一个具体的场景中——孩子问了一个你答不上来的问题、下雨天他说好无聊、他把玩具拆了——去观察、判断、回应。</p>
+    <p>罗森给了我们四个关键词。自动驾驶场景方法给了我们一个框架。AI给了我们一个新工具。</p>
+    <p><strong>这三层叠在一起，就是Good Ideas 2.0</strong>。</p>
+
+    <h2>这本书的使用方法</h2>
+    <p>这不是一本需要从头读到尾的书。</p>
+    <p>它是一个<strong>场景库</strong>。你可以翻到任何一个你当下正在经历的场景，看看罗森怎么说、我怎么做、AI能怎么帮。</p>
+    <p>每一章有三个部分：</p>
+    <ol>
+      <li><strong>场景故事</strong>：我和Lucky的真实经历。里面没有正确答案，只有一个父亲的诚实记录。</li>
+      <li><strong>L判断</strong>：在这个场景下，我选择了什么介入等级？为什么？事后看，选对了吗？</li>
+      <li><strong>AI实践</strong>：一个你可以直接复制粘贴到AI对话框里的提示词（Prompt），和你的孩子一起用。</li>
+    </ol>
+    <p>这本书也是一个<strong>开源项目</strong>。如果你有自己的"场景故事"想分享，欢迎贡献。每个家庭的场景库都不一样——你的经验也许正是另一个父母最需要的。</p>
+    <p>准备好了吗？</p>
+    <p>让我们从第一个场景开始。</p>
+
+    <hr>
+
+    <h2>L判断</h2>
+    <p><strong>本章场景：一个自动驾驶专家，突然要独自带娃了</strong>。</p>
+    <p>我的判断：这个场景本身就是一次从L1到L2的被迫升级。</p>
+    <p>以前在国内，有Helen、有双方父母、有成熟的生活节奏，我们是"双人驾驶"甚至"多人驾驶"。我在育儿里的介入等级一直比较舒适——大概L1到L2之间，偶尔参与但不是主力。</p>
+    <p>Helen回国后，我被迫成为唯一的"驾驶员"。没有副驾驶，没有安全员。从接Lucky放学到他睡着的5个半小时，每一个微小的决策都是我的。</p>
+    <p>这意味着我必须在极短的时间内，把自己的"场景覆盖率"从30%提升到100%。以前不用管的事（Lucky早上穿什么、中午吃什么、和小朋友发生冲突怎么办），全部进入了我的"运行设计域"。</p>
+    <p>说来惭愧，头两周我其实很手忙脚乱。但也正是这种手忙脚乱，让我开始用自己最熟悉的"场景思维"来整理育儿中的混乱。</p>
+    <p>后来我想通了：<strong>这不是灾难。这是我和Lucky独处的窗口期。错过了就没有了</strong>。</p>
+
+    <hr>
+
+    <h2>AI实践</h2>
+    <p><strong>和孩子一起认识AI</strong></p>
+    <blockquote>
+      <p><strong>Prompt</strong>："你好，我的孩子今年5岁，他叫Lucky。我们刚刚开始一个'好主意'项目——就是在日常生活中一起探索有趣的问题。Lucky最近对挖掘机非常着迷。你能用一个5岁孩子能听懂的方式，解释一下挖掘机的铲斗是怎么工作的吗？如果可以，请用一个他生活中熟悉的东西来做类比。"</p>
+    </blockquote>
+    <p><strong>预期效果</strong>：AI会用简单的语言解释液压原理，可能会用"就像你用手挤水枪"来类比。关键不是答案本身——而是你和孩子一起"问"这个问题的过程。他看到你在向AI提问，他学到的不是液压原理，而是"不懂就问"的习惯。这正是罗森说的"<strong>我不知道</strong>"的力量。</p>
+  </article>
+</div>
+
+<!-- English chapter content -->
+<div class="en">
+  <article class="chapter">
+    <div class="chapter-label">Chapter 1</div>
+    <h1 class="chapter-title">A Self-Driving Expert Suddenly Has to Solo-Parent</h1>
+
+    <h2>The Scenario</h2>
+    <p>Newcastle upon Tyne. A late March evening.</p>
+    <p>The day I saw Helen off at the airport, I walked back to our flat holding Lucky's hand. He didn't quite grasp what "Mummy's gone back to China" meant. He just kept asking: "Will Mummy pick me up tomorrow?"</p>
+    <p>"Mummy won't be back for a while," I said. "From now on, it's just the two of us."</p>
+    <p>He nodded, seemingly fine with that. Then he asked a question that had absolutely nothing to do with any of it: "Daddy, why is that bus red?"</p>
+    <p>From that day on, my life looked like this:</p>
+    <p>Just after 4 a.m., I'm awake. Not insomnia — a gift from the time zone. At this hour it's midday in Beijing, and my colleagues, students, and collaborators back in China are all online. In the two or three hours before Lucky stirs, I answer emails, reply to messages, and map out the day's work plan. This quiet window has turned out, unexpectedly, to be my most productive time.</p>
+    <p>At 7 a.m., Lucky wakes up. Then comes the first battle of the day: getting dressed, brushing teeth, eating breakfast. These three tasks together can take anywhere from 45 minutes to an hour and a half, depending on his "cooperation index" that morning.</p>
+    <p>At 8:30, I walk him to school. The UK Reception class — a bridge between Chinese kindergarten and Year 1 — starts at 8:45. I watch him disappear through the classroom door, then hurry home.</p>
+    <p>From 9 a.m. to 3 p.m. is my second block of work time. I'm an associate professor at Jilin University, currently a visiting researcher in the UK. My field is autonomous driving safety — specifically, figuring out how a self-driving car can operate safely across all kinds of complex, real-world conditions.</p>
+    <p>At 3 p.m. sharp, I'm back at the school gate. From 3 p.m. until Lucky falls asleep around 8:30, those five and a half hours belong entirely to him. Grocery shopping, cooking, the park, building blocks, excavator videos, bedtime stories, and navigating his "I don't want to brush my teeth" and "I don't want to go to sleep."</p>
+    <p>After 9 p.m., if I still have the energy, I work another hour or two. But because of a corneal transplant, my doctor has told me repeatedly to limit screen time. So more often than not, I work with headphones on — listening to AI-generated audio summaries of papers, dictating articles by voice.</p>
+    <p>4 a.m., 9 a.m., 9 p.m. — three fragmented windows of work, squeezed into the gaps between parenting. That's my life in Newcastle. A Chinese father, solo-parenting abroad.</p>
+
+    <h2>A Strange Discovery</h2>
+    <p>My day job is researching autonomous driving safety. Put simply, I'm trying to answer one question: if a car is going to drive itself, how do we make sure it doesn't crash in all the unexpected situations the real world throws at it?</p>
+    <p>The core method in this field is called "scenario-driven." We don't write one universal set of rules for every road condition. Instead, we break the real world into specific <strong>scenarios</strong> — merging onto a motorway in a downpour, a pedestrian darting across the road at night, a sharp bend on an icy surface — and for each one we ask: where's the risk? Where's the safety boundary? How should the system respond?</p>
+    <p>One evening, after Lucky had fallen asleep, I was sitting on the sofa collecting my thoughts. During the day in the lab, I'd been discussing "how an autonomous driving system judges pedestrian intent at a junction." That evening at home, I'd been navigating "how to judge whether to give in or hold firm when Lucky insists on a chocolate cake at the supermarket."</p>
+    <p>It hit me: <strong>these are the same thing</strong>.</p>
+    <p>Parenting and autonomous driving face the same fundamental problem: in an environment you can never fully predict, an "autonomous system" (child / vehicle) needs to make decisions, and you, as the "safety layer" (parent / supervision system), must judge in each specific scenario: should I intervene? How much? Or should I let them handle it?</p>
+    <p>The autonomous driving industry has a well-known scale — L0 through L5:</p>
+    <ul>
+      <li><span class="l-tag" style="color:#b83a3a">L0</span>: Full human driving. In parenting: you make every decision. What to wear, what to eat, what to play, who to play with.</li>
+      <li><span class="l-tag" style="color:#c87a3a">L1</span>: Assisted. The car helps keep the lane, but your hands stay on the wheel. In parenting: you hold the bike while they pedal.</li>
+      <li><span class="l-tag" style="color:var(--amber)">L2</span>: Partial automation. The car can accelerate, brake, and steer, but you must be ready to take over at any moment. In parenting: they do homework; you sit beside them.</li>
+      <li><span class="l-tag" style="color:var(--blue)">L3</span>: Conditional automation. In specific scenarios, the car drives itself. In parenting: they walk to the corner shop alone to buy a yoghurt.</li>
+      <li><span class="l-tag" style="color:var(--green)">L4</span>: High automation. In most scenarios, the car manages on its own. In parenting: they plan their own weekend.</li>
+      <li><span class="l-tag" style="color:#1a6b3a">L5</span>: Full autonomy. In parenting: they're grown up, making all their own decisions.</li>
+    </ul>
+    <p>Every parent makes "scenario judgments" every day: <strong>at what level should I be right now</strong>?</p>
+    <p>Lucky wants to cross the road by himself — L0, you hold his hand tight.<br>Lucky wants to pour his own milk — L2, you watch, ready to catch the wobbling carton.<br>Lucky gets into an argument with a stranger's child in the park — L3, you observe from a distance, stepping in only if things escalate.</p>
+    <p>This isn't a metaphor. It's literally what I do every day in two parallel worlds — one on a computer screen in the lab, the other on the streets and in the kitchen of Newcastle.</p>
+
+    <h2>The Nice Grandpa</h2>
+    <p>It was during these solo-parenting days that I stumbled upon an old "friend" in the Newcastle city library.</p>
+    <p>If you've spent any time on Chinese social media, you've seen him. The wrinkly-faced old man giving a thumbs-up and saying "Nice!"</p>
+    <p>But in the UK, I discovered who he really is. He's Michael Rosen — former Children's Laureate, veteran BBC broadcaster, professor of education. He wrote <em>We're Going on a Bear Hunt</em>, a picture book that has accompanied millions of childhoods around the world.</p>
+    <p>The book in my hands, though, was something he wrote for parents: <em>Good Ideas: How to Be Your Child's (and Your Own) Best Teacher</em>.</p>
+    <p>I was hooked from the table of contents. Rosen didn't divide education into "maths," "language," or "science." He divided it by <strong>living spaces</strong>: the kitchen, the bathroom, the sitting room, the loo, the park, the street, travelling... His core argument is disarmingly simple:</p>
+    <p><strong>Real learning should not be locked inside a classroom. It should happen in every corner of life</strong>.</p>
+    <p>He gave parents four keywords: <strong>Investigation</strong> (ask the questions you genuinely want answered), <strong>Interpretation</strong> (don't just memorise answers — form your own understanding), <strong>Invention</strong> (make things, don't just watch others make them), and <strong>Co-operation</strong> (learning is not a solo act — it's something we do together).</p>
+    <p>And he said one thing that changed me: "When your child asks you a question and you don't know the answer, don't make one up. Don't say 'go and do your homework.' Say: <strong>I don't know. Let's try to figure it out together</strong>."</p>
+    <p>I later learned that when Rosen wrote this book, his eldest son Eddie had already died — aged 18, of meningitis. In 2020, Rosen himself caught COVID-19, spent 47 days in a coma, and very nearly didn't make it.</p>
+    <p>A man who has lived through the death of a child and his own brush with death, yet still greets the world with that "Nice!" grin. He didn't write this book to <em>teach</em> parents how to parent. He wrote it to say: <strong>every moment you spend with your child is precious</strong>. Don't waste it on anxiety. Use it to investigate, interpret, invent, co-operate.</p>
+
+    <h2>Why 2.0?</h2>
+    <p>Rosen's ideas resonate deeply with me. But his book was written in 2014.</p>
+    <p>That was a world without ChatGPT, without algorithmic short-video feeds, without smart home devices.</p>
+    <p>As a father in 2026 — and specifically as someone who researches AI and autonomous driving — I see two gaps in the original:</p>
+    <p><strong>A technology gap</strong>. Rosen taught children to use Google. Now, when Lucky and I are in the loo debating "Why does China have squat toilets but England doesn't?", we can ask AI directly — and AI doesn't just answer, it sparks questions neither of us had thought of. AI isn't the enemy. It can be <strong>the third learning partner</strong> in the parent-child relationship.</p>
+    <p><strong>A cultural gap</strong>. Rosen's examples are quintessentially British: visiting castles, studying pub signs. What Chinese families know better is making dumplings at Chinese New Year, the courier locker outside the apartment block, five hours on the high-speed train.</p>
+    <p>But the most important gap is <strong>methodological</strong>.</p>
+    <p>Rosen gave us philosophy — investigate, interpret, invent, co-operate. Brilliant. But he didn't give parents a framework for deciding: <em>in this specific scenario, what do I do? Step in or step back? How much?</em></p>
+    <p>That framework happens to be the one I use every day at work: <strong>scenario-driven</strong>.</p>
+    <p>In autonomous driving development, we decompose the real world into thousands of scenarios, then design, test, and validate for each one.</p>
+    <p>Parenting can be thought about in exactly the same way:</p>
+    <p>Don't learn one "correct parenting theory" and apply it to every moment. Instead, in each concrete scenario — the child asks something you can't answer, it's raining and they're bored, they've taken a toy apart — observe, judge, respond.</p>
+    <p>Rosen gave us the keywords. The scenario-driven approach from autonomous driving gives us a framework. AI gives us a new tool.</p>
+    <p><strong>Stack these three layers together, and you get Good Ideas 2.0</strong>.</p>
+
+    <h2>How to Use This Book</h2>
+    <p>This is not a book you need to read front to back.</p>
+    <p>It's a <strong>scenario library</strong>. Flip to whichever scenario you're living through right now, and see what Rosen says, what I did, and how AI can help.</p>
+    <p>Each chapter has three parts:</p>
+    <ol>
+      <li><strong>Scenario Story</strong>: A real experience with Lucky. No right answers — just one father's honest account.</li>
+      <li><strong>L-Rating</strong>: What intervention level did I choose in this scenario? Why? In hindsight, was it right?</li>
+      <li><strong>AI Practice</strong>: A prompt you can copy-paste straight into an AI chat and use with your child.</li>
+    </ol>
+    <p>This book is also an <strong>open-source project</strong>. If you have your own scenario to share, you're welcome to contribute. Every family's scenario library is different — your experience might be exactly what another parent needs.</p>
+    <p>Ready?</p>
+    <p>Let's begin with the first scenario.</p>
+
+    <hr>
+
+    <h2>L-Rating</h2>
+    <p><strong>This chapter's scenario: a self-driving expert suddenly has to solo-parent</strong>.</p>
+    <p>My rating: this scenario was a forced upgrade from L1 to full operational coverage.</p>
+    <p>Back in China, with Helen, both sets of grandparents, and an established routine, we were "dual-driver" or even "multi-driver." My involvement in parenting sat comfortably at L1 to L2 — I participated occasionally but wasn't the primary operator.</p>
+    <p>After Helen went home, I became the sole driver. No co-pilot. No safety operator. From school pick-up to lights-out, every micro-decision was mine.</p>
+    <p>This meant I had to expand my "scenario coverage" from roughly 30% to 100% almost overnight. Things I'd never had to manage (what Lucky wears in the morning, what to cook for lunch, what to do when he has a conflict with a classmate) all entered my "operational design domain."</p>
+    <p>I'll be honest: the first two weeks were chaotic. But it was precisely that chaos that forced me to start applying my most familiar thinking tool — scenario-based reasoning — to the mess of everyday parenting.</p>
+    <p>Eventually, I made peace with it: <strong>this isn't a disaster. It's a window — my window of one-on-one time with Lucky. Once it closes, it's gone</strong>.</p>
+
+    <hr>
+
+    <h2>AI Practice</h2>
+    <p><strong>Introducing AI to your child:</strong></p>
+    <blockquote>
+      <p><strong>Prompt</strong>: "Hello. My child is 5 years old and his name is Lucky. We've just started a 'Good Ideas' project — exploring interesting questions in everyday life. Lucky is absolutely fascinated by excavators right now. Could you explain how an excavator's bucket works in a way a 5-year-old can understand? If possible, use an analogy from something in his daily life."</p>
+    </blockquote>
+    <p><strong>Expected outcome</strong>: AI will explain hydraulic principles in simple language, perhaps comparing it to squeezing a water gun. The point isn't the answer itself — it's the process of asking <em>together</em>. When your child sees you asking AI a question, what they learn isn't hydraulics. They learn that it's okay not to know, and that the thing to do is ask. This is exactly what Rosen calls the power of "<strong>I don't know</strong>."</p>
+  </article>
+</div>
+
+<!-- Chapter footer with prev/next -->
+<div class="chapter-footer">
+  <a href="index.html">
+    <span class="cn">&larr; 返回目录</span>
+    <span class="en">&larr; Contents</span>
+  </a>
+  <a href="ch04.html">
+    <span class="cn">Ch4 &rarr;</span>
+    <span class="en">Ch4 &rarr;</span>
+  </a>
+</div>
+
+<!-- Footer -->
+<footer>
+<div class="wrap">
+  <p>
+    <span class="cn">Good Ideas 2.0 &copy; 2026 <a href="https://www.linkedin.com/in/zhangyuxin/" target="_blank">Yuxin Zhang</a> | Apache 2.0 许可</span>
+    <span class="en">Good Ideas 2.0 &copy; 2026 <a href="https://www.linkedin.com/in/zhangyuxin/" target="_blank">Yuxin Zhang</a> | Apache 2.0 License</span>
+  </p>
+  <p>
+    <span class="cn">灵感来源：Michael Rosen《Good Ideas》(2014) &amp; Salman Khan《Brave New Words》(2024)</span>
+    <span class="en">Inspired by Michael Rosen's <em>Good Ideas</em> (2014) &amp; Salman Khan's <em>Brave New Words</em> (2024)</span>
+  </p>
+</div>
+</footer>
+
+<script>
+function setLang(l){
+  document.body.className = l==='E'?'E':'';
+  document.getElementById('btnCN').className = l==='E'?'':'on';
+  document.getElementById('btnEN').className = l==='E'?'on':'';
+  localStorage.setItem('gi2lang',l);
+}
+(function(){var s=localStorage.getItem('gi2lang');if(s)setLang(s);})();
+</script>
+</body>
+</html>
