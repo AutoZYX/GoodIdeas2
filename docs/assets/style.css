@@ -33,6 +33,18 @@ body.E li.en { display:list-item!important; }
 body.E td.en, body.E th.en { display:table-cell!important; }
 body.E .en-link { display:inline-block!important; }
 
+/* Header */
+header { padding:100px 32px 72px; text-align:center; border-bottom:1px solid var(--border); }
+header h1 { font-family:'Playfair Display',Georgia,serif; font-size:6vw; font-weight:800; letter-spacing:0.04em; margin-bottom:8px; color:var(--accent); line-height:1.1; }
+header .sub { font-family:'Inter',sans-serif; font-size:1.6vw; color:var(--text3); margin-bottom:24px; letter-spacing:3px; text-transform:uppercase; font-weight:500; }
+header .tagline { font-size:clamp(1.3rem,1.1rem+0.6vw,1.8rem); color:var(--text2); max-width:800px; margin:0 auto 40px; line-height:1.8; }
+header .actions { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+@media(max-width:640px) {
+  header { padding:70px 20px 48px; }
+  header h1 { font-size:10vw; }
+  header .sub { font-size:3.5vw; }
+}
+
 /* Buttons */
 .btn { display:inline-block; padding:14px 32px; border-radius:4px; font-size:1.15rem; font-weight:600; transition:.2s; font-family:inherit; }
 .btn-primary { background:var(--accent); color:white; }
