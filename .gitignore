@@ -7,7 +7,8 @@ Thumbs.db
 .idea/
 
 # Original books (copyright - do not distribute)
-原书英文/*.pdf
+原书英文/
+原书中文/
 
 # Working files
 参考材料/

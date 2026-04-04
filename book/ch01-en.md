@@ -14,13 +14,13 @@ He nodded, seemingly fine with that. Then he asked a question that had absolutel
 
 From that day on, my life looked like this:
 
-Just after 4 a.m., I'm awake. Not insomnia — a gift from the time zone. At this hour it's midday in Beijing, and my colleagues, students, and collaborators back in China are all online. In the two or three hours before Lucky stirs, I answer emails, reply to messages, and map out the day's work plan. This quiet window has turned out, unexpectedly, to be my most productive time.
+Just after 4 a.m., I'm awake. Not insomnia — a gift from the time zone. At this hour it's midday in Beijing, and my colleagues, students, and collaborators back in China are all online. Review a graduate student's draft paper, follow up on a testing collaboration with a government research centre, check a data delivery plan for my startup — in the two or three hours before Lucky stirs, I juggle three professional identities simultaneously. This quiet window has turned out, unexpectedly, to be my most productive time.
 
 At 7 a.m., Lucky wakes up. Then comes the first battle of the day: getting dressed, brushing teeth, eating breakfast. These three tasks together can take anywhere from 45 minutes to an hour and a half, depending on his "cooperation index" that morning.
 
 At 8:30, I walk him to school. The UK Reception class — a bridge between Chinese kindergarten and Year 1 — starts at 8:45. I watch him disappear through the classroom door, then hurry home.
 
-From 9 a.m. to 3 p.m. is my second block of work time. I'm an associate professor at Jilin University, currently a visiting researcher in the UK. My field is autonomous driving safety — specifically, figuring out how a self-driving car can operate safely across all kinds of complex, real-world conditions.
+From 9 a.m. to 3 p.m. is my second block of work time. I'm an associate professor at Jilin University, but I also serve as chief safety expert at an automotive tech company and run a startup that has built one of the world's largest aerial naturalistic driving datasets. Three roles, three jobs, one person. My research field is autonomous driving safety — specifically, figuring out how a self-driving car can operate safely across all kinds of complex, real-world conditions.
 
 At 3 p.m. sharp, I'm back at the school gate. From 3 p.m. until Lucky falls asleep around 8:30, those five and a half hours belong entirely to him. Grocery shopping, cooking, the park, building blocks, excavator videos, bedtime stories, and navigating his "I don't want to brush my teeth" and "I don't want to go to sleep."
 
@@ -152,3 +152,5 @@ Eventually, I made peace with it: **this isn't a disaster. It's a window — my 
 > **Prompt:** "Hello. My child is 5 years old and his name is Lucky. We've just started a 'Good Ideas' project — exploring interesting questions in everyday life. Lucky is absolutely fascinated by excavators right now. Could you explain how an excavator's bucket works in a way a 5-year-old can understand? If possible, use an analogy from something in his daily life."
 
 **Expected outcome:** AI will explain hydraulic principles in simple language, perhaps comparing it to squeezing a water gun. The point isn't the answer itself — it's the process of asking *together*. When your child sees you asking AI a question, what they learn isn't hydraulics. They learn that it's okay not to know, and that the thing to do is ask. This is exactly what Rosen calls the power of "**I don't know**."
+
+A side note: the book you're reading right now — its GitHub repository, bilingual website, the AI prompts in every chapter — was mostly built after Lucky fell asleep, with the help of AI tools. Without AI, given my current rhythm of three jobs plus solo parenting, this book would probably never exist. AI won't parent for you, but it can help you do things in fragmented time that used to require long, uninterrupted stretches.
