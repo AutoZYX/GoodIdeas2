@@ -132,41 +132,39 @@
     margin: 6px 10px;
     border-radius: 18px;
     background:
-      linear-gradient(to bottom, rgba(20,28,60,0.4) 0%, rgba(10,14,39,0.7) 65%, #2a1a0a 100%);
+      radial-gradient(ellipse at 70% 15%, rgba(255,203,5,0.12) 0%, transparent 45%),
+      linear-gradient(to bottom,
+        rgba(30,52,98,0.55) 0%,
+        rgba(18,26,58,0.75) 60%,
+        rgba(48,30,10,0.85) 78%,
+        rgba(14,8,2,0.95) 100%);
     border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.04);
+  }
+
+  /* Soft distant hills silhouette (subtle depth) */
+  .stage::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    bottom: 20%;
+    height: 36px;
+    background:
+      radial-gradient(ellipse 120px 28px at 10% 100%, rgba(0,0,0,0.35) 0%, transparent 70%),
+      radial-gradient(ellipse 180px 34px at 35% 100%, rgba(0,0,0,0.40) 0%, transparent 70%),
+      radial-gradient(ellipse 140px 30px at 60% 100%, rgba(0,0,0,0.35) 0%, transparent 70%),
+      radial-gradient(ellipse 200px 36px at 85% 100%, rgba(0,0,0,0.42) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Placeholder (pre-selection state) */
+  .placeholder {
+    position: absolute;
+    inset: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-  }
-  .stage-ground {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    height: 25%;
-    background: linear-gradient(to bottom, #3a2a1a 0%, #1a1208 100%);
-    border-top: 2px solid rgba(255,255,255,0.12);
-  }
-  .stage-ground::before {
-    content: '';
-    position: absolute;
-    top: 35%;
-    left: 0; right: 0;
-    height: 3px;
-    background-image: repeating-linear-gradient(to right,
-      var(--accent) 0 24px, transparent 24px 48px);
-    background-size: 48px 100%;
-    background-repeat: repeat-x;
-    opacity: 0.7;
-  }
-  /* Truck faces right → road scrolls leftward, car appears to drive forward */
-  .stage.running .stage-ground::before {
-    animation: laneFlow 0.6s linear infinite;
-  }
-  @keyframes laneFlow {
-    from { background-position: 0 0; }
-    to   { background-position: -48px 0; }
-  }
-  .placeholder {
     font-family: 'Playfair Display', Georgia, serif;
     font-size: clamp(17px, 4.5vw, 26px);
     font-weight: 700;
@@ -188,66 +186,84 @@
   }
   .placeholder.hidden { display: none; }
 
+  /* Result: name on top, truck anchored to bottom-of-stage sitting on road */
   .result {
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    inset: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 0 8px;
-    z-index: 2;
     opacity: 0;
     pointer-events: none;
+    z-index: 3;
   }
-  .result.show {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  #hybridTruck {
-    width: 96%;
-    max-width: 820px;
-    height: auto;
-    filter: drop-shadow(0 14px 24px rgba(0,0,0,0.55));
-    transform-origin: center;
-  }
-  .result.show #hybridTruck { animation: truckAppear .7s cubic-bezier(.34,1.56,.50,1) both; }
-  @keyframes truckAppear {
-    0%   { opacity: 0; transform: scale(.3) rotate(-6deg); }
-    60%  { opacity: 1; transform: scale(1.08) rotate(3deg); }
-    100% { opacity: 1; transform: scale(1) rotate(0); }
-  }
+  .result.show { opacity: 1; pointer-events: auto; }
 
   .result-name {
-    margin-top: 10px;
+    padding: 18px 16px 8px;
     text-align: center;
-    padding: 6px 14px;
-    max-width: 100%;
+    z-index: 4;
   }
   .result-name .cn {
     font-family: 'Playfair Display', Georgia, "Noto Serif SC", serif;
-    font-size: clamp(22px, 6vw, 34px);
+    font-size: clamp(22px, 5.6vw, 34px);
     font-weight: 800;
     letter-spacing: 0.03em;
-    background: linear-gradient(90deg, var(--accent), var(--accent-2));
-    -webkit-background-clip: text;
-    background-clip: text;
+    background: linear-gradient(90deg, #ffd670, #ff9a3a);
+    -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent;
-    line-height: 1.2;
+    line-height: 1.15;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.25);
   }
   .result-name .en {
     font-family: 'Inter', sans-serif;
-    font-size: clamp(13px, 3.4vw, 17px);
+    font-size: clamp(12px, 3.1vw, 16px);
     font-weight: 500;
     font-style: italic;
-    opacity: 0.8;
+    color: rgba(255,255,255,0.72);
     margin-top: 4px;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.04em;
   }
-  .result.show .result-name { animation: nameAppear .5s .45s both; }
+  .result.show .result-name { animation: nameAppear .55s .25s both; }
   @keyframes nameAppear {
-    0%   { opacity: 0; transform: translateY(14px); }
+    0%   { opacity: 0; transform: translateY(-10px); }
     100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Truck scene fills the lower portion and anchors truck to the road */
+  .truck-scene {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+  }
+  #hybridTruck {
+    width: 100%;
+    max-width: 1100px;
+    height: auto;
+    display: block;
+    max-height: 100%;
+    filter: drop-shadow(0 -6px 20px rgba(0,0,0,0.35));
+    transform-origin: center bottom;
+  }
+  .result.show #hybridTruck {
+    animation: truckAppear .65s cubic-bezier(.34,1.56,.50,1) both;
+  }
+  @keyframes truckAppear {
+    0%   { opacity: 0; transform: scale(.5) translateY(30px); }
+    60%  { opacity: 1; transform: scale(1.04) translateY(-4px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* Road-dash animation: SVG <g class="road-dashes"> translates leftward */
+  .stage.running .road-dashes {
+    animation: dashFlow 0.5s linear infinite;
+  }
+  @keyframes dashFlow {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-90px); }
   }
 
   /* ====== Bottom bar ====== */
@@ -489,8 +505,6 @@
 
 <!-- ============================ STAGE ============================ -->
 <div class="stage">
-  <div class="stage-ground"></div>
-
   <div class="placeholder" id="placeholder">
     <span class="big">🤔</span>
     选 2 辆以上的车
@@ -498,7 +512,12 @@
   </div>
 
   <div class="result" id="result">
-    <svg id="hybridTruck" viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
+    <div class="result-name">
+      <div class="cn" id="resultCn"></div>
+      <div class="en" id="resultEn"></div>
+    </div>
+    <div class="truck-scene">
+    <svg id="hybridTruck" viewBox="0 0 900 540" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
 
       <defs>
         <linearGradient id="flameGrad" x1="0" x2="0" y1="0" y2="1">
@@ -743,11 +762,41 @@
         <circle cx="615" cy="395" r="10" fill="#1a1a1a"/>
       </g>
 
+      <!-- ======================= ROAD (inside SVG for pixel-perfect alignment) ======================= -->
+      <defs>
+        <linearGradient id="roadGrad" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stop-color="#4a3420"/>
+          <stop offset="0.35" stop-color="#2e2010"/>
+          <stop offset="1" stop-color="#1a1208"/>
+        </linearGradient>
+        <linearGradient id="roadEdgeGrad" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stop-color="rgba(255,255,255,0.18)"/>
+          <stop offset="1" stop-color="rgba(255,255,255,0)"/>
+        </linearGradient>
+      </defs>
+      <!-- Road surface -->
+      <rect x="-20" y="458" width="940" height="90" fill="url(#roadGrad)"/>
+      <!-- Subtle highlight at road edge -->
+      <rect x="-20" y="456" width="940" height="3" fill="url(#roadEdgeGrad)"/>
+      <!-- Shadows under wheels (drawn on road) -->
+      <ellipse cx="295" cy="467" rx="58" ry="6" fill="rgba(0,0,0,0.45)"/>
+      <ellipse cx="615" cy="467" rx="58" ry="6" fill="rgba(0,0,0,0.45)"/>
+      <!-- Center lane dashes (animated via CSS transform) -->
+      <g class="road-dashes">
+        <rect x="-60" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
+        <rect x="30"  y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
+        <rect x="120" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
+        <rect x="210" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
+        <rect x="300" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
+        <rect x="390" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
+        <rect x="480" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
+        <rect x="570" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
+        <rect x="660" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
+        <rect x="750" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
+        <rect x="840" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
+        <rect x="930" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
+      </g>
     </svg>
-
-    <div class="result-name">
-      <div class="cn" id="resultCn"></div>
-      <div class="en" id="resultEn"></div>
     </div>
   </div>
 </div>
