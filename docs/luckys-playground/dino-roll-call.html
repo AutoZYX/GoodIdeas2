@@ -1264,52 +1264,142 @@
     return audioCtx;
   }
 
-  // Warm the voice list (iOS Safari lazy-loads voices)
-  if ('speechSynthesis' in window) {
-    speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
-    speechSynthesis.getVoices();
+  // Warm the voice list and cache picks (iOS Safari lazy-loads voices)
+  let voiceCache = { zh: null, en: null, loaded: false };
+
+  function waitForVoices() {
+    return new Promise(resolve => {
+      if (!('speechSynthesis' in window)) { resolve([]); return; }
+      const tryLoad = () => {
+        const list = speechSynthesis.getVoices();
+        if (list && list.length) { resolve(list); return true; }
+        return false;
+      };
+      if (tryLoad()) return;
+      speechSynthesis.addEventListener('voiceschanged', () => tryLoad(), { once: true });
+      // Safari fallback: poll briefly
+      let tries = 0;
+      const poll = setInterval(() => {
+        if (tryLoad() || ++tries > 20) clearInterval(poll);
+      }, 120);
+    });
   }
 
-  function pickVoice(lang) {
-    if (!('speechSynthesis' in window)) return null;
-    const voices = speechSynthesis.getVoices();
-    return voices.find(v => v.lang && v.lang.toLowerCase().startsWith(lang.toLowerCase()))
-        || voices.find(v => v.lang && v.lang.toLowerCase().startsWith(lang.slice(0,2).toLowerCase()))
-        || null;
+  // Score voices so we reliably pick the most natural one available.
+  // Heavy bonus for platform "premium/enhanced/neural" voices (iOS 17+, macOS Sonoma+,
+  // Chrome Google voices, Edge Microsoft Neural). Penalise eSpeak and legacy voices.
+  const CN_PREF = [
+    'meijia',      // macOS/iOS Taiwan – very natural
+    'tingting',    // macOS/iOS Mainland classic
+    'ting-ting',
+    'sinji',       // HK Cantonese but good
+    'li-mu',       // iOS 17 new neural
+    'yue',         // iOS Cantonese
+    'xiaoxiao',    // MS Azure neural
+    'yaoyao',      // MS classic
+    'huihui',      // MS
+    'google 普通话',
+    'google mandarin',
+    'zh-cn-standard'
+  ];
+  const EN_PREF = [
+    'samantha',    // macOS/iOS – US, very natural
+    'siri',        // iOS 16+ has Siri voices
+    'alex',        // macOS – male, excellent
+    'ava',         // iOS premium
+    'karen',       // Australian – natural
+    'daniel',      // UK – natural
+    'moira',       // Irish – natural
+    'tessa',       // South African
+    'aria',        // MS neural US
+    'jenny',       // MS neural US
+    'guy',         // MS neural US
+    'google us english',
+    'google uk english'
+  ];
+
+  function scoreVoice(voice, langPrefix) {
+    const name = (voice.name || '').toLowerCase();
+    const vLang = (voice.lang || '').toLowerCase();
+    if (!vLang.startsWith(langPrefix)) return -1;
+
+    let score = 10;
+    const prefList = langPrefix === 'zh' ? CN_PREF : EN_PREF;
+    for (let i = 0; i < prefList.length; i++) {
+      if (name.includes(prefList[i])) { score += 1000 - i * 20; break; }
+    }
+
+    // iOS/macOS expose "premium" / "enhanced" flavours — strongly prefer them
+    if (/premium|enhanced|neural|natural/.test(name)) score += 400;
+    if (/compact|espeak|microsoft david|microsoft zira/i.test(voice.name)) score -= 300;
+
+    // Local voices are usually smoother than remote/compact
+    if (voice.localService) score += 50;
+
+    // Prefer richer region tag match (zh-CN over zh)
+    if (vLang === (langPrefix === 'zh' ? 'zh-cn' : 'en-us')) score += 30;
+
+    return score;
+  }
+
+  async function primeVoices() {
+    const voices = await waitForVoices();
+    if (!voices.length) { voiceCache.loaded = true; return; }
+
+    let bestCn = null, bestCnScore = -1;
+    let bestEn = null, bestEnScore = -1;
+    voices.forEach(v => {
+      const s = scoreVoice(v, 'zh');
+      if (s > bestCnScore) { bestCn = v; bestCnScore = s; }
+      const s2 = scoreVoice(v, 'en');
+      if (s2 > bestEnScore) { bestEn = v; bestEnScore = s2; }
+    });
+    voiceCache = { zh: bestCn, en: bestEn, loaded: true };
+  }
+  primeVoices();
+
+  // Re-check on voices changing (Chrome sometimes adds voices after first speak)
+  if ('speechSynthesis' in window) {
+    speechSynthesis.addEventListener('voiceschanged', primeVoices);
   }
 
   function announceDino(dino) {
-    if (!('speechSynthesis' in window)) {
-      // Fallback: just a short chime
-      playChime();
-      return;
-    }
+    if (!('speechSynthesis' in window)) { playChime(); return; }
     speechSynthesis.cancel();
 
-    // Brief pre-roar to catch attention
+    // Brief pre-roar to catch attention and unlock audio on iOS
     playShortRoar();
 
-    setTimeout(() => {
-      const cn = new SpeechSynthesisUtterance('我是' + dino.cn);
+    // Ensure voices are loaded before speaking
+    const go = () => {
+      const cn = new SpeechSynthesisUtterance('我是 ' + dino.cn);
       cn.lang = 'zh-CN';
-      cn.rate = 0.95;
-      cn.pitch = 1.0;
-      const cnVoice = pickVoice('zh-CN') || pickVoice('zh');
-      if (cnVoice) cn.voice = cnVoice;
+      cn.rate = 0.85;   // slower for clarity, especially for kids
+      cn.pitch = 1.05;  // slightly brighter / friendlier
+      cn.volume = 1.0;
+      if (voiceCache.zh) cn.voice = voiceCache.zh;
 
-      const en = new SpeechSynthesisUtterance('I am ' + dino.en);
+      const en = new SpeechSynthesisUtterance("I am " + dino.en + ".");
       en.lang = 'en-US';
-      en.rate = 0.9;
-      en.pitch = 1.0;
-      const enVoice = pickVoice('en-US') || pickVoice('en');
-      if (enVoice) en.voice = enVoice;
+      en.rate = 0.82;   // English needs a touch slower to stay articulate
+      en.pitch = 1.02;
+      en.volume = 1.0;
+      if (voiceCache.en) en.voice = voiceCache.en;
 
-      cn.onend = () => setTimeout(() => speechSynthesis.speak(en), 150);
+      cn.onend = () => setTimeout(() => speechSynthesis.speak(en), 220);
       en.onend = () => { roarBtn.classList.remove('speaking'); };
+      en.onerror = () => { roarBtn.classList.remove('speaking'); };
 
       roarBtn.classList.add('speaking');
-      speechSynthesis.speak(cn);
-    }, 450);
+      // Tiny pre-delay so Safari/iOS has time to route audio after gesture
+      setTimeout(() => speechSynthesis.speak(cn), 250);
+    };
+
+    if (voiceCache.loaded) {
+      setTimeout(go, 300);
+    } else {
+      primeVoices().then(() => setTimeout(go, 300));
+    }
   }
 
   function playShortRoar() {
