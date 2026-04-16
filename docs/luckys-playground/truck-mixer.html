@@ -6,6 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0a0e27">
 <title>🛠️ Lucky's Truck Mixer · 超级组合车</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     --accent: #ffcb05;
@@ -26,7 +29,7 @@
   html, body {
     width: 100%; height: 100%;
     overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
     color: #fff;
     touch-action: manipulation;
     background: radial-gradient(ellipse at top, #1a2a5a 0%, #0a0e27 70%);
@@ -44,21 +47,27 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 16px 4px;
-    font-size: 13px;
+    padding: 14px 18px 6px;
+    font-size: 14px;
     opacity: 0.85;
   }
   .topbar a { color: inherit; opacity: 0.7; text-decoration: none; }
   .topbar a:hover { opacity: 1; }
-  .topbar .title { font-weight: 700; }
+  .topbar .title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: 0.01em;
+  }
 
   /* ====== Vehicle selection row ====== */
   .label-row {
     text-align: center;
-    font-size: 12px;
-    opacity: 0.55;
+    font-size: 13px;
+    opacity: 0.6;
     padding: 8px 16px 4px;
     letter-spacing: 0.06em;
+    font-weight: 500;
   }
   .vehicles {
     display: grid;
@@ -68,7 +77,7 @@
   }
   .vehicle-card {
     aspect-ratio: 1;
-    min-height: 70px;
+    min-height: 72px;
     background: rgba(255,255,255,0.07);
     border: 3px solid rgba(255,255,255,0.10);
     border-radius: 16px;
@@ -80,7 +89,7 @@
     transition: transform .2s, background .2s, border-color .2s;
     padding: 4px;
     position: relative;
-    gap: 2px;
+    gap: 3px;
   }
   .vehicle-card:active { transform: scale(.94); }
   .vehicle-card.selected {
@@ -104,11 +113,15 @@
     justify-content: center;
   }
   .vehicle-card .v-icon {
-    width: 50px; height: 34px;
+    width: 56px; height: 38px;
     flex-shrink: 0;
   }
-  .vehicle-card .v-cn { font-size: 12px; font-weight: 600; line-height: 1.1; }
-  .vehicle-card .v-en { font-size: 9px; opacity: 0.55; line-height: 1; letter-spacing: 0.04em; }
+  .vehicle-card .v-cn { font-size: 14px; font-weight: 700; line-height: 1.1; }
+  .vehicle-card .v-en {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px; opacity: 0.6; line-height: 1;
+    letter-spacing: 0.05em; font-style: italic;
+  }
 
   /* ====== Stage (result area) ====== */
   .stage {
@@ -139,19 +152,40 @@
     top: 35%;
     left: 0; right: 0;
     height: 3px;
-    background: repeating-linear-gradient(to right,
+    background-image: repeating-linear-gradient(to right,
       var(--accent) 0 24px, transparent 24px 48px);
+    background-size: 48px 100%;
+    background-repeat: repeat-x;
     opacity: 0.7;
   }
+  /* Truck faces right → road scrolls leftward, car appears to drive forward */
+  .stage.running .stage-ground::before {
+    animation: laneFlow 0.6s linear infinite;
+  }
+  @keyframes laneFlow {
+    from { background-position: 0 0; }
+    to   { background-position: -48px 0; }
+  }
   .placeholder {
-    font-size: clamp(15px, 4vw, 22px);
-    line-height: 1.6;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(17px, 4.5vw, 26px);
+    font-weight: 700;
+    line-height: 1.5;
     opacity: 0.55;
     text-align: center;
     padding: 20px;
     z-index: 2;
   }
-  .placeholder .big { font-size: 2.2em; display: block; margin-bottom: 8px; }
+  .placeholder .big { font-size: 2em; display: block; margin-bottom: 10px; }
+  .placeholder .hint {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 0.65em;
+    font-style: italic;
+    display: block;
+    margin-top: 8px;
+    opacity: 0.75;
+  }
   .placeholder.hidden { display: none; }
 
   .result {
@@ -185,27 +219,30 @@
   }
 
   .result-name {
-    margin-top: 8px;
+    margin-top: 10px;
     text-align: center;
     padding: 6px 14px;
     max-width: 100%;
   }
   .result-name .cn {
-    font-size: clamp(16px, 4.5vw, 24px);
-    font-weight: 900;
-    letter-spacing: 0.05em;
+    font-family: 'Playfair Display', Georgia, "Noto Serif SC", serif;
+    font-size: clamp(22px, 6vw, 34px);
+    font-weight: 800;
+    letter-spacing: 0.03em;
     background: linear-gradient(90deg, var(--accent), var(--accent-2));
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    line-height: 1.25;
+    line-height: 1.2;
   }
   .result-name .en {
-    font-size: clamp(10px, 2.8vw, 13px);
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(13px, 3.4vw, 17px);
+    font-weight: 500;
     font-style: italic;
-    opacity: 0.7;
-    margin-top: 2px;
-    letter-spacing: 0.04em;
+    opacity: 0.8;
+    margin-top: 4px;
+    letter-spacing: 0.03em;
   }
   .result.show .result-name { animation: nameAppear .5s .45s both; }
   @keyframes nameAppear {
@@ -213,57 +250,57 @@
     100% { opacity: 1; transform: translateY(0); }
   }
 
-  /* ====== Actions ====== */
-  .actions {
-    display: grid;
-    grid-template-columns: 60px 1fr;
+  /* ====== Bottom bar ====== */
+  .bottombar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 12px;
-    padding: 8px 14px 18px;
+    padding: 10px 16px 20px;
   }
   .btn-reset {
-    height: 60px;
-    border-radius: 16px;
+    min-width: 56px;
+    height: 48px;
+    padding: 0 14px;
+    border-radius: 14px;
     background: rgba(255,255,255,0.08);
     border: 2px solid rgba(255,255,255,0.12);
     cursor: pointer;
     color: #fff;
-    font-size: 22px;
+    font-size: 16px;
+    font-family: inherit;
+    font-weight: 600;
     transition: transform .12s, background .12s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
   .btn-reset:hover { background: rgba(255,255,255,0.15); }
   .btn-reset:active { transform: scale(.92); }
 
-  .btn-combine {
-    height: 60px;
-    background: linear-gradient(135deg, var(--accent), var(--accent-2));
-    color: #1a1a1a;
-    border: none;
-    border-radius: 16px;
-    font-family: inherit;
-    font-size: 18px;
-    font-weight: 900;
-    cursor: pointer;
-    box-shadow: 0 8px 30px rgba(255, 138, 5, 0.4);
-    letter-spacing: 0.08em;
-    transition: transform .1s, box-shadow .1s, background .2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+  .status-hint {
+    flex: 1;
+    text-align: right;
+    font-size: 13px;
+    font-style: italic;
+    opacity: 0.55;
+    letter-spacing: 0.03em;
+    transition: color .2s;
   }
-  .btn-combine:active { transform: scale(.96); }
-  .btn-combine:disabled {
-    background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
-    color: #666;
-    box-shadow: none;
-    cursor: not-allowed;
+  .status-hint.pending { color: var(--accent); opacity: 0.85; }
+  .status-hint .dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-right: 4px;
+    vertical-align: middle;
+    animation: pendingPulse .8s infinite alternate;
   }
-  .btn-combine .pip { font-size: 22px; }
-  .btn-combine .sub {
-    font-size: 10px;
-    font-weight: 600;
-    opacity: 0.7;
-    letter-spacing: 0.06em;
+  .status-hint:not(.pending) .dot { display: none; }
+  @keyframes pendingPulse {
+    from { transform: scale(.7); opacity: 0.5; }
+    to   { transform: scale(1.1); opacity: 1; }
   }
 
   /* ====== Flashing lights (for police layer) ====== */
@@ -346,18 +383,18 @@
 
   /* Small phones */
   @media (max-width: 380px) {
-    .vehicle-card .v-icon { width: 42px; height: 28px; }
-    .vehicle-card .v-cn { font-size: 11px; }
-    .vehicle-card .v-en { font-size: 8px; }
-    .btn-combine { font-size: 16px; }
-    .btn-reset { font-size: 20px; }
+    .vehicle-card .v-icon { width: 46px; height: 30px; }
+    .vehicle-card .v-cn { font-size: 12px; }
+    .vehicle-card .v-en { font-size: 9px; }
+    .btn-reset { font-size: 14px; height: 44px; }
+    .status-hint { font-size: 11px; }
   }
   @media (max-height: 640px) {
     .vehicles { padding: 2px 10px 4px; gap: 6px; }
     .vehicle-card { min-height: 60px; }
     .label-row { padding: 4px 16px 0; font-size: 11px; }
-    .actions { padding: 6px 14px 12px; }
-    .btn-reset, .btn-combine { height: 52px; }
+    .bottombar { padding: 6px 14px 12px; }
+    .btn-reset { height: 44px; }
   }
 </style>
 </head>
@@ -368,7 +405,7 @@
   <div class="title">🛠️ 超级组合车 · Truck Mixer</div>
 </div>
 
-<div class="label-row">选 2+ 辆车 · Pick 2 or more</div>
+<div class="label-row">选 2+ 辆车，自动组合 · Pick 2+ to auto-combine</div>
 
 <!-- ============================ VEHICLE CARDS ============================ -->
 <div class="vehicles" id="vehicleCards">
@@ -456,8 +493,8 @@
 
   <div class="placeholder" id="placeholder">
     <span class="big">🤔</span>
-    选好 2 辆以上<br>
-    点 <b style="color:var(--accent)">组合!</b> 变超级车
+    选 2 辆以上的车
+    <span class="hint">Pick 2 or more vehicles above<br>to auto-combine</span>
   </div>
 
   <div class="result" id="result">
@@ -715,13 +752,13 @@
   </div>
 </div>
 
-<!-- ============================ ACTIONS ============================ -->
-<div class="actions">
-  <button class="btn-reset" id="resetBtn" aria-label="Reset">🔄</button>
-  <button class="btn-combine" id="combineBtn" disabled>
-    <span class="pip">🔧</span>
-    <span>组合! COMBINE!</span>
+<!-- ============================ BOTTOM BAR ============================ -->
+<div class="bottombar">
+  <button class="btn-reset" id="resetBtn" aria-label="Reset">
+    <span>🔄</span>
+    <span>重来</span>
   </button>
+  <div class="status-hint" id="statusHint"></div>
 </div>
 
 <script>
@@ -738,17 +775,44 @@
   };
 
   const selected = new Set();
+  const AUTO_COMBINE_DELAY = 900; // ms: wait after last click before auto-combining
+  let autoTimer = null;
 
-  const cards         = document.querySelectorAll('.vehicle-card');
-  const combineBtn    = document.getElementById('combineBtn');
-  const resetBtn      = document.getElementById('resetBtn');
-  const placeholder   = document.getElementById('placeholder');
-  const result        = document.getElementById('result');
-  const resultCn      = document.getElementById('resultCn');
-  const resultEn      = document.getElementById('resultEn');
+  const cards       = document.querySelectorAll('.vehicle-card');
+  const resetBtn    = document.getElementById('resetBtn');
+  const placeholder = document.getElementById('placeholder');
+  const stage       = document.querySelector('.stage');
+  const result      = document.getElementById('result');
+  const resultCn    = document.getElementById('resultCn');
+  const resultEn    = document.getElementById('resultEn');
+  const statusHint  = document.getElementById('statusHint');
 
-  function updateButton() {
-    combineBtn.disabled = selected.size < 2;
+  function updateStatus() {
+    const n = selected.size;
+    if (n === 0) {
+      statusHint.textContent = '选车上面 ↑';
+      statusHint.classList.remove('pending');
+    } else if (n === 1) {
+      statusHint.innerHTML = '再选 1 辆';
+      statusHint.classList.remove('pending');
+    } else {
+      statusHint.innerHTML = '<span class="dot"></span>组合中…';
+      statusHint.classList.add('pending');
+    }
+  }
+
+  function scheduleAutoCombine() {
+    clearTimeout(autoTimer);
+    if (selected.size >= 2) {
+      autoTimer = setTimeout(combine, AUTO_COMBINE_DELAY);
+    } else {
+      // fewer than 2: hide result, show placeholder
+      result.classList.remove('show', 'has-police', 'has-loader', 'has-crane', 'has-excavator', 'has-monster');
+      placeholder.classList.remove('hidden');
+      stage.classList.remove('running');
+      resultCn.textContent = '';
+      resultEn.textContent = '';
+    }
   }
 
   function pickCard(card) {
@@ -760,7 +824,8 @@
       selected.add(v);
       card.classList.add('selected');
     }
-    updateButton();
+    updateStatus();
+    scheduleAutoCombine();
   }
 
   function buildName(sel) {
@@ -785,23 +850,30 @@
     selected.forEach(v => result.classList.add('has-' + v));
     result.classList.add('show');
     placeholder.classList.add('hidden');
+    stage.classList.add('running');
 
     const name = buildName(selected);
     resultCn.textContent = name.cn;
     resultEn.textContent = name.en;
+
+    // after combine, status goes quiet (car is rolling)
+    statusHint.textContent = '✨ 组合完成！';
+    statusHint.classList.remove('pending');
 
     playCombineSfx();
     if (navigator.vibrate) navigator.vibrate([40, 50, 80]);
   }
 
   function reset() {
+    clearTimeout(autoTimer);
     selected.clear();
     cards.forEach(c => c.classList.remove('selected'));
     result.classList.remove('show', 'has-police', 'has-loader', 'has-crane', 'has-excavator', 'has-monster');
     placeholder.classList.remove('hidden');
+    stage.classList.remove('running');
     resultCn.textContent = '';
     resultEn.textContent = '';
-    updateButton();
+    updateStatus();
   }
 
   // === Sound: "ta-da" combine chime (C-E-G-C arpeggio) ===
@@ -836,8 +908,8 @@
 
   // === Wiring ===
   cards.forEach(card => card.addEventListener('click', () => pickCard(card)));
-  combineBtn.addEventListener('click', combine);
   resetBtn.addEventListener('click', reset);
+  updateStatus();
 
   let lastTouch = 0;
   document.addEventListener('touchend', e => {

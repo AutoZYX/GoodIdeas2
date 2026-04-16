@@ -174,7 +174,7 @@
     background-repeat: repeat;
     opacity: 0.8;
   }
-  /* When siren is on, lane scrolls backward — car looks like it's driving forward */
+  /* When siren is on: car faces right → ground flows leftward so the car looks like it's driving forward */
   body.on .lane {
     animation: laneMove 0.45s linear infinite;
   }
@@ -182,7 +182,7 @@
     from { background-position: 0 0; }
     to   { background-position: -60px 0; }
   }
-  /* subtle parallax: skyline drifts slower */
+  /* subtle parallax: skyline drifts slowly leftward too (slower) */
   body.on .skyline {
     animation: skylineDrift 14s linear infinite;
   }

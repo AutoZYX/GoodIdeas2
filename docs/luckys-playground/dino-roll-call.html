@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a2e1a">
+<title>🦕 Lucky's Dino Roll Call · 恐龙点名器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #ffcb05;
+    --accent-2: #ff8a05;
+    --earth: #4a6b3a;
+    --fern: #2f4628;
+    --sand: #d4b078;
+    --rock: #6a5a4a;
+  }
+
+  *, *::before, *::after {
+    margin: 0; padding: 0; box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    font-family: 'Inter', -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #f4efdc;
+    touch-action: manipulation;
+    background:
+      radial-gradient(ellipse at top, #3a5028 0%, #1f2a15 60%, #0f1509 100%);
+  }
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0)
+             env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+  }
+
+  /* ====== Top bar ====== */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px 6px;
+    font-size: 14px;
+    opacity: 0.85;
+  }
+  .topbar a { color: inherit; opacity: 0.7; text-decoration: none; }
+  .topbar a:hover { opacity: 1; }
+  .topbar .title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 800;
+    font-size: 18px;
+  }
+
+  /* ====== Main display ====== */
+  .display {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    margin: 8px 10px 4px;
+    border-radius: 18px;
+    background:
+      linear-gradient(to bottom,
+        rgba(45, 70, 35, 0.6) 0%,
+        rgba(30, 45, 20, 0.7) 55%,
+        rgba(90, 70, 45, 0.85) 100%);
+    border: 1px solid rgba(255,255,255,0.10);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Ground / soil layer */
+  .ground {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 20%;
+    background: linear-gradient(to bottom, #5a4028 0%, #2a1e10 100%);
+    border-top: 2px solid rgba(255,255,255,0.1);
+  }
+  .ground::before {
+    content: '';
+    position: absolute;
+    top: 12%;
+    left: 0; right: 0;
+    height: 8px;
+    background: radial-gradient(ellipse 24px 3px at 10% 50%, #7a5a38 0%, transparent 100%),
+                radial-gradient(ellipse 20px 3px at 30% 50%, #8a6a48 0%, transparent 100%),
+                radial-gradient(ellipse 30px 4px at 55% 50%, #7a5a38 0%, transparent 100%),
+                radial-gradient(ellipse 26px 3px at 75% 50%, #8a6a48 0%, transparent 100%),
+                radial-gradient(ellipse 22px 3px at 92% 50%, #7a5a38 0%, transparent 100%);
+    opacity: 0.6;
+  }
+
+  /* Sun / moon / prehistoric sky glow */
+  .sky-glow {
+    position: absolute;
+    top: 10%;
+    right: 12%;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffd78a 0%, #ffa040 60%, transparent 85%);
+    opacity: 0.8;
+    filter: blur(4px);
+  }
+
+  /* Silhouette ferns / trees */
+  .flora {
+    position: absolute;
+    bottom: 16%;
+    pointer-events: none;
+    opacity: 0.6;
+    z-index: 1;
+  }
+  .flora.left  { left:  2%;  font-size: 60px; }
+  .flora.right { right: 2%;  font-size: 48px; }
+
+  /* Dinosaur stage */
+  .dino-stage {
+    width: 94%;
+    max-width: 720px;
+    height: 62%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    margin-bottom: 4%;
+  }
+  .dino {
+    width: 100%;
+    height: 100%;
+    display: none;
+    filter: drop-shadow(0 12px 18px rgba(0,0,0,0.55));
+  }
+  .dino.active { display: block; animation: dinoAppear .5s cubic-bezier(.34,1.56,.50,1); }
+  .dino.roaring { animation: dinoRoar .5s ease-in-out; }
+  @keyframes dinoAppear {
+    0%   { opacity: 0; transform: translateX(-20px) scale(.95); }
+    100% { opacity: 1; transform: translateX(0) scale(1); }
+  }
+  @keyframes dinoRoar {
+    0%, 100% { transform: scale(1); }
+    30%      { transform: scale(1.05) rotate(-1deg); }
+    60%      { transform: scale(1.04) rotate(1.5deg); }
+  }
+
+  /* Name plate */
+  .name-plate {
+    text-align: center;
+    padding: 4px 12px 8px;
+    width: 100%;
+    z-index: 3;
+  }
+  .name-cn {
+    font-family: 'Playfair Display', Georgia, "Noto Serif SC", serif;
+    font-size: clamp(22px, 6vw, 32px);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    background: linear-gradient(90deg, #ffd670, #ff9a3a);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.15;
+  }
+  .name-en {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(12px, 3.2vw, 15px);
+    font-style: italic;
+    font-weight: 500;
+    opacity: 0.75;
+    margin-top: 2px;
+    letter-spacing: 0.03em;
+  }
+  .name-facts {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+  }
+  .fact-chip {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.15);
+    letter-spacing: 0.04em;
+  }
+
+  /* Roar button */
+  .roar-wrap {
+    position: absolute;
+    bottom: 4%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 4;
+  }
+  .roar-btn {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #1a1a1a;
+    border: none;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 16px;
+    font-weight: 800;
+    padding: 12px 26px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(255, 138, 5, 0.4);
+    letter-spacing: 0.1em;
+    transition: transform .12s, box-shadow .12s;
+  }
+  .roar-btn:active { transform: scale(.94); }
+  .roar-btn.pulse { animation: roarPulse .7s ease-out; }
+  @keyframes roarPulse {
+    0%   { box-shadow: 0 0 0 0 rgba(255,138,5,0.7); }
+    100% { box-shadow: 0 0 0 30px rgba(255,138,5,0); }
+  }
+
+  /* Prev/Next arrows */
+  .nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.2);
+    cursor: pointer;
+    color: #fff;
+    font-size: 22px;
+    font-family: inherit;
+    z-index: 5;
+    backdrop-filter: blur(6px);
+    transition: transform .12s, background .12s;
+  }
+  .nav-arrow:active { transform: translateY(-50%) scale(.9); }
+  .nav-arrow:hover { background: rgba(0,0,0,0.5); }
+  .nav-arrow.prev { left: 10px; }
+  .nav-arrow.next { right: 10px; }
+
+  /* Dino picker row (thumbnails) */
+  .picker {
+    display: flex;
+    gap: 8px;
+    padding: 6px 10px 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .picker::-webkit-scrollbar { display: none; }
+  .pick-card {
+    flex-shrink: 0;
+    width: 78px; height: 72px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.08);
+    border: 3px solid transparent;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 4px;
+    transition: transform .15s, background .15s, border-color .15s;
+    scroll-snap-align: center;
+  }
+  .pick-card:active { transform: scale(.92); }
+  .pick-card.selected {
+    border-color: var(--accent);
+    background: rgba(255,203,5,0.18);
+  }
+  .pick-card .thumb {
+    width: 52px; height: 38px;
+    display: block;
+  }
+  .pick-card .thumb-name {
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.02em;
+  }
+
+  @media (max-width: 380px) {
+    .pick-card { width: 70px; height: 68px; }
+    .pick-card .thumb { width: 46px; height: 34px; }
+    .roar-btn { font-size: 14px; padding: 10px 20px; }
+  }
+  @media (max-height: 640px) {
+    .name-facts { display: none; }
+    .flora { font-size: 40px !important; bottom: 18%; }
+    .sky-glow { width: 60px; height: 60px; top: 6%; }
+    .dino-stage { height: 58%; }
+    .picker { padding: 4px 8px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="./">← Playground</a>
+  <div class="title">🦕 恐龙点名器 · Dino Roll Call</div>
+</div>
+
+<!-- ================ DISPLAY STAGE ================ -->
+<div class="display">
+  <div class="sky-glow"></div>
+  <div class="flora left">🌿</div>
+  <div class="flora right">🌴</div>
+  <div class="ground"></div>
+
+  <button class="nav-arrow prev" id="prevBtn" aria-label="Previous dinosaur">‹</button>
+  <button class="nav-arrow next" id="nextBtn" aria-label="Next dinosaur">›</button>
+
+  <div class="dino-stage" id="dinoStage">
+    <!-- Dinosaur SVGs injected by JS -->
+  </div>
+
+  <div class="name-plate">
+    <div class="name-cn" id="nameCn">—</div>
+    <div class="name-en" id="nameEn">—</div>
+    <div class="name-facts" id="nameFacts"></div>
+  </div>
+
+  <div class="roar-wrap">
+    <button class="roar-btn" id="roarBtn">🔊 ROAR!</button>
+  </div>
+</div>
+
+<!-- ================ PICKER ================ -->
+<div class="picker" id="picker">
+  <!-- Thumbnails injected by JS -->
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // =========================================================================
+  // DINOSAUR CATALOG
+  // Each dino has:
+  //   id, cn, en, era, diet, size, color palette,
+  //   drawDino(scale): big SVG innerHTML
+  //   drawThumb(): small SVG innerHTML
+  //   roar(ctx): function that plays a custom roar
+  // =========================================================================
+
+  // Helper: build a gradient def
+  function skinGrad(id, c1, c2) {
+    return `<defs><linearGradient id="${id}" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="${c1}"/>
+      <stop offset="1" stop-color="${c2}"/>
+    </linearGradient></defs>`;
+  }
+
+  const DINOS = [
+    // 1. T-REX
+    {
+      id: 'trex', cn: '霸王龙', en: 'Tyrannosaurus Rex',
+      era: '白垩纪', diet: '肉食', size: '12m / 40ft',
+      big: `<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+        ${skinGrad('trexSkin','#7d8a48','#46542a')}
+        <!-- BACK LEG (far side, behind body) -->
+        <path d="M 470 255 Q 455 275 450 320 Q 447 360 462 378 L 502 378 Q 510 345 515 300 Q 518 272 505 258 Z"
+              fill="#3c4820" stroke="#1c230e" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M 460 378 L 463 392 L 472 378 Z M 480 378 L 483 392 L 492 378 Z M 498 378 L 501 392 L 510 378 Z" fill="#0f1207"/>
+        <!-- MAIN BODY SILHOUETTE: head + neck + torso + tail as one continuous shape -->
+        <path d="M 52 210
+                 Q 42 185 62 172
+                 Q 95 148 155 142
+                 Q 220 140 285 155
+                 Q 360 168 430 180
+                 Q 520 196 595 215
+                 Q 665 233 720 258
+                 Q 760 275 785 295
+                 Q 795 305 782 312
+                 Q 755 308 705 295
+                 Q 650 285 585 282
+                 Q 520 282 460 290
+                 Q 400 300 350 298
+                 Q 300 295 265 285
+                 Q 220 272 180 258
+                 Q 135 240 95 225
+                 Q 72 218 58 215 Z"
+              fill="url(#trexSkin)" stroke="#1c230e" stroke-width="3" stroke-linejoin="round"/>
+        <!-- OPEN MOUTH: lower jaw, creates gap -->
+        <path d="M 52 215 Q 58 242 95 252 Q 135 258 152 246 L 140 230 Q 105 228 78 222 Q 62 217 52 215 Z"
+              fill="#6a7738" stroke="#1c230e" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Teeth -->
+        <g fill="#fff" stroke="#1c230e" stroke-width="1">
+          <path d="M 68 215 L 72 228 L 76 216"/>
+          <path d="M 88 220 L 92 233 L 96 221"/>
+          <path d="M 108 224 L 112 237 L 116 225"/>
+          <path d="M 128 228 L 132 239 L 136 229"/>
+        </g>
+        <g fill="#fff" stroke="#1c230e" stroke-width="1">
+          <path d="M 72 250 L 76 238 L 80 252"/>
+          <path d="M 96 254 L 100 242 L 104 256"/>
+          <path d="M 120 254 L 124 242 L 128 256"/>
+        </g>
+        <!-- Eye + brow -->
+        <path d="M 112 158 Q 128 152 140 158" stroke="#1c230e" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <circle cx="126" cy="168" r="5.5" fill="#ffd540" stroke="#1c230e" stroke-width="1.5"/>
+        <circle cx="127" cy="169" r="2.3" fill="#000"/>
+        <!-- Nostril -->
+        <ellipse cx="75" cy="195" rx="3" ry="2" fill="#0e1208"/>
+        <!-- Tiny ICONIC arms -->
+        <path d="M 318 258 Q 328 285 322 308 L 314 308 L 310 292 Q 308 272 307 258 Z"
+              fill="url(#trexSkin)" stroke="#1c230e" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M 316 308 L 310 316 L 315 318 L 320 312 M 316 308 L 320 320 L 324 317" stroke="#1c230e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- FRONT LEG -->
+        <path d="M 370 270 Q 355 290 350 335 Q 348 372 362 382 L 402 382 Q 410 350 415 305 Q 418 275 405 265 Z"
+              fill="url(#trexSkin)" stroke="#1c230e" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M 362 382 L 365 394 L 372 382 Z M 380 382 L 383 394 L 390 382 Z M 398 382 L 401 394 L 408 382 Z" fill="#0e1208"/>
+        <!-- Body texture stripes -->
+        <g stroke="#3a4420" stroke-width="2" fill="none" opacity="0.5">
+          <path d="M 260 195 Q 280 198 300 198"/>
+          <path d="M 380 205 Q 420 208 450 208"/>
+          <path d="M 520 225 Q 555 228 580 228"/>
+        </g>
+      </svg>`,
+      thumb: `<svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 30 30 Q 20 22 12 25 Q 6 28 6 32 Q 7 36 15 37 L 18 42 Q 8 44 6 48 Q 7 51 12 51 Q 22 51 32 46 Q 38 42 38 34 Z" fill="#5a6330"/>
+        <path d="M 28 28 Q 50 20 70 24 Q 88 26 90 34 Q 88 42 78 46 Q 60 50 40 48 Q 30 45 28 38 Z" fill="#5a6330"/>
+        <path d="M 85 34 Q 97 34 99 38 Q 95 42 85 40 Z" fill="#5a6330"/>
+        <path d="M 48 46 L 48 56 L 56 56 L 56 46 Z M 65 46 L 65 56 L 73 56 L 73 46 Z" fill="#4a5328"/>
+        <circle cx="22" cy="30" r="1.5" fill="#ffd540"/>
+      </svg>`,
+      roar: (ctx, master) => roarProfile(ctx, master, {
+        baseLow: 50, basePeak: 180, dur: 1.6, wave: 'sawtooth',
+        filterFreq: 900, vibrato: 9, noiseLevel: 0.25
+      })
+    },
+
+    // 2. TRICERATOPS
+    {
+      id: 'triceratops', cn: '三角龙', en: 'Triceratops',
+      era: '白垩纪', diet: '植食', size: '9m / 30ft',
+      big: `<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+        ${skinGrad('triSkin','#967a52','#62492c')}
+        ${skinGrad('triFrill','#b04a26','#6e2010')}
+        <!-- Back legs (behind body) -->
+        <path d="M 580 275 L 575 370 L 615 370 L 620 278 Z" fill="#4a3820" stroke="#2a1f10" stroke-width="2.5"/>
+        <path d="M 575 370 L 578 384 L 588 370 Z M 595 370 L 598 384 L 608 370 Z" fill="#1a1408"/>
+        <path d="M 495 278 L 490 368 L 530 368 L 535 280 Z" fill="#5a4830" stroke="#2a1f10" stroke-width="2.5"/>
+        <path d="M 490 368 L 493 382 L 503 368 Z M 510 368 L 513 382 L 523 368 Z" fill="#1a1408"/>
+
+        <!-- FRILL (giant bony shield behind head) -->
+        <path d="M 260 190
+                 Q 225 135 170 115
+                 Q 115 105 75 130
+                 Q 40 160 40 215
+                 Q 45 270 80 295
+                 Q 130 310 180 295
+                 Q 225 275 255 245 Z"
+              fill="url(#triFrill)" stroke="#2a1f10" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Frill bumps (scalloped edge) -->
+        <g fill="#4a1608" stroke="#2a1408" stroke-width="1">
+          <circle cx="70" cy="138" r="6"/>
+          <circle cx="52" cy="170" r="6"/>
+          <circle cx="44" cy="210" r="7"/>
+          <circle cx="52" cy="255" r="7"/>
+          <circle cx="78" cy="295" r="6"/>
+        </g>
+
+        <!-- Main body (big barrel body) -->
+        <path d="M 260 200
+                 Q 340 188 440 190
+                 Q 555 195 640 215
+                 Q 695 230 700 260
+                 Q 680 290 620 300
+                 Q 520 310 400 310
+                 Q 300 308 250 295
+                 Q 225 280 225 250
+                 Q 230 220 260 200 Z"
+              fill="url(#triSkin)" stroke="#2a1f10" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Belly (lighter) -->
+        <path d="M 240 275 Q 350 310 500 308 Q 630 302 690 278 L 680 290 Q 550 315 400 315 Q 280 313 240 290 Z"
+              fill="#b89865" opacity="0.4"/>
+
+        <!-- Head (in front of frill) -->
+        <path d="M 260 195
+                 Q 215 195 180 215
+                 Q 155 240 165 275
+                 Q 195 295 250 285
+                 Q 275 275 285 250
+                 Q 290 220 280 200 Z"
+              fill="url(#triSkin)" stroke="#2a1f10" stroke-width="3" stroke-linejoin="round"/>
+
+        <!-- Parrot-like BEAK -->
+        <path d="M 168 260 Q 145 270 148 285 Q 155 300 175 298 Q 190 290 188 270 Z"
+              fill="#dec9a0" stroke="#2a1f10" stroke-width="2"/>
+
+        <!-- Nose horn (short, on snout) -->
+        <path d="M 200 235 L 208 205 L 218 235 Z"
+              fill="#ebd9b0" stroke="#2a1f10" stroke-width="2" stroke-linejoin="round"/>
+
+        <!-- Brow horn 1 (long, left/back) -->
+        <path d="M 238 205 L 208 110 L 222 210 Z"
+              fill="#ebd9b0" stroke="#2a1f10" stroke-width="2" stroke-linejoin="round"/>
+        <!-- Brow horn 2 (long, front) -->
+        <path d="M 270 205 L 250 105 L 260 215 Z"
+              fill="#ebd9b0" stroke="#2a1f10" stroke-width="2" stroke-linejoin="round"/>
+
+        <!-- Eye -->
+        <circle cx="235" cy="245" r="5" fill="#1a1a0a"/>
+        <circle cx="236" cy="244" r="2" fill="#fff"/>
+
+        <!-- Front legs -->
+        <path d="M 295 300 L 290 370 L 330 370 L 335 300 Z" fill="url(#triSkin)" stroke="#2a1f10" stroke-width="2.5"/>
+        <path d="M 290 370 L 293 384 L 303 370 Z M 310 370 L 313 384 L 323 370 Z" fill="#1a1408"/>
+        <path d="M 370 302 L 365 372 L 405 372 L 410 304 Z" fill="#5a4830" stroke="#2a1f10" stroke-width="2.5"/>
+        <path d="M 365 372 L 368 384 L 378 372 Z M 385 372 L 388 384 L 398 372 Z" fill="#1a1408"/>
+
+        <!-- Small tail -->
+        <path d="M 700 255 Q 750 258 770 275 Q 755 288 700 280 Z"
+              fill="url(#triSkin)" stroke="#2a1f10" stroke-width="2.5"/>
+      </svg>`,
+      thumb: `<svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 30 28 Q 20 25 14 30 Q 10 38 16 42 Q 22 44 30 42 L 26 36 Z" fill="#9a3020"/>
+        <path d="M 32 28 Q 55 22 78 26 Q 94 30 94 40 Q 85 48 60 47 Q 38 46 32 40 Z" fill="#7a6240"/>
+        <path d="M 22 30 L 18 20 L 26 30 Z M 32 28 L 28 16 L 36 28 Z" fill="#ebdfc0" stroke="#2a1f10" stroke-width="0.5"/>
+        <path d="M 16 38 L 13 32 L 19 36 Z" fill="#ebdfc0"/>
+        <rect x="38" y="46" width="5" height="10" fill="#7a6240"/><rect x="50" y="46" width="5" height="10" fill="#5a4830"/>
+        <rect x="70" y="46" width="5" height="10" fill="#7a6240"/><rect x="82" y="46" width="5" height="10" fill="#5a4830"/>
+        <circle cx="25" cy="32" r="1" fill="#000"/>
+      </svg>`,
+      roar: (ctx, master) => roarProfile(ctx, master, {
+        baseLow: 90, basePeak: 220, dur: 1.1, wave: 'square',
+        filterFreq: 1200, vibrato: 6, noiseLevel: 0.15
+      })
+    },
+
+    // 3. STEGOSAURUS
+    {
+      id: 'stegosaurus', cn: '剑龙', en: 'Stegosaurus',
+      era: '侏罗纪', diet: '植食', size: '9m / 30ft',
+      big: `<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+        ${skinGrad('stegSkin','#7a8c42','#4f5a22')}
+        <!-- Far side legs (smaller, behind) -->
+        <path d="M 260 288 L 258 380 L 290 380 L 292 288 Z" fill="#3a4418" stroke="#222810" stroke-width="2"/>
+        <path d="M 458 288 L 456 378 L 488 378 L 490 288 Z" fill="#3a4418" stroke="#222810" stroke-width="2"/>
+        <!-- Arched back body (stego signature: tall arch over hips) -->
+        <path d="M 110 255
+                 Q 70 258 60 285
+                 Q 62 310 95 320
+                 Q 200 335 330 338
+                 Q 470 338 580 325
+                 Q 660 310 680 280
+                 Q 690 250 640 230
+                 Q 520 215 380 210
+                 Q 260 215 170 235
+                 Q 130 245 110 255 Z"
+              fill="url(#stegSkin)" stroke="#222810" stroke-width="3" stroke-linejoin="round"/>
+        <!-- TAIL with spikes (thagomizer) -->
+        <path d="M 680 265 Q 735 270 770 285 Q 780 295 770 300 Q 735 298 680 292 Z"
+              fill="url(#stegSkin)" stroke="#222810" stroke-width="3"/>
+        <g fill="#efe0b8" stroke="#222810" stroke-width="2" stroke-linejoin="round">
+          <path d="M 728 270 L 760 245 L 738 275 Z"/>
+          <path d="M 748 275 L 785 255 L 754 282 Z"/>
+          <path d="M 728 292 L 760 310 L 736 298 Z"/>
+          <path d="M 748 296 L 786 315 L 754 302 Z"/>
+        </g>
+
+        <!-- ICONIC KITE-SHAPED BACK PLATES (2 rows for depth) -->
+        <g stroke="#3a1208" stroke-width="2" stroke-linejoin="round">
+          <path d="M 155 245 L 175 170 L 195 245 Z" fill="#cc5830"/>
+          <path d="M 210 230 L 240 140 L 270 230 Z" fill="#a84020"/>
+          <path d="M 285 218 L 320 115 L 355 218 Z" fill="#cc5830"/>
+          <path d="M 370 215 L 410 110 L 450 215 Z" fill="#a84020"/>
+          <path d="M 465 220 L 500 120 L 535 220 Z" fill="#cc5830"/>
+          <path d="M 550 232 L 580 150 L 610 232 Z" fill="#a84020"/>
+          <path d="M 625 248 L 650 190 L 675 248 Z" fill="#cc5830"/>
+        </g>
+
+        <!-- Head (small, low) -->
+        <path d="M 115 273
+                 Q 75 272 45 285
+                 Q 25 295 40 308
+                 Q 70 315 108 308
+                 Q 125 298 128 285 Z"
+              fill="url(#stegSkin)" stroke="#222810" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Beak -->
+        <path d="M 45 295 Q 25 298 25 305 Q 35 312 52 309 Q 58 302 52 295 Z"
+              fill="#dcc79a" stroke="#222810" stroke-width="2"/>
+        <!-- Eye -->
+        <circle cx="70" cy="290" r="3.5" fill="#1a1a0a"/>
+        <circle cx="71" cy="290" r="1.3" fill="#fff"/>
+        <!-- Mouth line -->
+        <path d="M 45 306 Q 60 311 85 308" stroke="#222810" stroke-width="1.5" fill="none"/>
+
+        <!-- Front near-side legs -->
+        <path d="M 215 330 L 212 380 L 250 380 L 253 330 Z" fill="url(#stegSkin)" stroke="#222810" stroke-width="2.5"/>
+        <path d="M 212 380 L 216 392 L 226 380 Z M 236 380 L 240 392 L 250 380 Z" fill="#1a2008"/>
+        <!-- Back near-side legs -->
+        <path d="M 500 328 L 498 380 L 538 380 L 540 328 Z" fill="url(#stegSkin)" stroke="#222810" stroke-width="2.5"/>
+        <path d="M 498 380 L 502 392 L 512 380 Z M 522 380 L 526 392 L 536 380 Z" fill="#1a2008"/>
+      </svg>`,
+      thumb: `<svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 18 30 Q 10 32 8 38 Q 10 44 22 46 Q 45 48 70 46 Q 88 42 92 35 Q 88 28 70 26 Q 45 26 24 28 Z" fill="#5f6a30"/>
+        <path d="M 88 35 Q 98 36 99 40 Q 96 44 88 42 Z" fill="#5f6a30"/>
+        <path d="M 94 37 L 99 32 L 96 40 Z" fill="#c8baa0"/>
+        <path d="M 25 26 L 28 14 L 33 26 Z" fill="#c85840"/>
+        <path d="M 36 24 L 40 12 L 45 24 Z" fill="#a04a30"/>
+        <path d="M 48 22 L 53 10 L 58 22 Z" fill="#c85840"/>
+        <path d="M 60 23 L 65 12 L 70 23 Z" fill="#a04a30"/>
+        <path d="M 72 25 L 76 16 L 81 25 Z" fill="#c85840"/>
+        <path d="M 14 34 Q 6 34 3 38 Q 6 42 12 41 Z" fill="#5f6a30"/>
+        <circle cx="9" cy="37" r="0.8" fill="#000"/>
+        <rect x="24" y="46" width="4" height="8" fill="#5f6a30"/><rect x="42" y="46" width="4" height="8" fill="#4a5220"/>
+        <rect x="58" y="46" width="4" height="8" fill="#5f6a30"/><rect x="74" y="46" width="4" height="8" fill="#4a5220"/>
+      </svg>`,
+      roar: (ctx, master) => roarProfile(ctx, master, {
+        baseLow: 100, basePeak: 250, dur: 1.0, wave: 'triangle',
+        filterFreq: 1500, vibrato: 4, noiseLevel: 0.08
+      })
+    },
+
+    // 4. BRACHIOSAURUS (long neck)
+    {
+      id: 'brachiosaurus', cn: '腕龙', en: 'Brachiosaurus',
+      era: '侏罗纪', diet: '植食', size: '26m / 85ft',
+      big: `<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+        ${skinGrad('brachSkin','#677ea8','#2e4668')}
+        <!-- Far side legs -->
+        <path d="M 320 370 L 318 465 L 358 465 L 362 370 Z" fill="#2a4060" stroke="#15202e" stroke-width="2"/>
+        <path d="M 318 465 L 322 480 L 332 465 Z M 342 465 L 346 480 L 356 465 Z" fill="#0a1218"/>
+        <path d="M 500 372 L 498 465 L 538 465 L 542 372 Z" fill="#2a4060" stroke="#15202e" stroke-width="2"/>
+        <path d="M 498 465 L 502 480 L 512 465 Z M 522 465 L 526 480 L 536 465 Z" fill="#0a1218"/>
+
+        <!-- Big body (barrel-like) -->
+        <path d="M 295 305
+                 Q 250 300 220 330
+                 Q 205 375 235 405
+                 Q 320 420 460 418
+                 Q 580 410 635 385
+                 Q 670 360 650 320
+                 Q 610 298 530 295
+                 Q 430 293 350 298
+                 Q 315 302 295 305 Z"
+              fill="url(#brachSkin)" stroke="#15202e" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Belly shading -->
+        <path d="M 220 380 Q 330 418 490 415 Q 590 408 640 380 L 620 395 Q 480 425 330 420 Q 250 412 220 380 Z"
+              fill="#7a92b8" opacity="0.4"/>
+
+        <!-- TAIL -->
+        <path d="M 640 335 Q 720 345 760 360 Q 770 370 760 378 Q 730 382 660 370 Z"
+              fill="url(#brachSkin)" stroke="#15202e" stroke-width="3"/>
+
+        <!-- LONG NECK (signature feature: reaches from shoulders to top of frame) -->
+        <path d="M 320 310
+                 Q 290 230 285 165
+                 Q 280 100 295 55
+                 Q 310 30 335 30
+                 Q 355 40 355 75
+                 Q 348 130 340 180
+                 Q 338 240 345 290
+                 Q 348 310 330 310 Z"
+              fill="url(#brachSkin)" stroke="#15202e" stroke-width="3" stroke-linejoin="round"/>
+
+        <!-- Small head at top -->
+        <path d="M 320 40
+                 Q 290 25 275 35
+                 Q 265 48 275 60
+                 Q 300 68 340 62
+                 Q 360 55 355 40
+                 Q 345 28 325 32 Z"
+              fill="url(#brachSkin)" stroke="#15202e" stroke-width="3" stroke-linejoin="round"/>
+
+        <!-- Characteristic nose arch (brachiosaur had a dome on top) -->
+        <path d="M 300 28 Q 315 18 330 28 Q 320 33 305 32 Z"
+              fill="url(#brachSkin)" stroke="#15202e" stroke-width="2"/>
+
+        <!-- Eye -->
+        <circle cx="315" cy="46" r="4" fill="#1a1a1a"/>
+        <circle cx="316" cy="46" r="1.5" fill="#fff"/>
+        <!-- Nostril -->
+        <ellipse cx="288" cy="48" rx="2" ry="1.2" fill="#0a0810"/>
+        <!-- Mouth line -->
+        <path d="M 275 56 Q 295 64 320 60" stroke="#0a0810" stroke-width="1.5" fill="none"/>
+
+        <!-- Near side front legs (LONGER - iconic brachiosaur trait) -->
+        <path d="M 280 405 L 278 465 L 320 465 L 322 408 Z" fill="url(#brachSkin)" stroke="#15202e" stroke-width="2.5"/>
+        <path d="M 278 465 L 282 480 L 292 465 Z M 302 465 L 306 480 L 316 465 Z" fill="#0a1218"/>
+        <!-- Near side back legs (shorter) -->
+        <path d="M 460 410 L 458 468 L 498 468 L 502 412 Z" fill="url(#brachSkin)" stroke="#15202e" stroke-width="2.5"/>
+        <path d="M 458 468 L 462 480 L 472 468 Z M 482 468 L 486 480 L 496 468 Z" fill="#0a1218"/>
+      </svg>`,
+      thumb: `<svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 28 34 Q 18 36 16 42 Q 18 50 30 51 Q 60 52 82 48 Q 92 42 88 36 Q 60 32 28 34 Z" fill="#4e6884"/>
+        <path d="M 88 40 Q 97 40 98 44 Q 95 47 88 46 Z" fill="#4e6884"/>
+        <path d="M 34 34 Q 26 22 24 10 Q 23 4 30 3 Q 38 5 39 14 Q 40 26 41 34 Z" fill="#4e6884"/>
+        <path d="M 28 4 Q 22 2 20 6 Q 22 10 28 10 Q 38 11 42 8 Q 40 3 32 4 Z" fill="#4e6884"/>
+        <rect x="30" y="51" width="5" height="8" fill="#4e6884"/>
+        <rect x="45" y="51" width="5" height="8" fill="#355070"/>
+        <rect x="62" y="51" width="5" height="8" fill="#4e6884"/>
+        <rect x="77" y="51" width="5" height="8" fill="#355070"/>
+        <circle cx="25" cy="7" r="0.8" fill="#000"/>
+      </svg>`,
+      roar: (ctx, master) => roarProfile(ctx, master, {
+        baseLow: 45, basePeak: 120, dur: 2.0, wave: 'sine',
+        filterFreq: 600, vibrato: 3, noiseLevel: 0.12
+      })
+    },
+
+    // 5. VELOCIRAPTOR
+    {
+      id: 'velociraptor', cn: '伶盗龙', en: 'Velociraptor',
+      era: '白垩纪', diet: '肉食', size: '2m / 6ft',
+      big: `<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+        ${skinGrad('rapSkin','#8c4d2a','#421f0d')}
+        ${skinGrad('rapFeather','#cc6824','#8a3a15')}
+        <!-- Far-side leg -->
+        <path d="M 410 275 Q 395 315 388 360 Q 390 378 405 378 L 440 378 Q 445 345 452 295 Z"
+              fill="#58301a" stroke="#221108" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M 405 378 L 408 390 L 418 378 Z M 428 378 L 431 390 L 440 378 Z" fill="#0f0804"/>
+
+        <!-- MAIN BODY SILHOUETTE: head + neck arched + body + long straight tail -->
+        <path d="M 80 220
+                 Q 60 215 50 232
+                 Q 55 252 80 260
+                 L 120 268
+                 Q 155 278 190 270
+                 Q 230 255 245 228
+                 Q 255 210 280 212
+                 Q 340 220 430 238
+                 Q 520 258 610 262
+                 Q 690 260 750 255
+                 Q 780 252 785 265
+                 Q 755 272 675 278
+                 Q 560 282 450 278
+                 Q 350 280 300 290
+                 Q 260 297 220 303
+                 Q 180 308 145 298
+                 Q 110 288 90 270
+                 Q 72 252 68 235
+                 Z"
+              fill="url(#rapSkin)" stroke="#221108" stroke-width="3" stroke-linejoin="round"/>
+
+        <!-- Open jaw bottom (teeth slot) -->
+        <path d="M 58 245 L 90 260 L 125 265 L 135 270 Q 108 275 88 272 Q 68 268 60 258 Z"
+              fill="#2a1a0e" stroke="#221108" stroke-width="2"/>
+        <!-- Teeth (upper row) -->
+        <g fill="#fff" stroke="#1a1a1a" stroke-width="0.8">
+          <path d="M 72 232 L 76 242 L 80 233"/>
+          <path d="M 88 236 L 92 246 L 96 237"/>
+          <path d="M 104 240 L 108 250 L 112 241"/>
+          <path d="M 120 244 L 124 254 L 128 245"/>
+        </g>
+        <!-- Teeth (lower) -->
+        <g fill="#fff" stroke="#1a1a1a" stroke-width="0.8">
+          <path d="M 84 262 L 88 252 L 92 262"/>
+          <path d="M 100 266 L 104 256 L 108 266"/>
+          <path d="M 116 268 L 120 258 L 124 268"/>
+        </g>
+
+        <!-- Head feathers (crest) - iconic modern depiction -->
+        <g fill="url(#rapFeather)" stroke="#3a1808" stroke-width="1.5" stroke-linejoin="round">
+          <path d="M 165 218 L 160 195 L 172 220 Z"/>
+          <path d="M 185 218 L 180 190 L 195 222 Z"/>
+          <path d="M 205 220 L 203 195 L 215 225 Z"/>
+        </g>
+
+        <!-- Eye (sharp, yellow) -->
+        <circle cx="148" cy="232" r="5" fill="#ffc030" stroke="#221108" stroke-width="1.5"/>
+        <circle cx="148" cy="233" r="2.2" fill="#000"/>
+        <!-- Nostril -->
+        <ellipse cx="88" cy="240" rx="2.5" ry="1.5" fill="#0a0504"/>
+
+        <!-- Arm feathers on tail tip (modern reconstruction) -->
+        <g fill="url(#rapFeather)" stroke="#3a1808" stroke-width="1.2">
+          <path d="M 710 260 L 755 240 L 745 262 Z"/>
+          <path d="M 730 268 L 785 262 L 760 275 Z"/>
+          <path d="M 720 278 L 780 282 L 745 285 Z"/>
+        </g>
+
+        <!-- Small arms with feathers -->
+        <path d="M 330 275 Q 330 310 315 335 L 305 340 L 302 335 L 318 325 Q 322 300 325 275 Z"
+              fill="url(#rapSkin)" stroke="#221108" stroke-width="2"/>
+        <!-- Arm feathers -->
+        <g fill="url(#rapFeather)" stroke="#3a1808" stroke-width="1" opacity="0.9">
+          <path d="M 340 290 L 365 305 L 345 305 Z"/>
+          <path d="M 335 310 L 360 328 L 340 325 Z"/>
+        </g>
+
+        <!-- Strong NEAR-SIDE leg (bipedal hunter) -->
+        <path d="M 355 280 Q 338 325 332 370 Q 335 388 350 388 L 385 388 Q 390 350 395 290 Z"
+              fill="url(#rapSkin)" stroke="#221108" stroke-width="3" stroke-linejoin="round"/>
+        <!-- SICKLE CLAW (iconic!) raised off ground -->
+        <path d="M 350 388 Q 362 405 395 388 Q 380 378 370 370" fill="#f0e8c0" stroke="#221108" stroke-width="2"/>
+        <path d="M 350 388 L 354 398 L 362 388 Z" fill="#0f0804"/>
+        <path d="M 375 388 L 379 398 L 385 388 Z" fill="#0f0804"/>
+      </svg>`,
+      thumb: `<svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 22 28 Q 12 26 8 30 Q 6 36 12 38 L 16 41 Q 8 44 8 48 Q 11 50 18 50 Q 28 48 34 42 Q 38 38 36 32 Z" fill="#7a4528"/>
+        <path d="M 34 30 Q 55 26 75 30 Q 85 34 84 40 Q 70 44 50 43 Q 36 40 34 36 Z" fill="#7a4528"/>
+        <path d="M 82 34 Q 98 32 97 38 Q 95 40 82 40 Z" fill="#7a4528"/>
+        <path d="M 90 33 L 99 26 L 93 36 Z" fill="#c8632a"/>
+        <path d="M 42 40 L 40 52 L 48 52 L 47 42 Z" fill="#7a4528"/>
+        <path d="M 47 52 Q 52 56 54 50 Q 50 48 48 50" fill="#f0e8c0"/>
+        <path d="M 58 40 L 56 52 L 62 52 L 60 42 Z" fill="#5a321a"/>
+        <circle cx="18" cy="32" r="1" fill="#ffc030"/>
+        <path d="M 22 22 L 26 16 L 28 22 Z" fill="#c8632a"/>
+      </svg>`,
+      roar: (ctx, master) => roarProfile(ctx, master, {
+        baseLow: 180, basePeak: 450, dur: 0.8, wave: 'sawtooth',
+        filterFreq: 2000, vibrato: 14, noiseLevel: 0.35
+      })
+    },
+
+    // 6. PTERANODON (flying)
+    {
+      id: 'pteranodon', cn: '翼龙', en: 'Pteranodon',
+      era: '白垩纪', diet: '鱼食', size: '7m wingspan',
+      big: `<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+        ${skinGrad('ptSkin','#b08860','#70502a')}
+        ${skinGrad('wingMem','#c9a578','#8a6c40')}
+        <!-- LEFT WING membrane (full span) -->
+        <path d="M 400 195
+                 Q 260 130 120 120
+                 Q 60 125 35 160
+                 Q 70 175 130 185
+                 Q 240 210 380 220 Z"
+              fill="url(#wingMem)" stroke="#2a1608" stroke-width="3" stroke-linejoin="round"/>
+        <!-- RIGHT WING membrane -->
+        <path d="M 400 195
+                 Q 540 130 680 125
+                 Q 740 135 765 170
+                 Q 720 180 660 190
+                 Q 540 215 410 220 Z"
+              fill="url(#wingMem)" stroke="#2a1608" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Wing finger bones -->
+        <g stroke="#2a1608" stroke-width="2.5" fill="none" stroke-linecap="round">
+          <path d="M 400 195 L 40 155"/>
+          <path d="M 395 205 L 90 180"/>
+          <path d="M 400 195 L 760 160"/>
+          <path d="M 405 205 L 720 185"/>
+        </g>
+        <!-- Wing trailing edge scallops -->
+        <path d="M 60 160 Q 100 175 130 188 Q 160 198 200 205 Q 240 212 280 216 Q 320 220 380 220"
+              stroke="#2a1608" stroke-width="1.5" fill="none" opacity="0.5"/>
+        <path d="M 740 165 Q 700 178 670 188 Q 640 198 600 205 Q 560 212 520 216 Q 480 220 420 220"
+              stroke="#2a1608" stroke-width="1.5" fill="none" opacity="0.5"/>
+
+        <!-- Body (central torso, small) -->
+        <ellipse cx="400" cy="220" rx="32" ry="45" fill="url(#ptSkin)" stroke="#2a1608" stroke-width="3"/>
+
+        <!-- Long pointed BEAK (distinctive) -->
+        <path d="M 425 185
+                 Q 525 172 600 182
+                 Q 620 188 600 200
+                 Q 525 204 425 205 Z"
+              fill="url(#ptSkin)" stroke="#2a1608" stroke-width="3" stroke-linejoin="round"/>
+
+        <!-- ICONIC head crest (large, pointing up-back) -->
+        <path d="M 415 175
+                 Q 395 115 340 90
+                 Q 320 95 345 130
+                 Q 370 158 405 180 Z"
+              fill="url(#ptSkin)" stroke="#2a1608" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Crest highlight -->
+        <path d="M 395 170 Q 380 135 355 110" stroke="#5a4020" stroke-width="2" fill="none"/>
+
+        <!-- Eye -->
+        <circle cx="438" cy="188" r="4" fill="#1a1a0a" stroke="#2a1608" stroke-width="1"/>
+        <circle cx="439" cy="187" r="1.5" fill="#fff"/>
+        <!-- Nostril -->
+        <ellipse cx="510" cy="188" rx="3" ry="1.8" fill="#0a0a0a"/>
+        <!-- Mouth line -->
+        <path d="M 430 197 L 520 195 L 585 192" stroke="#2a1608" stroke-width="1.2" fill="none"/>
+
+        <!-- Tucked legs (small) -->
+        <path d="M 385 258 Q 380 285 376 300 L 370 302 L 372 285 Z" fill="url(#ptSkin)" stroke="#2a1608" stroke-width="2"/>
+        <path d="M 372 302 L 368 310 L 375 310" fill="#2a1608"/>
+        <path d="M 415 258 Q 420 285 424 300 L 430 302 L 428 285 Z" fill="url(#ptSkin)" stroke="#2a1608" stroke-width="2"/>
+        <path d="M 428 302 L 432 310 L 425 310" fill="#2a1608"/>
+
+        <!-- Small tail -->
+        <path d="M 400 258 L 395 285 L 405 285 Z" fill="#70502a" stroke="#2a1608" stroke-width="1.5"/>
+      </svg>`,
+      thumb: `<svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 50 26 Q 28 14 10 18 Q 6 22 12 30 Q 28 30 50 34 Z" fill="#b0906a"/>
+        <path d="M 50 26 Q 72 14 90 18 Q 94 22 88 30 Q 72 30 50 34 Z" fill="#b0906a"/>
+        <ellipse cx="50" cy="32" rx="5" ry="8" fill="#805830"/>
+        <path d="M 54 28 Q 72 26 80 30 Q 82 32 72 34 Q 58 34 54 32 Z" fill="#805830"/>
+        <path d="M 50 28 Q 40 18 30 16 Q 28 18 38 26 Q 46 30 50 30 Z" fill="#805830"/>
+        <circle cx="56" cy="30" r="0.8" fill="#000"/>
+        <rect x="47" y="40" width="3" height="8" fill="#805830"/><rect x="52" y="40" width="3" height="8" fill="#805830"/>
+      </svg>`,
+      roar: (ctx, master) => roarProfile(ctx, master, {
+        baseLow: 300, basePeak: 800, dur: 0.6, wave: 'square',
+        filterFreq: 3000, vibrato: 18, noiseLevel: 0.25, screech: true
+      })
+    },
+
+    // 7. ANKYLOSAURUS (armored, club tail)
+    {
+      id: 'ankylosaurus', cn: '甲龙', en: 'Ankylosaurus',
+      era: '白垩纪', diet: '植食', size: '8m / 26ft',
+      big: `<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+        ${skinGrad('ankSkin','#6a5a3e','#32281a')}
+        ${skinGrad('armorPlate','#8a7a54','#4a3e28')}
+        <!-- Far legs (behind) -->
+        <path d="M 275 308 L 272 380 L 315 380 L 318 308 Z" fill="#3a2e1a" stroke="#1a1408" stroke-width="2"/>
+        <path d="M 272 380 L 276 392 L 286 380 Z M 298 380 L 302 392 L 312 380 Z" fill="#0c0804"/>
+        <path d="M 475 308 L 472 380 L 515 380 L 518 308 Z" fill="#3a2e1a" stroke="#1a1408" stroke-width="2"/>
+        <path d="M 472 380 L 476 392 L 486 380 Z M 498 380 L 502 392 L 512 380 Z" fill="#0c0804"/>
+
+        <!-- LOW WIDE BODY (tank-like) -->
+        <path d="M 185 245
+                 Q 130 255 110 295
+                 Q 112 325 148 335
+                 Q 300 348 470 345
+                 Q 580 340 625 325
+                 Q 655 310 645 280
+                 Q 610 250 530 245
+                 Q 400 238 270 240
+                 Q 220 243 185 245 Z"
+              fill="url(#ankSkin)" stroke="#1a1408" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Belly -->
+        <path d="M 125 310 Q 280 342 470 340 Q 580 332 635 310 L 625 322 Q 490 352 320 348 Q 200 340 125 310 Z"
+              fill="#2a1f10" opacity="0.35"/>
+
+        <!-- BIG ARMOR PLATES on back (bumpy texture) -->
+        <g fill="url(#armorPlate)" stroke="#1a1408" stroke-width="1.5">
+          <ellipse cx="200" cy="245" rx="20" ry="10"/>
+          <ellipse cx="248" cy="242" rx="20" ry="10"/>
+          <ellipse cx="300" cy="240" rx="20" ry="10"/>
+          <ellipse cx="352" cy="240" rx="20" ry="10"/>
+          <ellipse cx="405" cy="242" rx="20" ry="10"/>
+          <ellipse cx="458" cy="245" rx="20" ry="10"/>
+          <ellipse cx="508" cy="250" rx="18" ry="9"/>
+          <ellipse cx="555" cy="258" rx="15" ry="8"/>
+        </g>
+        <!-- Secondary rows of small plates -->
+        <g fill="#756340" stroke="#1a1408" stroke-width="1">
+          <ellipse cx="180" cy="280" rx="12" ry="6"/>
+          <ellipse cx="225" cy="295" rx="12" ry="6"/>
+          <ellipse cx="280" cy="310" rx="12" ry="6"/>
+          <ellipse cx="350" cy="315" rx="12" ry="6"/>
+          <ellipse cx="420" cy="315" rx="12" ry="6"/>
+          <ellipse cx="490" cy="312" rx="12" ry="6"/>
+          <ellipse cx="555" cy="302" rx="12" ry="6"/>
+        </g>
+        <!-- Side spikes -->
+        <g fill="url(#armorPlate)" stroke="#1a1408" stroke-width="1.5" stroke-linejoin="round">
+          <path d="M 155 298 L 130 303 L 160 320 Z"/>
+          <path d="M 210 325 L 195 345 L 228 340 Z"/>
+          <path d="M 605 300 L 625 300 L 618 322 Z"/>
+        </g>
+
+        <!-- TAIL extending right, with CLUB at end -->
+        <path d="M 630 290
+                 Q 685 298 715 305
+                 Q 725 315 720 320
+                 L 688 328
+                 Q 650 322 628 315 Z"
+              fill="url(#ankSkin)" stroke="#1a1408" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Iconic CLUB (bony ball) -->
+        <g>
+          <circle cx="735" cy="315" r="28" fill="url(#armorPlate)" stroke="#1a1408" stroke-width="3"/>
+          <circle cx="728" cy="308" r="4" fill="#2a2010"/>
+          <circle cx="744" cy="315" r="4" fill="#2a2010"/>
+          <circle cx="725" cy="322" r="3" fill="#2a2010"/>
+          <circle cx="742" cy="328" r="3" fill="#2a2010"/>
+        </g>
+
+        <!-- Head (boxy, low, armored) -->
+        <path d="M 190 270
+                 Q 130 265 95 285
+                 Q 80 305 105 318
+                 Q 155 325 195 310 Z"
+              fill="url(#armorPlate)" stroke="#1a1408" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Head spikes (cheek horns) -->
+        <path d="M 100 280 L 88 268 L 112 285 Z"
+              fill="url(#armorPlate)" stroke="#1a1408" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M 130 270 L 120 252 L 142 272 Z"
+              fill="url(#armorPlate)" stroke="#1a1408" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- Eye -->
+        <circle cx="135" cy="292" r="3.5" fill="#1a1a0a"/>
+        <circle cx="136" cy="292" r="1.3" fill="#fff"/>
+        <!-- Beak/mouth -->
+        <path d="M 95 305 Q 85 312 95 317 L 115 316 Q 120 310 115 305 Z"
+              fill="#3a2e1a" stroke="#1a1408" stroke-width="2"/>
+
+        <!-- Near-side legs -->
+        <path d="M 225 335 L 223 380 L 263 380 L 265 335 Z" fill="url(#ankSkin)" stroke="#1a1408" stroke-width="2.5"/>
+        <path d="M 223 380 L 227 392 L 237 380 Z M 249 380 L 253 392 L 263 380 Z" fill="#0c0804"/>
+        <path d="M 420 338 L 418 380 L 458 380 L 460 338 Z" fill="url(#ankSkin)" stroke="#1a1408" stroke-width="2.5"/>
+        <path d="M 418 380 L 422 392 L 432 380 Z M 444 380 L 448 392 L 458 380 Z" fill="#0c0804"/>
+      </svg>`,
+      thumb: `<svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 22 32 Q 12 34 10 42 Q 12 50 22 50 Q 50 52 74 50 Q 84 46 82 38 Q 70 34 50 34 Z" fill="#4a3c26"/>
+        <circle cx="24" cy="34" r="2.5" fill="#6a5a3a"/>
+        <circle cx="34" cy="33" r="2.5" fill="#6a5a3a"/>
+        <circle cx="44" cy="32" r="2.5" fill="#6a5a3a"/>
+        <circle cx="54" cy="33" r="2.5" fill="#6a5a3a"/>
+        <circle cx="64" cy="34" r="2.5" fill="#6a5a3a"/>
+        <circle cx="72" cy="36" r="2" fill="#6a5a3a"/>
+        <path d="M 78 40 Q 86 42 90 44 Q 92 44 92 46 Q 94 46 94 50 Q 88 53 83 50 Z" fill="#4a3c26"/>
+        <circle cx="94" cy="48" r="5" fill="#6a5a3a"/>
+        <path d="M 16 38 Q 8 38 6 42 Q 8 44 14 44 Z" fill="#6a5a3a"/>
+        <rect x="26" y="50" width="4" height="6" fill="#3a2e18"/>
+        <rect x="40" y="50" width="4" height="6" fill="#3a2e18"/>
+        <rect x="56" y="50" width="4" height="6" fill="#3a2e18"/>
+        <rect x="68" y="50" width="4" height="6" fill="#3a2e18"/>
+        <circle cx="14" cy="41" r="0.6" fill="#000"/>
+      </svg>`,
+      roar: (ctx, master) => roarProfile(ctx, master, {
+        baseLow: 70, basePeak: 180, dur: 1.2, wave: 'square',
+        filterFreq: 800, vibrato: 5, noiseLevel: 0.2
+      })
+    },
+
+    // 8. SPINOSAURUS (with sail)
+    {
+      id: 'spinosaurus', cn: '棘龙', en: 'Spinosaurus',
+      era: '白垩纪', diet: '肉食/鱼食', size: '15m / 50ft',
+      big: `<svg viewBox="0 0 800 440" xmlns="http://www.w3.org/2000/svg">
+        ${skinGrad('spinSkin','#9a7845','#4c3220')}
+        ${skinGrad('sailMem','#e7763a','#a0381a')}
+        ${skinGrad('sailSpine','#d05828','#7c2a10')}
+        <!-- Far-side leg (behind) -->
+        <path d="M 490 310 Q 478 355 473 395 Q 475 410 490 410 L 525 410 Q 530 370 538 310 Z"
+              fill="#593820" stroke="#1f1408" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M 488 410 L 492 420 L 498 410 Z M 510 410 L 514 420 L 520 410 Z" fill="#0e0804"/>
+
+        <!-- HUGE SAIL (iconic feature) connecting full back -->
+        <path d="M 230 245
+                 Q 200 140 245 80
+                 Q 285 65 330 85
+                 Q 380 115 420 170
+                 Q 460 210 510 232
+                 Q 540 245 510 265
+                 Q 465 258 410 240
+                 Q 360 225 310 225
+                 Q 270 228 245 245 Z"
+              fill="url(#sailMem)" stroke="#3a1808" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Sail spines (vertical supporting struts) -->
+        <g stroke="#3a1808" stroke-width="2" fill="url(#sailSpine)" stroke-linejoin="round">
+          <path d="M 248 245 L 248 105 L 262 245 Z"/>
+          <path d="M 280 238 L 285 85 L 300 240 Z"/>
+          <path d="M 318 228 L 325 82 L 342 232 Z"/>
+          <path d="M 358 225 L 370 95 L 385 230 Z"/>
+          <path d="M 398 228 L 412 120 L 428 235 Z"/>
+          <path d="M 440 240 L 455 155 L 470 248 Z"/>
+          <path d="M 480 252 L 495 200 L 508 258 Z"/>
+        </g>
+
+        <!-- BODY (bipedal, horizontal posture) -->
+        <path d="M 230 255
+                 Q 175 258 155 295
+                 Q 160 325 195 335
+                 Q 290 345 400 340
+                 Q 510 325 595 305
+                 Q 640 298 640 272
+                 Q 600 252 520 250
+                 Q 410 245 310 248
+                 Q 260 252 230 255 Z"
+              fill="url(#spinSkin)" stroke="#1f1408" stroke-width="3" stroke-linejoin="round"/>
+
+        <!-- Long tail -->
+        <path d="M 620 275 Q 710 280 780 270 Q 790 292 760 300 Q 700 302 620 295 Z"
+              fill="url(#spinSkin)" stroke="#1f1408" stroke-width="3"/>
+
+        <!-- HEAD: long narrow CROCODILE-like snout -->
+        <path d="M 225 275
+                 Q 165 272 110 280
+                 Q 55 290 25 302
+                 Q 15 315 35 322
+                 Q 105 320 155 314
+                 L 175 328
+                 Q 110 330 75 340
+                 Q 55 350 75 358
+                 Q 150 355 190 345
+                 Q 220 332 225 305 Z"
+              fill="url(#spinSkin)" stroke="#1f1408" stroke-width="3" stroke-linejoin="round"/>
+
+        <!-- Crocodile teeth (narrow, sharp) -->
+        <g fill="#fff" stroke="#1a1a1a" stroke-width="0.7">
+          <path d="M 40 312 L 44 322 L 48 313"/>
+          <path d="M 60 314 L 64 324 L 68 315"/>
+          <path d="M 82 316 L 86 326 L 90 317"/>
+          <path d="M 104 318 L 108 328 L 112 319"/>
+          <path d="M 126 318 L 130 328 L 134 319"/>
+        </g>
+        <g fill="#fff" stroke="#1a1a1a" stroke-width="0.7">
+          <path d="M 78 342 L 82 334 L 86 343"/>
+          <path d="M 102 344 L 106 336 L 110 345"/>
+          <path d="M 128 343 L 132 335 L 136 344"/>
+          <path d="M 155 340 L 159 332 L 163 341"/>
+        </g>
+        <!-- Nostril -->
+        <ellipse cx="62" cy="302" rx="3" ry="2" fill="#0a0808"/>
+        <!-- Eye -->
+        <circle cx="195" cy="290" r="5" fill="#ffb030" stroke="#1f1408" stroke-width="1.5"/>
+        <circle cx="196" cy="291" r="2" fill="#000"/>
+
+        <!-- Small arms (stronger than T-Rex) -->
+        <path d="M 295 320 Q 305 355 295 378 L 285 380 L 283 365 Q 283 340 286 320 Z"
+              fill="url(#spinSkin)" stroke="#1f1408" stroke-width="2"/>
+        <path d="M 285 380 L 278 388 L 285 390 L 290 384" fill="url(#spinSkin)" stroke="#1f1408" stroke-width="1.5"/>
+        <!-- Arm claws -->
+        <path d="M 278 388 L 272 395 L 282 390 Z" fill="#f0e8c0" stroke="#1f1408" stroke-width="1"/>
+
+        <!-- Near side back leg (bipedal) -->
+        <path d="M 405 340 Q 390 380 385 410 Q 385 425 400 425 L 435 425 Q 440 390 448 342 Z"
+              fill="url(#spinSkin)" stroke="#1f1408" stroke-width="3" stroke-linejoin="round"/>
+        <g fill="#1f1408">
+          <path d="M 400 425 L 404 435 L 410 425 Z"/>
+          <path d="M 418 425 L 422 435 L 428 425 Z"/>
+        </g>
+      </svg>`,
+      thumb: `<svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 30 28 Q 26 18 32 8 Q 40 4 50 8 Q 60 16 64 25 Q 58 26 40 28 Z" fill="#c85828"/>
+        <g fill="#7a2a10">
+          <path d="M 32 26 L 34 12 L 38 26 Z"/><path d="M 42 26 L 46 10 L 50 26 Z"/><path d="M 54 26 L 58 14 L 62 26 Z"/>
+        </g>
+        <path d="M 20 30 Q 12 30 10 36 Q 12 42 20 42 Q 44 44 66 42 Q 74 40 72 34 Q 56 30 44 30 Z" fill="#7a5830"/>
+        <path d="M 72 36 Q 92 38 94 40 Q 90 44 72 42 Z" fill="#7a5830"/>
+        <path d="M 18 34 Q 10 34 6 38 Q 8 40 14 40 L 12 44 Q 6 44 5 46 Q 8 48 16 46 Q 22 42 22 36 Z" fill="#7a5830"/>
+        <path d="M 8 38 L 11 40 L 14 38 L 16 40 L 18 38" stroke="#fff" stroke-width="0.8" fill="none"/>
+        <circle cx="22" cy="36" r="0.8" fill="#ffb030"/>
+        <rect x="44" y="42" width="4" height="12" fill="#7a5830"/>
+        <rect x="58" y="42" width="4" height="12" fill="#5a3820"/>
+      </svg>`,
+      roar: (ctx, master) => roarProfile(ctx, master, {
+        baseLow: 65, basePeak: 200, dur: 1.4, wave: 'sawtooth',
+        filterFreq: 1100, vibrato: 7, noiseLevel: 0.28
+      })
+    }
+  ];
+
+  // =========================================================================
+  // AUDIO: generic roar synth with parametric profile
+  // =========================================================================
+  let audioCtx = null;
+  let master = null;
+  function ensureCtx() {
+    if (!audioCtx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      audioCtx = new AC();
+      master = audioCtx.createGain();
+      master.gain.value = 0.4;
+      master.connect(audioCtx.destination);
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  function roarProfile(ctx, master, p) {
+    const now = ctx.currentTime;
+    const dur = p.dur;
+
+    // Main oscillator — the roar pitch
+    const osc = ctx.createOscillator();
+    osc.type = p.wave;
+    const filt = ctx.createBiquadFilter();
+    filt.type = 'lowpass';
+    filt.frequency.value = p.filterFreq;
+    filt.Q.value = 4;
+
+    // Envelope
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(0.35, now + 0.05);
+    g.gain.setValueAtTime(0.35, now + dur - 0.25);
+    g.gain.exponentialRampToValueAtTime(0.001, now + dur);
+
+    // Frequency sweep (roar shape: rises fast, slowly falls)
+    osc.frequency.setValueAtTime(p.baseLow, now);
+    osc.frequency.linearRampToValueAtTime(p.basePeak, now + dur * 0.2);
+    osc.frequency.linearRampToValueAtTime(p.baseLow * 0.8, now + dur);
+
+    // Vibrato (tremor) via LFO on frequency
+    if (p.vibrato > 0) {
+      const lfo = ctx.createOscillator();
+      lfo.frequency.value = p.vibrato;
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = p.basePeak * 0.08;
+      lfo.connect(lfoGain).connect(osc.frequency);
+      lfo.start(now);
+      lfo.stop(now + dur);
+    }
+
+    osc.connect(filt).connect(g).connect(master);
+    osc.start(now);
+    osc.stop(now + dur + 0.02);
+
+    // Noise layer for "growl texture"
+    if (p.noiseLevel > 0) {
+      const bufSize = Math.floor(ctx.sampleRate * dur);
+      const buf = ctx.createBuffer(1, bufSize, ctx.sampleRate);
+      const data = buf.getChannelData(0);
+      for (let i = 0; i < bufSize; i++) data[i] = (Math.random() * 2 - 1);
+      const noise = ctx.createBufferSource();
+      noise.buffer = buf;
+      const noiseFilt = ctx.createBiquadFilter();
+      noiseFilt.type = 'bandpass';
+      noiseFilt.frequency.value = p.filterFreq * 0.7;
+      noiseFilt.Q.value = 2;
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(0, now);
+      noiseGain.gain.linearRampToValueAtTime(p.noiseLevel, now + 0.05);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      noise.connect(noiseFilt).connect(noiseGain).connect(master);
+      noise.start(now);
+      noise.stop(now + dur);
+    }
+
+    // Pteranodon screech option: a second high oscillator
+    if (p.screech) {
+      const scr = ctx.createOscillator();
+      scr.type = 'sawtooth';
+      scr.frequency.setValueAtTime(1200, now);
+      scr.frequency.linearRampToValueAtTime(1800, now + dur * 0.3);
+      scr.frequency.linearRampToValueAtTime(900, now + dur);
+      const scrG = ctx.createGain();
+      scrG.gain.setValueAtTime(0, now);
+      scrG.gain.linearRampToValueAtTime(0.12, now + 0.05);
+      scrG.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      scr.connect(scrG).connect(master);
+      scr.start(now); scr.stop(now + dur);
+    }
+  }
+
+  // =========================================================================
+  // UI
+  // =========================================================================
+  const picker      = document.getElementById('picker');
+  const dinoStage   = document.getElementById('dinoStage');
+  const nameCn      = document.getElementById('nameCn');
+  const nameEn      = document.getElementById('nameEn');
+  const nameFacts   = document.getElementById('nameFacts');
+  const roarBtn     = document.getElementById('roarBtn');
+  const prevBtn     = document.getElementById('prevBtn');
+  const nextBtn     = document.getElementById('nextBtn');
+
+  let currentIdx = 0;
+
+  // Populate dinosaur stage (big SVGs, hidden)
+  DINOS.forEach((d, i) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'dino';
+    wrap.id = 'dino-' + d.id;
+    wrap.innerHTML = d.big;
+    dinoStage.appendChild(wrap);
+
+    // Thumb card
+    const card = document.createElement('button');
+    card.className = 'pick-card' + (i === 0 ? ' selected' : '');
+    card.dataset.idx = i;
+    card.setAttribute('aria-label', d.cn + ' / ' + d.en);
+    card.innerHTML = `<div class="thumb">${d.thumb}</div><div class="thumb-name">${d.cn}</div>`;
+    card.addEventListener('click', () => showDino(i));
+    picker.appendChild(card);
+  });
+
+  function showDino(idx, triggerRoar = false) {
+    currentIdx = (idx + DINOS.length) % DINOS.length;
+    const d = DINOS[currentIdx];
+
+    // Update stage (remove active from all, add to current)
+    document.querySelectorAll('.dino').forEach(el => el.classList.remove('active', 'roaring'));
+    const el = document.getElementById('dino-' + d.id);
+    el.classList.add('active');
+
+    // Update name + facts
+    nameCn.textContent = d.cn;
+    nameEn.textContent = d.en;
+    nameFacts.innerHTML = `
+      <span class="fact-chip">🌋 ${d.era}</span>
+      <span class="fact-chip">🍖 ${d.diet}</span>
+      <span class="fact-chip">📏 ${d.size}</span>
+    `;
+
+    // Update picker selection
+    document.querySelectorAll('.pick-card').forEach((c, i) => {
+      c.classList.toggle('selected', i === currentIdx);
+      if (i === currentIdx) c.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    });
+
+    if (triggerRoar) playRoar();
+  }
+
+  function playRoar() {
+    ensureCtx();
+    const d = DINOS[currentIdx];
+    const el = document.getElementById('dino-' + d.id);
+    el.classList.remove('roaring');
+    void el.offsetWidth;
+    el.classList.add('roaring');
+    roarBtn.classList.remove('pulse');
+    void roarBtn.offsetWidth;
+    roarBtn.classList.add('pulse');
+    if (d.roar) d.roar(audioCtx, master);
+    if (navigator.vibrate) navigator.vibrate([30, 40, 60]);
+  }
+
+  // Auto-roar when tapping the dinosaur itself
+  dinoStage.addEventListener('click', () => playRoar());
+  roarBtn.addEventListener('click', playRoar);
+  prevBtn.addEventListener('click', () => showDino(currentIdx - 1));
+  nextBtn.addEventListener('click', () => showDino(currentIdx + 1));
+
+  // Keyboard arrows
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowLeft') showDino(currentIdx - 1);
+    else if (e.key === 'ArrowRight') showDino(currentIdx + 1);
+    else if (e.key === ' ' || e.key === 'Enter') { playRoar(); e.preventDefault(); }
+  });
+
+  // iOS double-tap zoom prevention
+  let lastTouch = 0;
+  document.addEventListener('touchend', e => {
+    const now = Date.now();
+    if (now - lastTouch < 320) e.preventDefault();
+    lastTouch = now;
+  }, { passive: false });
+
+  // Boot up
+  showDino(0);
+})();
+</script>
+</body>
+</html>
