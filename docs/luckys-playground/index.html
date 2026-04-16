@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lucky's Playground — Good Ideas 2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+<style>
+  .pg-header { padding: 72px 32px 40px; text-align: center; border-bottom: 1px solid var(--border); }
+  .pg-header .back { color: var(--text3); font-size: 0.95rem; margin-bottom: 24px; display: inline-block; }
+  .pg-header h1 { font-family: 'Playfair Display', Georgia, serif; font-size: clamp(2.4rem, 5vw, 3.6rem); font-weight: 800; color: var(--accent); margin-bottom: 10px; }
+  .pg-header .sub { color: var(--text2); font-size: 1.15rem; max-width: 640px; margin: 0 auto 8px; line-height: 1.8; }
+  .pg-header .meta { color: var(--text3); font-size: 0.9rem; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  .games {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin: 40px 0;
+  }
+  .game {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    display: flex;
+    flex-direction: column;
+    min-height: 220px;
+  }
+  .game:hover {
+    text-decoration: none;
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+  }
+  .game .icon { font-size: 56px; line-height: 1; margin-bottom: 12px; }
+  .game h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+  }
+  .game .tags {
+    font-size: 0.8rem;
+    color: var(--text3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .game p {
+    color: var(--text2);
+    font-size: 0.98rem;
+    line-height: 1.6;
+    flex: 1;
+  }
+  .game.placeholder {
+    opacity: 0.55;
+    pointer-events: none;
+    background: transparent;
+    border-style: dashed;
+  }
+
+  .pg-principles {
+    background: var(--bg2);
+    border-radius: 14px;
+    padding: 28px 32px;
+    margin-top: 24px;
+  }
+  .pg-principles h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+  .pg-principles ul { list-style: none; }
+  .pg-principles li {
+    padding: 8px 0 8px 28px;
+    position: relative;
+    color: var(--text2);
+    font-size: 1rem;
+  }
+  .pg-principles li::before {
+    content: "▸";
+    position: absolute;
+    left: 6px;
+    color: var(--accent);
+  }
+
+  .footer-note {
+    margin-top: 48px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+    color: var(--text2);
+    font-size: 0.95rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="pg-header">
+  <a href="../" class="back">← Good Ideas 2.0</a>
+  <h1>Lucky's Playground</h1>
+  <p class="sub">一个 4 岁半的娃 × 爸爸 × Claude Code，一起做的小游戏和小应用。</p>
+  <div class="meta">A father-son coding lab · part of Good Ideas 2.0</div>
+</div>
+
+<section>
+<div class="wrap">
+
+  <h2 class="sec-title">游戏库 · Games</h2>
+  <p class="sec-sub">手机、平板、电脑都能直接打开玩。</p>
+
+  <div class="games">
+
+    <a class="game" href="police-siren.html">
+      <div class="icon">🚓</div>
+      <h3>警灯鸣笛器</h3>
+      <div class="tags">P1 · L5 · 5 min</div>
+      <p>点一下开启警灯和警笛，车道线往后跑，车像在追嫌犯。🇺🇸 Yelp / 🇬🇧 Hi-Lo / 🇨🇳 Wail 三国三车切换。</p>
+    </a>
+
+    <a class="game" href="truck-mixer.html">
+      <div class="icon">🛠️</div>
+      <h3>超级组合车</h3>
+      <div class="tags">E3 · L4 · 10 min</div>
+      <p>警车 + 装载机 + 吊车 + 挖掘机 + Monster Truck 随便组，点组合按钮变出一辆超级怪兽工程车。</p>
+    </a>
+
+    <div class="game placeholder">
+      <div class="icon">🦕</div>
+      <h3>恐龙点名器</h3>
+      <div class="tags">D1 · 敬请期待</div>
+      <p>十只恐龙轮播，点击播放咆哮声，念出中英文名字、体重身长。</p>
+    </div>
+
+    <div class="game placeholder">
+      <div class="icon">🚜</div>
+      <h3>工地模拟器</h3>
+      <div class="tags">E1 · 敬请期待</div>
+      <p>挖掘机、推土机、自卸车，用方向键/触屏操控。Lucky 自己设关卡。</p>
+    </div>
+
+    <div class="game placeholder">
+      <div class="icon">🧱</div>
+      <h3>颜色分拣</h3>
+      <div class="tags">B1 · 敬请期待</div>
+      <p>彩色积木从上方掉落，拖到对应颜色的桶里。</p>
+    </div>
+
+    <div class="game placeholder">
+      <div class="icon">🎤</div>
+      <h3>恐龙博士问答</h3>
+      <div class="tags">D3 · 敬请期待</div>
+      <p>按住麦克风问问题，"恐龙老爷爷"用孩子听得懂的话回答。</p>
+    </div>
+
+  </div>
+
+  <div class="pg-principles">
+    <h3>三条原则</h3>
+    <ul>
+      <li><strong>Lucky 当 Creator，不是 Consumer。</strong>他决定做什么恐龙、什么颜色、什么声音。</li>
+      <li><strong>不识字也要能玩。</strong>UI 靠颜色、图标、声音、动作传递信息，触控优先。</li>
+      <li><strong>单次 ≤ 15 分钟。</strong>宁可做 10 个 5 分钟的小玩意，不做 1 个 1 小时的大项目。</li>
+    </ul>
+  </div>
+
+  <div class="footer-note">
+    <p>完整点子清单（15 个项目，按恐龙/工程车/积木/警车/综合创作分类）见仓库 <a href="https://github.com/AutoZYX/GoodIdeas2/tree/main/luckys-playground">luckys-playground/README.md</a>。</p>
+    <p style="margin-top: 8px;">下一个做什么？Lucky 决定 👶。</p>
+  </div>
+
+</div>
+</section>
+
+</body>
+</html>

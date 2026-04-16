@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0e27">
+<title>🛠️ Lucky's Truck Mixer · 超级组合车</title>
+<style>
+  :root {
+    --accent: #ffcb05;
+    --accent-2: #ff8a05;
+    --red: #ff2040;
+    --blue: #2060ff;
+    --green: #4ade80;
+  }
+
+  *, *::before, *::after {
+    margin: 0; padding: 0; box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: #fff;
+    touch-action: manipulation;
+    background: radial-gradient(ellipse at top, #1a2a5a 0%, #0a0e27 70%);
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0)
+             env(safe-area-inset-bottom, 0) env(safe-area-inset-left, 0);
+  }
+
+  /* ====== Top bar ====== */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px 4px;
+    font-size: 13px;
+    opacity: 0.85;
+  }
+  .topbar a { color: inherit; opacity: 0.7; text-decoration: none; }
+  .topbar a:hover { opacity: 1; }
+  .topbar .title { font-weight: 700; }
+
+  /* ====== Vehicle selection row ====== */
+  .label-row {
+    text-align: center;
+    font-size: 12px;
+    opacity: 0.55;
+    padding: 8px 16px 4px;
+    letter-spacing: 0.06em;
+  }
+  .vehicles {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    padding: 4px 12px 6px;
+  }
+  .vehicle-card {
+    aspect-ratio: 1;
+    min-height: 70px;
+    background: rgba(255,255,255,0.07);
+    border: 3px solid rgba(255,255,255,0.10);
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform .2s, background .2s, border-color .2s;
+    padding: 4px;
+    position: relative;
+    gap: 2px;
+  }
+  .vehicle-card:active { transform: scale(.94); }
+  .vehicle-card.selected {
+    border-color: var(--accent);
+    background: rgba(255,203,5,0.18);
+    box-shadow: 0 0 24px rgba(255,203,5,0.3);
+  }
+  .vehicle-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    background: var(--green);
+    color: #000;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .vehicle-card .v-icon {
+    width: 50px; height: 34px;
+    flex-shrink: 0;
+  }
+  .vehicle-card .v-cn { font-size: 12px; font-weight: 600; line-height: 1.1; }
+  .vehicle-card .v-en { font-size: 9px; opacity: 0.55; line-height: 1; letter-spacing: 0.04em; }
+
+  /* ====== Stage (result area) ====== */
+  .stage {
+    flex: 1;
+    min-height: 0;
+    position: relative;
+    overflow: hidden;
+    margin: 6px 10px;
+    border-radius: 18px;
+    background:
+      linear-gradient(to bottom, rgba(20,28,60,0.4) 0%, rgba(10,14,39,0.7) 65%, #2a1a0a 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .stage-ground {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 25%;
+    background: linear-gradient(to bottom, #3a2a1a 0%, #1a1208 100%);
+    border-top: 2px solid rgba(255,255,255,0.12);
+  }
+  .stage-ground::before {
+    content: '';
+    position: absolute;
+    top: 35%;
+    left: 0; right: 0;
+    height: 3px;
+    background: repeating-linear-gradient(to right,
+      var(--accent) 0 24px, transparent 24px 48px);
+    opacity: 0.7;
+  }
+  .placeholder {
+    font-size: clamp(15px, 4vw, 22px);
+    line-height: 1.6;
+    opacity: 0.55;
+    text-align: center;
+    padding: 20px;
+    z-index: 2;
+  }
+  .placeholder .big { font-size: 2.2em; display: block; margin-bottom: 8px; }
+  .placeholder.hidden { display: none; }
+
+  .result {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    z-index: 2;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .result.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #hybridTruck {
+    width: 96%;
+    max-width: 820px;
+    height: auto;
+    filter: drop-shadow(0 14px 24px rgba(0,0,0,0.55));
+    transform-origin: center;
+  }
+  .result.show #hybridTruck { animation: truckAppear .7s cubic-bezier(.34,1.56,.50,1) both; }
+  @keyframes truckAppear {
+    0%   { opacity: 0; transform: scale(.3) rotate(-6deg); }
+    60%  { opacity: 1; transform: scale(1.08) rotate(3deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0); }
+  }
+
+  .result-name {
+    margin-top: 8px;
+    text-align: center;
+    padding: 6px 14px;
+    max-width: 100%;
+  }
+  .result-name .cn {
+    font-size: clamp(16px, 4.5vw, 24px);
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.25;
+  }
+  .result-name .en {
+    font-size: clamp(10px, 2.8vw, 13px);
+    font-style: italic;
+    opacity: 0.7;
+    margin-top: 2px;
+    letter-spacing: 0.04em;
+  }
+  .result.show .result-name { animation: nameAppear .5s .45s both; }
+  @keyframes nameAppear {
+    0%   { opacity: 0; transform: translateY(14px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ====== Actions ====== */
+  .actions {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 12px;
+    padding: 8px 14px 18px;
+  }
+  .btn-reset {
+    height: 60px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.08);
+    border: 2px solid rgba(255,255,255,0.12);
+    cursor: pointer;
+    color: #fff;
+    font-size: 22px;
+    transition: transform .12s, background .12s;
+  }
+  .btn-reset:hover { background: rgba(255,255,255,0.15); }
+  .btn-reset:active { transform: scale(.92); }
+
+  .btn-combine {
+    height: 60px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #1a1a1a;
+    border: none;
+    border-radius: 16px;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 900;
+    cursor: pointer;
+    box-shadow: 0 8px 30px rgba(255, 138, 5, 0.4);
+    letter-spacing: 0.08em;
+    transition: transform .1s, box-shadow .1s, background .2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-combine:active { transform: scale(.96); }
+  .btn-combine:disabled {
+    background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
+    color: #666;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+  .btn-combine .pip { font-size: 22px; }
+  .btn-combine .sub {
+    font-size: 10px;
+    font-weight: 600;
+    opacity: 0.7;
+    letter-spacing: 0.06em;
+  }
+
+  /* ====== Flashing lights (for police layer) ====== */
+  @keyframes redFlash  {
+    0%, 40%   { fill: #ff2040; filter: drop-shadow(0 0 8px #ff2040) drop-shadow(0 0 18px #ff2040); }
+    50%, 100% { fill: #3a0c18; filter: none; }
+  }
+  @keyframes blueFlash {
+    0%, 40%   { fill: #2060ff; filter: drop-shadow(0 0 8px #2060ff) drop-shadow(0 0 18px #2060ff); }
+    50%, 100% { fill: #0a1040; filter: none; }
+  }
+  .result.show.has-police .flash-red  { animation: redFlash  .5s infinite; }
+  .result.show.has-police .flash-blue { animation: blueFlash .5s infinite .25s; }
+
+  /* Halo when police selected */
+  .result.has-police::before {
+    content: '';
+    position: absolute;
+    left: 50%; top: 55%;
+    transform: translate(-50%, -50%);
+    width: 90%; height: 60%;
+    background: radial-gradient(ellipse at center, transparent 0%, transparent 100%);
+    animation: haloFlash .5s infinite;
+    pointer-events: none;
+    z-index: 1;
+  }
+  @keyframes haloFlash {
+    0%, 45%   { background: radial-gradient(ellipse at center, rgba(255,32,64,0.3) 0%, transparent 55%); }
+    50%, 100% { background: radial-gradient(ellipse at center, rgba(32,96,255,0.3) 0%, transparent 55%); }
+  }
+
+  /* ====== Layer visibility ====== */
+  .layer { display: none; }
+  .has-police    .layer-police    { display: block; }
+  .has-loader    .layer-loader    { display: block; }
+  .has-crane     .layer-crane     { display: block; }
+  .has-excavator .layer-excavator { display: block; }
+  .has-monster   .layer-monster   { display: block; }
+  .wheels-monster { display: none; }
+  .has-monster .wheels-normal  { display: none; }
+  .has-monster .wheels-monster { display: block; }
+
+  /* Crane animation: gentle sway */
+  @keyframes craneSway {
+    0%, 100% { transform: rotate(0); }
+    50%      { transform: rotate(-1.5deg); }
+  }
+  .result.show.has-crane .layer-crane {
+    transform-origin: 510px 250px;
+    animation: craneSway 2s ease-in-out infinite;
+  }
+
+  /* Excavator arm: subtle dig motion */
+  @keyframes digMotion {
+    0%, 100% { transform: rotate(0); }
+    50%      { transform: rotate(-3deg); }
+  }
+  .result.show.has-excavator .excavator-arm {
+    transform-origin: 220px 240px;
+    animation: digMotion 2.6s ease-in-out infinite;
+  }
+
+  /* Loader bucket: subtle up-down */
+  @keyframes scoopMotion {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+  }
+  .result.show.has-loader .loader-bucket {
+    animation: scoopMotion 2.2s ease-in-out infinite;
+  }
+
+  /* Monster truck bounce */
+  @keyframes monsterBounce {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50%      { transform: translateY(-3px) rotate(.4deg); }
+  }
+  .result.show.has-monster #truckAssembly {
+    animation: monsterBounce 1.2s ease-in-out infinite;
+  }
+
+  /* Small phones */
+  @media (max-width: 380px) {
+    .vehicle-card .v-icon { width: 42px; height: 28px; }
+    .vehicle-card .v-cn { font-size: 11px; }
+    .vehicle-card .v-en { font-size: 8px; }
+    .btn-combine { font-size: 16px; }
+    .btn-reset { font-size: 20px; }
+  }
+  @media (max-height: 640px) {
+    .vehicles { padding: 2px 10px 4px; gap: 6px; }
+    .vehicle-card { min-height: 60px; }
+    .label-row { padding: 4px 16px 0; font-size: 11px; }
+    .actions { padding: 6px 14px 12px; }
+    .btn-reset, .btn-combine { height: 52px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="./">← Playground</a>
+  <div class="title">🛠️ 超级组合车 · Truck Mixer</div>
+</div>
+
+<div class="label-row">选 2+ 辆车 · Pick 2 or more</div>
+
+<!-- ============================ VEHICLE CARDS ============================ -->
+<div class="vehicles" id="vehicleCards">
+  <div class="vehicle-card" data-vehicle="police">
+    <svg class="v-icon" viewBox="0 0 100 60">
+      <rect x="10" y="18" width="80" height="26" rx="5" fill="#f0f0f0"/>
+      <rect x="10" y="30" width="80" height="10" fill="#0050cc"/>
+      <rect x="38" y="8" width="24" height="8" rx="1.5" fill="#222"/>
+      <rect x="40" y="10" width="10" height="4" fill="#ff2040"/>
+      <rect x="50" y="10" width="10" height="4" fill="#2060ff"/>
+      <circle cx="26" cy="46" r="9" fill="#1a1a1a"/><circle cx="26" cy="46" r="4" fill="#666"/>
+      <circle cx="74" cy="46" r="9" fill="#1a1a1a"/><circle cx="74" cy="46" r="4" fill="#666"/>
+    </svg>
+    <div class="v-cn">警车</div>
+    <div class="v-en">Police</div>
+  </div>
+
+  <div class="vehicle-card" data-vehicle="loader">
+    <svg class="v-icon" viewBox="0 0 100 60">
+      <rect x="22" y="22" width="50" height="22" rx="3" fill="#ffc820"/>
+      <rect x="26" y="14" width="28" height="10" rx="2" fill="#ffc820"/>
+      <rect x="28" y="16" width="22" height="6" fill="#3a6090" opacity=".7"/>
+      <!-- bucket arm -->
+      <path d="M 68 34 L 90 38 L 94 50 L 78 52 L 72 42 Z" fill="#ffaa00"/>
+      <circle cx="20" cy="48" r="9" fill="#1a1a1a"/><circle cx="20" cy="48" r="4" fill="#666"/>
+      <circle cx="62" cy="48" r="9" fill="#1a1a1a"/><circle cx="62" cy="48" r="4" fill="#666"/>
+    </svg>
+    <div class="v-cn">装载机</div>
+    <div class="v-en">Loader</div>
+  </div>
+
+  <div class="vehicle-card" data-vehicle="crane">
+    <svg class="v-icon" viewBox="0 0 100 60">
+      <rect x="10" y="32" width="70" height="14" rx="2" fill="#ffaa20"/>
+      <!-- boom -->
+      <path d="M 38 34 L 90 8 L 93 14 L 41 40 Z" fill="#ffd040"/>
+      <line x1="90" y1="12" x2="90" y2="30" stroke="#333" stroke-width="1.2"/>
+      <path d="M 87 30 L 93 30 L 93 36 Q 90 38 87 36 Z" fill="#888"/>
+      <circle cx="24" cy="50" r="8" fill="#1a1a1a"/><circle cx="24" cy="50" r="3.5" fill="#666"/>
+      <circle cx="64" cy="50" r="8" fill="#1a1a1a"/><circle cx="64" cy="50" r="3.5" fill="#666"/>
+    </svg>
+    <div class="v-cn">吊车</div>
+    <div class="v-en">Crane</div>
+  </div>
+
+  <div class="vehicle-card" data-vehicle="excavator">
+    <svg class="v-icon" viewBox="0 0 100 60">
+      <rect x="28" y="26" width="54" height="18" rx="2" fill="#ff8800"/>
+      <rect x="34" y="18" width="24" height="10" rx="2" fill="#ff8800"/>
+      <!-- boom + stick + bucket -->
+      <path d="M 50 22 L 20 4 L 14 10 L 46 30 Z" fill="#ff9a00"/>
+      <path d="M 18 7 L 6 26 L 12 30 L 22 12 Z" fill="#ff9a00"/>
+      <path d="M 6 26 L 2 36 L 10 42 L 16 38 L 14 30 Z" fill="#c06020"/>
+      <rect x="4" y="40" width="2" height="5" fill="#444"/>
+      <rect x="8" y="42" width="2" height="5" fill="#444"/>
+      <circle cx="40" cy="48" r="8" fill="#1a1a1a"/><circle cx="40" cy="48" r="3.5" fill="#666"/>
+      <circle cx="70" cy="48" r="8" fill="#1a1a1a"/><circle cx="70" cy="48" r="3.5" fill="#666"/>
+    </svg>
+    <div class="v-cn">挖掘机</div>
+    <div class="v-en">Excavator</div>
+  </div>
+
+  <div class="vehicle-card" data-vehicle="monster">
+    <svg class="v-icon" viewBox="0 0 100 60">
+      <rect x="18" y="20" width="64" height="16" rx="3" fill="#d83020"/>
+      <rect x="24" y="12" width="32" height="10" rx="2" fill="#d83020"/>
+      <rect x="26" y="14" width="26" height="6" fill="#3a6090" opacity=".7"/>
+      <!-- flames -->
+      <path d="M 34 34 Q 40 28 45 32 Q 50 26 56 32 L 56 36 L 34 36 Z" fill="#ffc000"/>
+      <circle cx="25" cy="48" r="14" fill="#0a0a0a"/>
+      <circle cx="25" cy="48" r="8" fill="#333"/>
+      <circle cx="25" cy="48" r="4" fill="#999"/>
+      <circle cx="75" cy="48" r="14" fill="#0a0a0a"/>
+      <circle cx="75" cy="48" r="8" fill="#333"/>
+      <circle cx="75" cy="48" r="4" fill="#999"/>
+    </svg>
+    <div class="v-cn">怪兽车</div>
+    <div class="v-en">Monster</div>
+  </div>
+</div>
+
+<!-- ============================ STAGE ============================ -->
+<div class="stage">
+  <div class="stage-ground"></div>
+
+  <div class="placeholder" id="placeholder">
+    <span class="big">🤔</span>
+    选好 2 辆以上<br>
+    点 <b style="color:var(--accent)">组合!</b> 变超级车
+  </div>
+
+  <div class="result" id="result">
+    <svg id="hybridTruck" viewBox="0 0 900 500" xmlns="http://www.w3.org/2000/svg">
+
+      <defs>
+        <linearGradient id="flameGrad" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stop-color="#ffee00"/>
+          <stop offset="0.5" stop-color="#ff8800"/>
+          <stop offset="1" stop-color="#d92200"/>
+        </linearGradient>
+        <linearGradient id="craneBoomGrad" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0" stop-color="#ffd040"/>
+          <stop offset="1" stop-color="#ffa820"/>
+        </linearGradient>
+      </defs>
+
+      <g id="truckAssembly">
+
+        <!-- ======================= EXCAVATOR (back arm) ======================= -->
+        <g class="layer layer-excavator">
+          <!-- rotating platform on truck bed -->
+          <rect x="180" y="240" width="90" height="16" rx="3" fill="#ff7800" stroke="#000" stroke-width="2"/>
+          <!-- cabin -->
+          <path d="M 200 240 L 200 210 L 258 210 L 270 240 Z" fill="#ff8800" stroke="#000" stroke-width="2"/>
+          <rect x="207" y="216" width="40" height="18" fill="#3a6090" opacity="0.75"/>
+          <!-- arm (animated) -->
+          <g class="excavator-arm">
+            <!-- boom (upper, back and up) -->
+            <path d="M 232 220 L 230 210 L 90 110 L 75 135 L 220 235 Z"
+                  fill="#ff9a00" stroke="#000" stroke-width="2"/>
+            <!-- pivot circle -->
+            <circle cx="232" cy="220" r="7" fill="#222"/>
+            <!-- stick (lower, down-back) -->
+            <path d="M 95 115 L 45 260 L 70 275 L 115 135 Z"
+                  fill="#ff8000" stroke="#000" stroke-width="2"/>
+            <circle cx="92" cy="117" r="6" fill="#222"/>
+            <!-- bucket -->
+            <path d="M 50 253 L 22 280 L 20 318 L 65 328 L 82 300 L 75 268 Z"
+                  fill="#b84a10" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
+            <!-- teeth -->
+            <path d="M 22 318 L 25 336 L 34 336 L 31 320 Z" fill="#aaa" stroke="#000" stroke-width="1"/>
+            <path d="M 38 322 L 40 338 L 50 338 L 48 324 Z" fill="#aaa" stroke="#000" stroke-width="1"/>
+            <path d="M 54 322 L 57 335 L 67 333 L 65 322 Z" fill="#aaa" stroke="#000" stroke-width="1"/>
+            <!-- hydraulic cylinder on boom -->
+            <line x1="180" y1="215" x2="145" y2="160" stroke="#666" stroke-width="5"/>
+            <line x1="180" y1="215" x2="145" y2="160" stroke="#bbb" stroke-width="2"/>
+          </g>
+        </g>
+
+        <!-- ======================= TRUCK BODY (core) ======================= -->
+        <g class="truck-body">
+          <!-- chassis + body -->
+          <path d="M 215 375 L 225 290 L 275 275 L 315 215 L 455 215 L 480 275 L 650 275 L 695 320 L 695 375 Z"
+                fill="#d92020" stroke="#1a1a1a" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- cab window -->
+          <path d="M 320 220 L 328 275 L 450 275 L 445 220 Z" fill="#3a6090" opacity="0.82"/>
+          <line x1="386" y1="220" x2="386" y2="275" stroke="#222" stroke-width="2" opacity="0.7"/>
+          <!-- side trim -->
+          <rect x="225" y="330" width="470" height="40" fill="rgba(0,0,0,0.18)"/>
+          <!-- door seams -->
+          <line x1="385" y1="275" x2="385" y2="370" stroke="rgba(0,0,0,0.3)" stroke-width="1.5"/>
+          <line x1="490" y1="275" x2="490" y2="370" stroke="rgba(0,0,0,0.2)" stroke-width="1.2"/>
+          <rect x="345" y="302" width="24" height="5" fill="#222" rx="2"/>
+          <rect x="445" y="302" width="24" height="5" fill="#222" rx="2"/>
+          <!-- headlight -->
+          <ellipse cx="675" cy="305" rx="13" ry="9" fill="#fff2c8"/>
+          <ellipse cx="677" cy="305" rx="5" ry="4" fill="#fff"/>
+          <!-- front grille -->
+          <rect x="658" y="335" width="38" height="32" fill="#151515" rx="2"/>
+          <g stroke="#444" stroke-width="1.3">
+            <line x1="662" y1="344" x2="693" y2="344"/>
+            <line x1="662" y1="352" x2="693" y2="352"/>
+            <line x1="662" y1="360" x2="693" y2="360"/>
+          </g>
+          <!-- tail light -->
+          <rect x="216" y="330" width="12" height="22" rx="1.5" fill="#c22020"/>
+          <!-- exhaust pipe -->
+          <rect x="238" y="214" width="8" height="60" fill="#6a6a6a" rx="2"/>
+          <circle cx="242" cy="214" r="5" fill="#2a2a2a"/>
+        </g>
+
+        <!-- ======================= POLICE LAYER ======================= -->
+        <g class="layer layer-police">
+          <!-- roof lightbar -->
+          <rect x="330" y="202" width="110" height="18" rx="3" fill="#121212"/>
+          <rect x="330" y="199" width="110" height="3" rx="1" fill="#2a2a2a"/>
+          <rect class="flash-red"  x="334" y="205" width="50" height="12" rx="1" fill="#3a0c18"/>
+          <rect class="flash-blue" x="388" y="205" width="48" height="12" rx="1" fill="#0a1040"/>
+          <!-- blue side stripe -->
+          <rect x="226" y="325" width="470" height="18" fill="#0050cc"/>
+          <rect x="226" y="343" width="470" height="3" fill="#ffffff"/>
+          <!-- POLICE text and 警察 -->
+          <text x="325" y="342" font-family="Impact, 'Arial Black', sans-serif" font-size="20" font-weight="900" fill="#ffffff" letter-spacing="2">POLICE</text>
+          <text x="500" y="340" font-family="'PingFang SC','Microsoft YaHei',sans-serif" font-size="22" font-weight="900" fill="#ffffff" letter-spacing="6">警察</text>
+          <!-- star badge -->
+          <g transform="translate(615, 310)">
+            <circle r="16" fill="#ffffff"/>
+            <circle r="16" fill="none" stroke="#0050cc" stroke-width="2"/>
+            <path fill="#ffc800" d="M 0,-12 L 3,-4 L 11,-4 L 4.5,1.5 L 7,9 L 0,4.5 L -7,9 L -4.5,1.5 L -11,-4 L -3,-4 Z"/>
+          </g>
+        </g>
+
+        <!-- ======================= LOADER LAYER (front bucket) ======================= -->
+        <g class="layer layer-loader">
+          <!-- pivot joint -->
+          <circle cx="655" cy="292" r="10" fill="#2a2a2a" stroke="#000" stroke-width="1.5"/>
+          <!-- hydraulic arm -->
+          <path d="M 650 285 L 790 315 L 810 350 L 785 360 L 770 340 L 640 302 Z"
+                fill="#ffc820" stroke="#000" stroke-width="2"/>
+          <!-- second arm -->
+          <path d="M 652 300 L 780 340 L 795 360 L 655 315 Z"
+                fill="#ffaa00" stroke="#000" stroke-width="2" opacity="0.85"/>
+          <!-- bucket (animated) -->
+          <g class="loader-bucket">
+            <path d="M 770 330 L 885 318 L 895 375 L 800 395 L 775 355 Z"
+                  fill="#ffc820" stroke="#000" stroke-width="2.5" stroke-linejoin="round"/>
+            <!-- inner shadow -->
+            <path d="M 785 342 L 880 332 L 888 372 L 808 385 Z" fill="rgba(0,0,0,0.25)"/>
+            <!-- teeth -->
+            <rect x="795" y="387" width="10" height="16" rx="1" fill="#3a3a3a"/>
+            <rect x="822" y="390" width="10" height="16" rx="1" fill="#3a3a3a"/>
+            <rect x="850" y="387" width="10" height="16" rx="1" fill="#3a3a3a"/>
+            <rect x="875" y="380" width="10" height="16" rx="1" fill="#3a3a3a"/>
+          </g>
+        </g>
+
+        <!-- ======================= CRANE LAYER (boom up-right) ======================= -->
+        <g class="layer layer-crane">
+          <!-- cabin on truck bed -->
+          <rect x="470" y="208" width="42" height="32" rx="3" fill="#ff9800" stroke="#000" stroke-width="2"/>
+          <rect x="473" y="212" width="28" height="12" fill="#3a6090" opacity="0.7"/>
+          <!-- base platform -->
+          <rect x="460" y="238" width="90" height="14" rx="3" fill="#ffa820" stroke="#000" stroke-width="2"/>
+          <!-- boom segment 1 -->
+          <path d="M 510 220 L 535 213 L 785 40 L 770 22 Z"
+                fill="url(#craneBoomGrad)" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
+          <!-- boom segment 2 (telescoped) -->
+          <path d="M 720 75 L 880 10 L 890 32 L 730 100 Z"
+                fill="#ffaa20" stroke="#000" stroke-width="2" stroke-linejoin="round"/>
+          <!-- top pulley -->
+          <circle cx="885" cy="22" r="9" fill="#333" stroke="#000" stroke-width="1.5"/>
+          <circle cx="885" cy="22" r="4" fill="#777"/>
+          <!-- cable -->
+          <line x1="885" y1="28" x2="875" y2="195" stroke="#222" stroke-width="2.5"/>
+          <!-- hook -->
+          <g transform="translate(875, 195)">
+            <rect x="-10" y="0" width="20" height="10" rx="2" fill="#888" stroke="#000" stroke-width="1.5"/>
+            <path d="M -8 10 L -8 24 Q -8 36 0 36 Q 8 36 8 24 L 8 10"
+                  fill="none" stroke="#888" stroke-width="5" stroke-linecap="round"/>
+            <path d="M 0 36 L 0 46 Q 0 50 4 50 Q 8 50 8 44"
+                  fill="none" stroke="#888" stroke-width="4" stroke-linecap="round"/>
+          </g>
+          <!-- bracing cables -->
+          <line x1="530" y1="218" x2="720" y2="75" stroke="#999" stroke-width="1.2" opacity="0.6"/>
+        </g>
+
+        <!-- ======================= MONSTER LAYER (flames + shocks) ======================= -->
+        <g class="layer layer-monster">
+          <!-- flame decals on body -->
+          <path d="M 242 335 Q 265 298 285 322 Q 300 300 320 325 Q 340 300 365 324 Q 375 310 390 322 L 395 360 L 242 360 Z"
+                fill="url(#flameGrad)" opacity="0.92"/>
+          <path d="M 500 340 Q 520 310 540 326 Q 555 306 575 325 Q 595 306 620 322 Q 635 308 652 320 L 655 368 L 500 368 Z"
+                fill="url(#flameGrad)" opacity="0.92"/>
+          <!-- shock absorbers -->
+          <rect x="275" y="365" width="12" height="90" rx="2" fill="#888" stroke="#000" stroke-width="1"/>
+          <rect x="278" y="370" width="6" height="70" fill="#cccccc"/>
+          <rect x="625" y="365" width="12" height="90" rx="2" fill="#888" stroke="#000" stroke-width="1"/>
+          <rect x="628" y="370" width="6" height="70" fill="#cccccc"/>
+        </g>
+
+      </g>
+
+      <!-- ======================= WHEELS ======================= -->
+      <!-- Normal wheels -->
+      <g class="wheels-normal">
+        <circle cx="295" cy="410" r="48" fill="#0a0a0a"/>
+        <circle cx="295" cy="410" r="28" fill="#666"/>
+        <g stroke="#1a1a1a" stroke-width="5" stroke-linecap="round">
+          <line x1="295" y1="385" x2="295" y2="435"/>
+          <line x1="272" y1="395" x2="318" y2="425"/>
+          <line x1="318" y1="395" x2="272" y2="425"/>
+          <line x1="267" y1="410" x2="323" y2="410"/>
+        </g>
+        <circle cx="295" cy="410" r="9" fill="#222"/>
+
+        <circle cx="615" cy="410" r="48" fill="#0a0a0a"/>
+        <circle cx="615" cy="410" r="28" fill="#666"/>
+        <g stroke="#1a1a1a" stroke-width="5" stroke-linecap="round">
+          <line x1="615" y1="385" x2="615" y2="435"/>
+          <line x1="592" y1="395" x2="638" y2="425"/>
+          <line x1="638" y1="395" x2="592" y2="425"/>
+          <line x1="587" y1="410" x2="643" y2="410"/>
+        </g>
+        <circle cx="615" cy="410" r="9" fill="#222"/>
+      </g>
+
+      <!-- Monster wheels (huge, tread pattern) -->
+      <g class="wheels-monster">
+        <!-- rear -->
+        <circle cx="295" cy="395" r="78" fill="#0a0a0a"/>
+        <circle cx="295" cy="395" r="50" fill="#2a2a2a"/>
+        <circle cx="295" cy="395" r="34" fill="#aaaaaa"/>
+        <!-- tread -->
+        <g fill="#111" stroke="#000" stroke-width="0.5">
+          <path d="M 217 395 L 232 383 L 238 408 L 222 418 Z"/>
+          <path d="M 250 348 L 268 340 L 274 364 L 258 370 Z"/>
+          <path d="M 295 317 L 312 320 L 308 344 L 290 340 Z"/>
+          <path d="M 340 348 L 355 352 L 350 376 L 336 371 Z"/>
+          <path d="M 373 395 L 378 412 L 358 425 L 355 408 Z"/>
+          <path d="M 345 445 L 352 460 L 332 466 L 328 452 Z"/>
+          <path d="M 295 470 L 312 472 L 308 454 L 292 452 Z"/>
+          <path d="M 245 445 L 240 462 L 260 468 L 262 451 Z"/>
+          <path d="M 215 410 L 203 425 L 215 445 L 230 430 Z"/>
+        </g>
+        <!-- center spokes -->
+        <g stroke="#1a1a1a" stroke-width="7" stroke-linecap="round">
+          <line x1="295" y1="365" x2="295" y2="425"/>
+          <line x1="263" y1="375" x2="327" y2="415"/>
+          <line x1="327" y1="375" x2="263" y2="415"/>
+          <line x1="263" y1="395" x2="327" y2="395"/>
+        </g>
+        <circle cx="295" cy="395" r="10" fill="#1a1a1a"/>
+
+        <!-- front -->
+        <circle cx="615" cy="395" r="78" fill="#0a0a0a"/>
+        <circle cx="615" cy="395" r="50" fill="#2a2a2a"/>
+        <circle cx="615" cy="395" r="34" fill="#aaaaaa"/>
+        <g fill="#111" stroke="#000" stroke-width="0.5">
+          <path d="M 537 395 L 552 383 L 558 408 L 542 418 Z"/>
+          <path d="M 570 348 L 588 340 L 594 364 L 578 370 Z"/>
+          <path d="M 615 317 L 632 320 L 628 344 L 610 340 Z"/>
+          <path d="M 660 348 L 675 352 L 670 376 L 656 371 Z"/>
+          <path d="M 693 395 L 698 412 L 678 425 L 675 408 Z"/>
+          <path d="M 665 445 L 672 460 L 652 466 L 648 452 Z"/>
+          <path d="M 615 470 L 632 472 L 628 454 L 612 452 Z"/>
+          <path d="M 565 445 L 560 462 L 580 468 L 582 451 Z"/>
+          <path d="M 535 410 L 523 425 L 535 445 L 550 430 Z"/>
+        </g>
+        <g stroke="#1a1a1a" stroke-width="7" stroke-linecap="round">
+          <line x1="615" y1="365" x2="615" y2="425"/>
+          <line x1="583" y1="375" x2="647" y2="415"/>
+          <line x1="647" y1="375" x2="583" y2="415"/>
+          <line x1="583" y1="395" x2="647" y2="395"/>
+        </g>
+        <circle cx="615" cy="395" r="10" fill="#1a1a1a"/>
+      </g>
+
+    </svg>
+
+    <div class="result-name">
+      <div class="cn" id="resultCn"></div>
+      <div class="en" id="resultEn"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================ ACTIONS ============================ -->
+<div class="actions">
+  <button class="btn-reset" id="resetBtn" aria-label="Reset">🔄</button>
+  <button class="btn-combine" id="combineBtn" disabled>
+    <span class="pip">🔧</span>
+    <span>组合! COMBINE!</span>
+  </button>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const ALL = ['police', 'loader', 'crane', 'excavator', 'monster'];
+  const NAMES = {
+    police:    { cn: '警察',   en: 'Police' },
+    loader:    { cn: '装载机', en: 'Loader' },
+    crane:     { cn: '吊车',   en: 'Crane' },
+    excavator: { cn: '挖掘机', en: 'Digger' },
+    monster:   { cn: '怪兽',   en: 'Monster' }
+  };
+
+  const selected = new Set();
+
+  const cards         = document.querySelectorAll('.vehicle-card');
+  const combineBtn    = document.getElementById('combineBtn');
+  const resetBtn      = document.getElementById('resetBtn');
+  const placeholder   = document.getElementById('placeholder');
+  const result        = document.getElementById('result');
+  const resultCn      = document.getElementById('resultCn');
+  const resultEn      = document.getElementById('resultEn');
+
+  function updateButton() {
+    combineBtn.disabled = selected.size < 2;
+  }
+
+  function pickCard(card) {
+    const v = card.dataset.vehicle;
+    if (selected.has(v)) {
+      selected.delete(v);
+      card.classList.remove('selected');
+    } else {
+      selected.add(v);
+      card.classList.add('selected');
+    }
+    updateButton();
+  }
+
+  function buildName(sel) {
+    // Sort in canonical order for consistent naming
+    const sorted = ALL.filter(v => sel.has(v));
+    const count = sorted.length;
+    const prefixCn = count >= 5 ? '终极无敌' : count >= 4 ? '超级' : count >= 3 ? '多功能' : '';
+    const prefixEn = count >= 5 ? 'Ultimate ' : count >= 4 ? 'Super ' : count >= 3 ? 'Multi-' : '';
+    const cn = prefixCn + sorted.map(v => NAMES[v].cn).join('+') + '车';
+    const en = prefixEn + sorted.map(v => NAMES[v].en).join('-') + ' Truck';
+    return { cn, en };
+  }
+
+  function combine() {
+    if (selected.size < 2) return;
+
+    // set layer classes on result
+    result.classList.remove('has-police','has-loader','has-crane','has-excavator','has-monster','show');
+    // force reflow so animation can restart
+    void result.offsetWidth;
+
+    selected.forEach(v => result.classList.add('has-' + v));
+    result.classList.add('show');
+    placeholder.classList.add('hidden');
+
+    const name = buildName(selected);
+    resultCn.textContent = name.cn;
+    resultEn.textContent = name.en;
+
+    playCombineSfx();
+    if (navigator.vibrate) navigator.vibrate([40, 50, 80]);
+  }
+
+  function reset() {
+    selected.clear();
+    cards.forEach(c => c.classList.remove('selected'));
+    result.classList.remove('show', 'has-police', 'has-loader', 'has-crane', 'has-excavator', 'has-monster');
+    placeholder.classList.remove('hidden');
+    resultCn.textContent = '';
+    resultEn.textContent = '';
+    updateButton();
+  }
+
+  // === Sound: "ta-da" combine chime (C-E-G-C arpeggio) ===
+  let audioCtx = null;
+  function playCombineSfx() {
+    try {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AC();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+
+      const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+      const now = audioCtx.currentTime;
+      const step = 0.09;
+
+      notes.forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.value = freq;
+        const start = now + i * step;
+        gain.gain.setValueAtTime(0, start);
+        gain.gain.linearRampToValueAtTime(0.22, start + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.55);
+        osc.connect(gain).connect(audioCtx.destination);
+        osc.start(start);
+        osc.stop(start + 0.6);
+      });
+    } catch (e) {}
+  }
+
+  // === Wiring ===
+  cards.forEach(card => card.addEventListener('click', () => pickCard(card)));
+  combineBtn.addEventListener('click', combine);
+  resetBtn.addEventListener('click', reset);
+
+  let lastTouch = 0;
+  document.addEventListener('touchend', e => {
+    const now = Date.now();
+    if (now - lastTouch < 320) e.preventDefault();
+    lastTouch = now;
+  }, { passive: false });
+})();
+</script>
+</body>
+</html>
