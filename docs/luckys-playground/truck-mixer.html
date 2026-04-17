@@ -236,62 +236,97 @@
     to   { background-position: -120px 0; }
   }
 
-  /* ============ Roadside decorations (buildings, lamp posts, signs) ============ */
+  /* ============ Roadside decorations (buildings + lamp posts + signs) ============ */
   .scene-deco {
     position: absolute; left: 0; right: 0; bottom: 17%;
     height: 80%; pointer-events: none; z-index: 1;
+    overflow: hidden;
   }
-  .buildings {
-    position: absolute; left: 0; right: 0; bottom: 0;
-    height: 26%;
-    background-image:
-      linear-gradient(to top, #1a1a28 0%, #1a1a28 calc(50% - 1px), transparent 50%),
-      linear-gradient(to top, #161621 0%, #161621 30%, transparent 30%);
-    background-repeat: no-repeat;
-    background-position: 0 100%;
-    opacity: 0.65;
+
+  /* Far layer: distant city skyline (parallax slow) */
+  .buildings-layer {
+    position: absolute; left: 0; bottom: 0;
+    width: 200%; height: 46%;  /* bigger than before */
+    opacity: 0.85;
   }
-  .buildings svg {
-    width: 100%; height: 100%;
-    display: block;
+  .buildings-layer svg {
+    width: 100%; height: 100%; display: block;
   }
+  .stage.running .buildings-layer {
+    animation: scrollFar 18s linear infinite;
+  }
+  @keyframes scrollFar {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* Mid layer: closer trees/buildings (parallax medium) */
+  .trees-layer {
+    position: absolute; left: 0; bottom: 0;
+    width: 200%; height: 30%;
+    opacity: 0.85;
+  }
+  .trees-layer svg { width: 100%; height: 100%; display: block; }
+  .stage.running .trees-layer {
+    animation: scrollMid 10s linear infinite;
+  }
+  @keyframes scrollMid {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* Near layer: lamp posts + road signs (parallax fast, same as road) */
+  .roadside-layer {
+    position: absolute; left: 0; bottom: 0;
+    width: 200%; height: 70%;
+  }
+  .stage.running .roadside-layer {
+    animation: scrollNear 6s linear infinite;
+  }
+  @keyframes scrollNear {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
   .lamp-post {
     position: absolute; bottom: 0;
-    width: 4px; height: 38%;
+    width: 4px; height: 42%;
     background: linear-gradient(to bottom, #2a2a2a 0%, #1a1a1a 100%);
   }
   .lamp-post::before {
-    content: ''; position: absolute; top: -12px; left: -16px;
-    width: 36px; height: 14px;
+    content: ''; position: absolute; top: -10px; left: -16px;
+    width: 36px; height: 13px;
     border-radius: 4px 4px 2px 2px;
     background: linear-gradient(to bottom, #3a3a3a 0%, #1a1a1a 100%);
     border: 1px solid #0a0a0a;
   }
   .lamp-post::after {
-    /* glow */
-    content: ''; position: absolute; top: 0; left: -30px;
+    content: ''; position: absolute; top: -2px; left: -30px;
     width: 64px; height: 30px;
-    background: radial-gradient(ellipse, rgba(255,220,130,0.45) 0%, transparent 70%);
-    opacity: 0.85;
+    background: radial-gradient(ellipse, rgba(255,220,130,0.55) 0%, transparent 70%);
+    opacity: 0.9;
   }
   .road-sign {
-    position: absolute; bottom: 24%;
-    width: 60px; height: 40px;
+    position: absolute; bottom: 20%;
+    width: 44px; height: 32px;
     background: #1a4a9a;
     border: 2px solid #111;
     border-radius: 3px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.5);
     display: flex; align-items: center; justify-content: center;
     font-family: 'Inter', sans-serif;
-    font-size: 11px; font-weight: 800; color: #fff;
+    font-size: 11px; font-weight: 900; color: #fff;
     letter-spacing: 0.08em;
   }
   .road-sign::before {
-    content: ''; position: absolute; bottom: -28px; left: 50%;
+    content: ''; position: absolute; bottom: -22px; left: 50%;
     transform: translateX(-50%);
-    width: 3px; height: 28px;
+    width: 3px; height: 22px;
     background: #1a1a1a;
   }
+  .road-sign.stop { background: #d23a1a; }
+  .road-sign.yield { background: #d2a320; color: #111; }
+  .road-sign.highway { background: #1a7a3a; font-size: 10px; }
 
   /* ============ Truck SVG ============ */
   #hybridTruck {
@@ -312,28 +347,44 @@
     100% { opacity: 1; transform: scale(1) translateY(0); }
   }
 
-  /* ============ Obstacles (monster truck crushes them) ============ */
+  /* ============ Obstacles (crushed by the front wheel / front blade) ============
+     The truck is centered in the scene and its front (right-facing) is
+     roughly 28-30% right-of-center. Obstacles enter from the right, travel
+     leftward at the same rate as the road lane dashes, and the crush keyframe
+     fires right around the truck's front wheel position.
+  */
   .obstacle {
     position: absolute;
-    bottom: 13%;
+    bottom: 13.5%;
     left: 100%;
-    width: 44px;
-    height: 52px;
+    width: 50px;
+    height: 58px;
     z-index: 3;
     display: none;
     will-change: transform;
+    transform-origin: 50% 100%;
   }
-  .primary-monster.show .obstacle { display: block; }
+  .primary-monster.show .obstacle,
+  .primary-bulldozer.show .obstacle { display: block; }
   .obstacle svg { width: 100%; height: 100%; display: block; }
-  .obstacle-a { animation: obstacleRun 5.2s linear infinite; }
-  .obstacle-b { animation: obstacleRun 5.2s linear infinite 1.8s; }
-  .obstacle-c { animation: obstacleRun 5.2s linear infinite 3.6s; }
+  .obstacle-a { animation: obstacleRun 5s linear infinite; }
+  .obstacle-b { animation: obstacleRun 5s linear infinite 1.7s; }
+  .obstacle-c { animation: obstacleRun 5s linear infinite 3.4s; }
+
+  /* Phase breakdown:
+     0–62%: obstacle travels leftward from right edge to truck front wheel
+            (approximately -62vw, slightly right of scene centre)
+     62–68%: crushed by the wheel/blade — flattens to scale 0, rotates forward
+     68–100%: debris flag; stays invisible as it slides off
+  */
   @keyframes obstacleRun {
-    0%   { transform: translateX(0)       rotate(0)   scale(1); opacity: 1; }
-    44%  { transform: translateX(-52vw)   rotate(0)   scale(1); opacity: 1; }
-    50%  { transform: translateX(-54vw)   rotate(60deg) scale(0.4); opacity: 0.55; }
-    56%  { transform: translateX(-56vw)   rotate(180deg) scale(0.1); opacity: 0; }
-    100% { transform: translateX(-110vw)  rotate(180deg) scale(0);   opacity: 0; }
+    0%   { transform: translateX(0) translateY(0) rotate(0) scale(1);        opacity: 1; }
+    55%  { transform: translateX(-55vw) translateY(0) rotate(0) scale(1);    opacity: 1; }
+    62%  { transform: translateX(-62vw) translateY(0) rotate(0) scale(1);    opacity: 1; }   /* front-wheel contact */
+    65%  { transform: translateX(-64vw) translateY(18px) rotate(25deg) scale(0.8, 0.35); opacity: 0.8; }
+    70%  { transform: translateX(-68vw) translateY(22px) rotate(75deg) scale(0.4, 0.15); opacity: 0.35; }
+    74%  { transform: translateX(-72vw) translateY(24px) rotate(180deg) scale(0.1, 0.05); opacity: 0; }
+    100% { transform: translateX(-110vw) rotate(180deg) scale(0);            opacity: 0; }
   }
 
   /* ==== Flashing police lights ==== */
@@ -652,54 +703,171 @@
       <div class="en" id="resultEn"></div>
     </div>
     <div class="truck-scene">
-    <!-- Distant skyline / buildings / signs / lamp posts -->
+    <!-- Layered parallax scenery: buildings (far, slow) / trees (mid) / lamp posts + signs (near, fast) -->
     <div class="scene-deco">
-      <div class="buildings">
-        <svg viewBox="0 0 1200 110" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
-          <g fill="#12121c">
-            <rect x="0" y="50" width="65" height="60"/>
-            <rect x="55" y="30" width="70" height="80"/>
-            <rect x="130" y="55" width="50" height="55"/>
-            <rect x="180" y="20" width="80" height="90"/>
-            <rect x="250" y="45" width="55" height="65"/>
-            <rect x="300" y="35" width="60" height="75"/>
-            <rect x="360" y="58" width="52" height="52"/>
-            <rect x="410" y="25" width="75" height="85"/>
-            <rect x="480" y="52" width="45" height="58"/>
-            <rect x="520" y="32" width="65" height="78"/>
-            <rect x="580" y="48" width="55" height="62"/>
-            <rect x="630" y="18" width="72" height="92"/>
-            <rect x="700" y="52" width="50" height="58"/>
-            <rect x="748" y="40" width="60" height="70"/>
-            <rect x="805" y="56" width="48" height="54"/>
-            <rect x="850" y="28" width="70" height="82"/>
-            <rect x="918" y="50" width="55" height="60"/>
-            <rect x="972" y="36" width="62" height="74"/>
-            <rect x="1032" y="54" width="50" height="56"/>
-            <rect x="1080" y="22" width="76" height="88"/>
-            <rect x="1154" y="48" width="46" height="62"/>
+      <!-- FAR: city skyline – 2 copies tiled for seamless loop -->
+      <div class="buildings-layer">
+        <svg viewBox="0 0 2400 220" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Tile 1: 0-1200 -->
+          <g fill="#1e1e2e">
+            <rect x="0"   y="80"  width="90"  height="140"/>
+            <rect x="80"  y="40"  width="110" height="180"/>
+            <rect x="185" y="90"  width="75"  height="130"/>
+            <rect x="255" y="10"  width="130" height="210"/>
+            <rect x="380" y="70"  width="80"  height="150"/>
+            <rect x="455" y="50"  width="95"  height="170"/>
+            <rect x="545" y="100" width="70"  height="120"/>
+            <rect x="610" y="20"  width="120" height="200"/>
+            <rect x="725" y="90"  width="65"  height="130"/>
+            <rect x="785" y="48"  width="105" height="172"/>
+            <rect x="885" y="84"  width="80"  height="136"/>
+            <rect x="960" y="0"   width="118" height="220"/>
+            <rect x="1075" y="90" width="75"  height="130"/>
+            <rect x="1145" y="60" width="60"  height="160"/>
           </g>
-          <!-- scattered lit windows -->
-          <g fill="#f5d070" opacity="0.55">
-            <rect x="68" y="46" width="4" height="5"/><rect x="78" y="56" width="4" height="5"/>
-            <rect x="195" y="38" width="4" height="5"/><rect x="222" y="56" width="4" height="5"/>
-            <rect x="315" y="50" width="4" height="5"/><rect x="335" y="68" width="4" height="5"/>
-            <rect x="432" y="40" width="4" height="5"/><rect x="462" y="60" width="4" height="5"/>
-            <rect x="540" y="48" width="4" height="5"/><rect x="568" y="72" width="4" height="5"/>
-            <rect x="648" y="34" width="4" height="5"/><rect x="678" y="58" width="4" height="5"/>
-            <rect x="762" y="54" width="4" height="5"/><rect x="788" y="72" width="4" height="5"/>
-            <rect x="868" y="42" width="4" height="5"/><rect x="898" y="62" width="4" height="5"/>
-            <rect x="990" y="50" width="4" height="5"/><rect x="1012" y="68" width="4" height="5"/>
-            <rect x="1098" y="38" width="4" height="5"/><rect x="1124" y="60" width="4" height="5"/>
+          <!-- Antenna spires -->
+          <g stroke="#1e1e2e" stroke-width="3">
+            <line x1="310" y1="10"  x2="310" y2="-10"/>
+            <line x1="670" y1="20"  x2="670" y2="-5"/>
+            <line x1="1020" y1="0" x2="1020" y2="-20"/>
+          </g>
+          <!-- Lit windows -->
+          <g fill="#f5d070">
+            <rect x="18"  y="94"  width="6" height="8"/><rect x="32"  y="120" width="6" height="8"/>
+            <rect x="50"  y="140" width="6" height="8"/><rect x="68"  y="170" width="6" height="8"/>
+            <rect x="100" y="60"  width="6" height="8"/><rect x="128" y="90"  width="6" height="8"/>
+            <rect x="150" y="130" width="6" height="8"/><rect x="170" y="180" width="6" height="8"/>
+            <rect x="200" y="110" width="6" height="8"/><rect x="225" y="160" width="6" height="8"/>
+            <rect x="270" y="30"  width="6" height="8"/><rect x="300" y="80"  width="6" height="8"/>
+            <rect x="330" y="130" width="6" height="8"/><rect x="360" y="180" width="6" height="8"/>
+            <rect x="400" y="90"  width="6" height="8"/><rect x="430" y="160" width="6" height="8"/>
+            <rect x="475" y="70"  width="6" height="8"/><rect x="510" y="130" width="6" height="8"/>
+            <rect x="565" y="130" width="6" height="8"/><rect x="600" y="180" width="6" height="8"/>
+            <rect x="635" y="50"  width="6" height="8"/><rect x="670" y="100" width="6" height="8"/>
+            <rect x="705" y="160" width="6" height="8"/><rect x="745" y="130" width="6" height="8"/>
+            <rect x="795" y="70"  width="6" height="8"/><rect x="830" y="120" width="6" height="8"/>
+            <rect x="870" y="180" width="6" height="8"/><rect x="905" y="120" width="6" height="8"/>
+            <rect x="940" y="180" width="6" height="8"/><rect x="980" y="40"  width="6" height="8"/>
+            <rect x="1015" y="100" width="6" height="8"/><rect x="1055" y="170" width="6" height="8"/>
+            <rect x="1090" y="130" width="6" height="8"/><rect x="1125" y="90"  width="6" height="8"/>
+            <rect x="1160" y="160" width="6" height="8"/>
+          </g>
+          <!-- Tile 2: identical, translated +1200 -->
+          <g transform="translate(1200 0)">
+            <g fill="#1e1e2e">
+              <rect x="0"   y="80"  width="90"  height="140"/>
+              <rect x="80"  y="40"  width="110" height="180"/>
+              <rect x="185" y="90"  width="75"  height="130"/>
+              <rect x="255" y="10"  width="130" height="210"/>
+              <rect x="380" y="70"  width="80"  height="150"/>
+              <rect x="455" y="50"  width="95"  height="170"/>
+              <rect x="545" y="100" width="70"  height="120"/>
+              <rect x="610" y="20"  width="120" height="200"/>
+              <rect x="725" y="90"  width="65"  height="130"/>
+              <rect x="785" y="48"  width="105" height="172"/>
+              <rect x="885" y="84"  width="80"  height="136"/>
+              <rect x="960" y="0"   width="118" height="220"/>
+              <rect x="1075" y="90" width="75"  height="130"/>
+              <rect x="1145" y="60" width="60"  height="160"/>
+            </g>
+            <g stroke="#1e1e2e" stroke-width="3">
+              <line x1="310" y1="10"  x2="310" y2="-10"/>
+              <line x1="670" y1="20"  x2="670" y2="-5"/>
+              <line x1="1020" y1="0" x2="1020" y2="-20"/>
+            </g>
+            <g fill="#f5d070">
+              <rect x="18"  y="94"  width="6" height="8"/><rect x="32"  y="120" width="6" height="8"/>
+              <rect x="50"  y="140" width="6" height="8"/><rect x="68"  y="170" width="6" height="8"/>
+              <rect x="100" y="60"  width="6" height="8"/><rect x="128" y="90"  width="6" height="8"/>
+              <rect x="150" y="130" width="6" height="8"/><rect x="170" y="180" width="6" height="8"/>
+              <rect x="200" y="110" width="6" height="8"/><rect x="225" y="160" width="6" height="8"/>
+              <rect x="270" y="30"  width="6" height="8"/><rect x="300" y="80"  width="6" height="8"/>
+              <rect x="330" y="130" width="6" height="8"/><rect x="360" y="180" width="6" height="8"/>
+              <rect x="400" y="90"  width="6" height="8"/><rect x="430" y="160" width="6" height="8"/>
+              <rect x="475" y="70"  width="6" height="8"/><rect x="510" y="130" width="6" height="8"/>
+              <rect x="565" y="130" width="6" height="8"/><rect x="600" y="180" width="6" height="8"/>
+              <rect x="635" y="50"  width="6" height="8"/><rect x="670" y="100" width="6" height="8"/>
+              <rect x="705" y="160" width="6" height="8"/><rect x="745" y="130" width="6" height="8"/>
+              <rect x="795" y="70"  width="6" height="8"/><rect x="830" y="120" width="6" height="8"/>
+              <rect x="870" y="180" width="6" height="8"/><rect x="905" y="120" width="6" height="8"/>
+              <rect x="940" y="180" width="6" height="8"/><rect x="980" y="40"  width="6" height="8"/>
+              <rect x="1015" y="100" width="6" height="8"/><rect x="1055" y="170" width="6" height="8"/>
+              <rect x="1090" y="130" width="6" height="8"/><rect x="1125" y="90"  width="6" height="8"/>
+              <rect x="1160" y="160" width="6" height="8"/>
+            </g>
           </g>
         </svg>
       </div>
-      <!-- Lamp posts at varied positions -->
-      <div class="lamp-post" style="left: 8%;"></div>
-      <div class="lamp-post" style="left: 92%;"></div>
-      <!-- Road signs -->
-      <div class="road-sign" style="left: 18%;">50</div>
-      <div class="road-sign" style="right: 14%; background: #d23a1a;">STOP</div>
+
+      <!-- MID: trees / small warehouses (parallax medium) -->
+      <div class="trees-layer">
+        <svg viewBox="0 0 2400 140" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <g fill="#16281a">
+            <!-- Tile 1 -->
+            <circle cx="50"  cy="100" r="38"/><circle cx="42"  cy="118" r="26"/>
+            <circle cx="180" cy="105" r="32"/><circle cx="172" cy="120" r="24"/>
+            <circle cx="320" cy="95"  r="45"/><circle cx="340" cy="122" r="28"/>
+            <circle cx="470" cy="108" r="30"/>
+            <circle cx="600" cy="98"  r="40"/><circle cx="620" cy="125" r="25"/>
+            <circle cx="760" cy="100" r="35"/>
+            <circle cx="900" cy="92"  r="44"/><circle cx="920" cy="122" r="26"/>
+            <circle cx="1060" cy="105" r="32"/>
+            <circle cx="1180" cy="100" r="36"/>
+          </g>
+          <g fill="#16281a" transform="translate(1200 0)">
+            <circle cx="50"  cy="100" r="38"/><circle cx="42"  cy="118" r="26"/>
+            <circle cx="180" cy="105" r="32"/><circle cx="172" cy="120" r="24"/>
+            <circle cx="320" cy="95"  r="45"/><circle cx="340" cy="122" r="28"/>
+            <circle cx="470" cy="108" r="30"/>
+            <circle cx="600" cy="98"  r="40"/><circle cx="620" cy="125" r="25"/>
+            <circle cx="760" cy="100" r="35"/>
+            <circle cx="900" cy="92"  r="44"/><circle cx="920" cy="122" r="26"/>
+            <circle cx="1060" cy="105" r="32"/>
+            <circle cx="1180" cy="100" r="36"/>
+          </g>
+          <!-- tree trunks -->
+          <g fill="#2a1810">
+            <rect x="48"   y="115" width="5" height="22"/>
+            <rect x="178"  y="115" width="5" height="22"/>
+            <rect x="318"  y="115" width="5" height="22"/>
+            <rect x="468"  y="115" width="5" height="22"/>
+            <rect x="598"  y="115" width="5" height="22"/>
+            <rect x="758"  y="115" width="5" height="22"/>
+            <rect x="898"  y="115" width="5" height="22"/>
+            <rect x="1058" y="115" width="5" height="22"/>
+            <rect x="1178" y="115" width="5" height="22"/>
+          </g>
+          <g fill="#2a1810" transform="translate(1200 0)">
+            <rect x="48"   y="115" width="5" height="22"/>
+            <rect x="178"  y="115" width="5" height="22"/>
+            <rect x="318"  y="115" width="5" height="22"/>
+            <rect x="468"  y="115" width="5" height="22"/>
+            <rect x="598"  y="115" width="5" height="22"/>
+            <rect x="758"  y="115" width="5" height="22"/>
+            <rect x="898"  y="115" width="5" height="22"/>
+            <rect x="1058" y="115" width="5" height="22"/>
+            <rect x="1178" y="115" width="5" height="22"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- NEAR: lamp posts + road signs + billboards, fast scroll in sync with road -->
+      <div class="roadside-layer">
+        <!-- Tile 1 (0% .. 50%) -->
+        <div class="lamp-post" style="left: 4%;"></div>
+        <div class="road-sign" style="left: 12%;">50</div>
+        <div class="road-sign stop" style="left: 24%;">STOP</div>
+        <div class="lamp-post" style="left: 30%;"></div>
+        <div class="road-sign yield" style="left: 38%;">⚠</div>
+        <div class="road-sign highway" style="left: 44%;">G1</div>
+        <!-- Tile 2 (duplicates, offset +50%) -->
+        <div class="lamp-post" style="left: 54%;"></div>
+        <div class="road-sign" style="left: 62%;">50</div>
+        <div class="road-sign stop" style="left: 74%;">STOP</div>
+        <div class="lamp-post" style="left: 80%;"></div>
+        <div class="road-sign yield" style="left: 88%;">⚠</div>
+        <div class="road-sign highway" style="left: 94%;">G1</div>
+      </div>
     </div>
 
     <!-- Full-width road with edge-to-edge animated lane lines -->
@@ -1154,33 +1322,66 @@
               fill="url(#loaderGrad)" stroke="#1a1a1a" stroke-width="3" stroke-linejoin="round"/>
         <rect x="280" y="280" width="160" height="22" rx="2" fill="#c08000" opacity="0.4"/>
 
-        <!-- Big bucket arms (integral to loader) -->
-        <path d="M 275 290 Q 195 300 125 330 L 130 355 L 225 335 Q 260 330 290 315 Z"
+        <!-- LIFT ARM (Z-bar bent, two parallel beams reaching forward) -->
+        <path d="M 280 288
+                 Q 220 295 165 310
+                 L 115 335
+                 L 100 362
+                 L 135 365
+                 L 185 345
+                 Q 240 330 288 320 Z"
               fill="url(#loaderGrad)" stroke="#1a1a1a" stroke-width="2.5" stroke-linejoin="round"/>
-        <circle cx="280" cy="300" r="9" fill="#2a2a2a" stroke="#000" stroke-width="1.5"/>
-        <!-- Hydraulic cylinder to bucket -->
-        <line x1="305" y1="275" x2="150" y2="340" stroke="#888" stroke-width="8" stroke-linecap="round"/>
-        <line x1="305" y1="275" x2="150" y2="340" stroke="#ccc" stroke-width="3" stroke-linecap="round"/>
+        <!-- Rib line on the arm -->
+        <path d="M 282 302 Q 225 310 168 322 L 125 345" stroke="#a06a00" stroke-width="2" fill="none" opacity="0.7"/>
+        <!-- Pivot pin at cab -->
+        <circle cx="282" cy="298" r="10" fill="#2a2a2a" stroke="#000" stroke-width="2"/>
+        <circle cx="282" cy="298" r="4" fill="#ffcb05"/>
+        <!-- Bucket-arm joint pin (where arm meets bucket tilt linkage) -->
+        <circle cx="120" cy="350" r="8" fill="#2a2a2a" stroke="#000" stroke-width="1.5"/>
 
-        <!-- Integrated GIANT front bucket -->
+        <!-- Main hydraulic LIFT cylinder (chunky) -->
+        <line x1="310" y1="268" x2="200" y2="325" stroke="#2a2a2a" stroke-width="18" stroke-linecap="round"/>
+        <line x1="310" y1="268" x2="200" y2="325" stroke="#888" stroke-width="14" stroke-linecap="round"/>
+        <line x1="310" y1="268" x2="200" y2="325" stroke="#d4d4d4" stroke-width="6" stroke-linecap="round"/>
+        <circle cx="310" cy="268" r="7" fill="#1a1a1a"/>
+        <circle cx="200" cy="325" r="6" fill="#1a1a1a"/>
+
+        <!-- TILT linkage (the Z-bar that tilts bucket) -->
+        <line x1="180" y1="260" x2="140" y2="330" stroke="#2a2a2a" stroke-width="14" stroke-linecap="round"/>
+        <line x1="180" y1="260" x2="140" y2="330" stroke="#888" stroke-width="10" stroke-linecap="round"/>
+        <line x1="180" y1="260" x2="140" y2="330" stroke="#d4d4d4" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="180" cy="260" r="6" fill="#1a1a1a"/>
+
+        <!-- INTEGRATED FRONT BUCKET (realistic curved scoop with pronounced belly) -->
         <g class="loader-bucket-anim">
-          <path d="M 125 315
-                   L 40 335
-                   L 25 390
-                   L 60 410
-                   L 180 390
-                   L 150 355 Z"
+          <!-- Bucket body: a curved C-shape seen from the side -->
+          <path d="M 118 335
+                   Q 70 340 35 352
+                   Q 10 372 20 402
+                   Q 35 420 85 418
+                   Q 135 408 175 392
+                   Q 185 378 172 365
+                   Q 160 350 145 348
+                   L 125 345 Z"
                 fill="url(#loaderGrad)" stroke="#1a1a1a" stroke-width="3" stroke-linejoin="round"/>
-          <!-- Bucket interior shadow -->
-          <path d="M 50 360 L 150 355 L 155 378 L 60 395 Z" fill="rgba(0,0,0,0.3)"/>
-          <!-- Teeth -->
-          <rect x="50" y="402" width="12" height="18" rx="2" fill="#3a3a3a"/>
-          <rect x="80" y="404" width="12" height="18" rx="2" fill="#3a3a3a"/>
-          <rect x="110" y="400" width="12" height="18" rx="2" fill="#3a3a3a"/>
-          <rect x="142" y="395" width="12" height="18" rx="2" fill="#3a3a3a"/>
-          <rect x="170" y="388" width="12" height="18" rx="2" fill="#3a3a3a"/>
-          <!-- Edge highlight -->
-          <path d="M 125 318 L 38 338" stroke="#ffe080" stroke-width="2" opacity="0.7"/>
+          <!-- Structural side rib (vertical) -->
+          <path d="M 108 345 Q 98 390 118 418" stroke="#a06a00" stroke-width="2.5" fill="none" opacity="0.75"/>
+          <path d="M 70 355 Q 55 392 80 416" stroke="#a06a00" stroke-width="2" fill="none" opacity="0.65"/>
+          <!-- Wear strip along cutting edge -->
+          <path d="M 20 405 Q 60 418 170 395" stroke="#d48000" stroke-width="4" fill="none" opacity="0.85"/>
+          <!-- Cutting-edge bevel highlight -->
+          <path d="M 22 400 Q 60 412 168 390" stroke="#ffe080" stroke-width="1.8" fill="none" opacity="0.7"/>
+          <!-- Bucket interior shadow (visible at top opening) -->
+          <path d="M 118 335 Q 80 345 55 360 L 90 368 Q 130 358 165 360 L 145 348 Z" fill="rgba(0,0,0,0.35)"/>
+          <!-- TEETH row (6 proper trapezoidal teeth along cutting edge) -->
+          <path d="M 22 406 L 28 430 L 42 428 L 38 404 Z" fill="#444" stroke="#1a1a1a" stroke-width="1.2"/>
+          <path d="M 48 406 L 54 432 L 68 430 L 64 404 Z" fill="#444" stroke="#1a1a1a" stroke-width="1.2"/>
+          <path d="M 74 406 L 80 432 L 94 430 L 90 404 Z" fill="#444" stroke="#1a1a1a" stroke-width="1.2"/>
+          <path d="M 100 406 L 106 432 L 120 428 L 116 402 Z" fill="#444" stroke="#1a1a1a" stroke-width="1.2"/>
+          <path d="M 126 402 L 132 428 L 146 424 L 142 398 Z" fill="#444" stroke="#1a1a1a" stroke-width="1.2"/>
+          <path d="M 150 396 L 156 420 L 170 414 L 166 392 Z" fill="#444" stroke="#1a1a1a" stroke-width="1.2"/>
+          <!-- Tooth reinforcement plate -->
+          <rect x="20" y="394" width="152" height="7" rx="1.5" fill="#5a3a10" opacity="0.6"/>
         </g>
 
         <!-- Exhaust stack on engine -->
@@ -1278,29 +1479,77 @@
         <rect x="100" y="320" width="100" height="50" rx="2" fill="#3a3a3a" stroke="#1a1a1a" stroke-width="2"/>
         <text x="120" y="352" font-family="Impact" font-size="18" fill="#ffc820" letter-spacing="2">50T</text>
 
-        <!-- INTEGRATED CRANE BOOM (extends up-right, telescoping) -->
+        <!-- INTEGRATED CRANE BOOM (hydraulic 3-stage telescoping) -->
         <g class="crane-arm">
-          <!-- Boom segment 1 (attached to turret) -->
-          <path d="M 285 265 L 305 255 L 720 70 L 705 50 Z"
+          <!-- BASE SECTION (widest, rooted at turret) -->
+          <path d="M 290 278 L 336 232 L 540 132 L 510 178 Z"
                 fill="url(#craneGrad)" stroke="#1a1a1a" stroke-width="2.5" stroke-linejoin="round"/>
-          <!-- Boom segment 2 (telescoped further) -->
-          <path d="M 660 90 L 870 18 L 880 42 L 670 112 Z"
-                fill="#ffaa20" stroke="#1a1a1a" stroke-width="2.5" stroke-linejoin="round"/>
-          <!-- Top pulley -->
-          <circle cx="876" cy="28" r="10" fill="#333" stroke="#1a1a1a" stroke-width="2"/>
-          <circle cx="876" cy="28" r="4" fill="#777"/>
-          <!-- Cable -->
-          <line x1="876" y1="38" x2="868" y2="205" stroke="#222" stroke-width="3"/>
-          <!-- Hook assembly -->
-          <g transform="translate(868, 205)">
-            <rect x="-12" y="0" width="24" height="12" rx="2" fill="#888" stroke="#1a1a1a" stroke-width="2"/>
-            <path d="M -8 12 L -8 28 Q -8 40 0 40 Q 8 40 8 28 L 8 12"
-                  fill="none" stroke="#888" stroke-width="6" stroke-linecap="round"/>
-            <path d="M 0 40 L 0 50 Q 0 54 5 54 Q 10 54 10 48"
-                  fill="none" stroke="#888" stroke-width="5" stroke-linecap="round"/>
+          <!-- Base section hatching / ribs -->
+          <line x1="348" y1="226" x2="322" y2="186" stroke="#1a1a1a" stroke-width="2" opacity="0.85"/>
+          <line x1="398" y1="198" x2="376" y2="160" stroke="#1a1a1a" stroke-width="2" opacity="0.85"/>
+          <line x1="450" y1="170" x2="428" y2="132" stroke="#1a1a1a" stroke-width="2" opacity="0.85"/>
+          <!-- Yellow-and-black warning stripe block -->
+          <g>
+            <path d="M 310 268 L 335 240 L 352 252 L 327 280 Z" fill="#111"/>
+            <path d="M 327 280 L 352 252 L 368 264 L 343 292 Z" fill="#ffcb05"/>
           </g>
-          <!-- Supporting tie-bar -->
-          <line x1="320" y1="262" x2="660" y2="90" stroke="#999" stroke-width="1.3" opacity="0.6"/>
+
+          <!-- MID SECTION (telescoped out of base) -->
+          <path d="M 498 180 L 528 142 L 716 80 L 698 118 Z"
+                fill="#ffc030" stroke="#1a1a1a" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- Mid section segmentation lines -->
+          <line x1="580" y1="154" x2="560" y2="122" stroke="#1a1a1a" stroke-width="1.8" opacity="0.85"/>
+          <line x1="640" y1="124" x2="620" y2="96" stroke="#1a1a1a" stroke-width="1.8" opacity="0.85"/>
+
+          <!-- TIP SECTION (most telescoped, thinnest) -->
+          <path d="M 688 122 L 708 90 L 850 32 L 838 58 Z"
+                fill="#ffaa20" stroke="#1a1a1a" stroke-width="2.5" stroke-linejoin="round"/>
+          <line x1="752" y1="98" x2="738" y2="74" stroke="#1a1a1a" stroke-width="1.5" opacity="0.7"/>
+          <line x1="802" y1="74" x2="788" y2="52" stroke="#1a1a1a" stroke-width="1.5" opacity="0.7"/>
+
+          <!-- HYDRAULIC LIFT CYLINDER (big ram from turret to underside of base section) -->
+          <line x1="330" y1="300" x2="470" y2="210" stroke="#2a2a2a" stroke-width="20" stroke-linecap="round"/>
+          <line x1="330" y1="300" x2="470" y2="210" stroke="#7a7a7a" stroke-width="15" stroke-linecap="round"/>
+          <line x1="330" y1="300" x2="470" y2="210" stroke="#d4d4d4" stroke-width="7" stroke-linecap="round"/>
+          <circle cx="330" cy="300" r="9" fill="#1a1a1a" stroke="#000" stroke-width="1.5"/>
+          <circle cx="472" cy="208" r="7" fill="#1a1a1a" stroke="#000" stroke-width="1"/>
+
+          <!-- Boom tip with sheave housing -->
+          <g>
+            <rect x="844" y="28" width="24" height="28" rx="3" fill="#ffcb05" stroke="#1a1a1a" stroke-width="2"/>
+            <!-- Three pulleys (sheaves) -->
+            <circle cx="852" cy="42" r="5" fill="#1a1a1a"/>
+            <circle cx="852" cy="42" r="2.5" fill="#666"/>
+            <circle cx="862" cy="42" r="5" fill="#1a1a1a"/>
+            <circle cx="862" cy="42" r="2.5" fill="#666"/>
+          </g>
+
+          <!-- Multiple rigging cables from boom tip to hook block -->
+          <line x1="850" y1="48" x2="836" y2="210" stroke="#222" stroke-width="2.5"/>
+          <line x1="862" y1="48" x2="850" y2="210" stroke="#222" stroke-width="2.5"/>
+
+          <!-- HOOK BLOCK (chunky pulley housing with hook) -->
+          <g transform="translate(843, 210)">
+            <rect x="-20" y="0" width="40" height="20" rx="3" fill="#ffcb05" stroke="#1a1a1a" stroke-width="2.5"/>
+            <rect x="-18" y="3" width="36" height="2" fill="#1a1a1a" opacity="0.5"/>
+            <circle cx="-10" cy="10" r="5" fill="#1a1a1a"/>
+            <circle cx="-10" cy="10" r="2.5" fill="#aaa"/>
+            <circle cx="10" cy="10" r="5" fill="#1a1a1a"/>
+            <circle cx="10" cy="10" r="2.5" fill="#aaa"/>
+            <!-- Shackle pin -->
+            <rect x="-4" y="20" width="8" height="10" fill="#888" stroke="#1a1a1a" stroke-width="1.5"/>
+            <!-- Hook -->
+            <path d="M -2 30 L -2 44 Q -2 60 0 60 Q 12 60 12 48 L 12 40"
+                  fill="none" stroke="#aaa" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M -2 30 L -2 44 Q -2 60 0 60 Q 12 60 12 48 L 12 40"
+                  fill="none" stroke="#666" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Hook safety latch -->
+            <line x1="-2" y1="34" x2="10" y2="52" stroke="#444" stroke-width="2"/>
+          </g>
+
+          <!-- Supporting lattice tie-bar (for realism) -->
+          <line x1="330" y1="254" x2="530" y2="134" stroke="#cccccc" stroke-width="1.8" opacity="0.55"/>
+          <line x1="510" y1="148" x2="700" y2="76"  stroke="#cccccc" stroke-width="1.5" opacity="0.45"/>
         </g>
 
         <!-- Attachment: police livery on crane truck -->
@@ -1513,23 +1762,65 @@
           <!-- Chassis frame -->
           <rect x="130" y="382" width="630" height="10" rx="2" fill="#1a1a1a"/>
 
-          <!-- Dump bed (tilted slightly for drama) -->
-          <path d="M 130 380 L 140 195 L 440 195 L 450 300 Q 452 320 450 340 L 450 382 Z"
-                fill="#2060cc" stroke="#0a1a3a" stroke-width="3" stroke-linejoin="round"/>
-          <!-- Bed inner lining -->
-          <path d="M 148 208 L 432 208 L 440 295 L 160 300 Z" fill="#1a4aaa" opacity="0.5"/>
-          <!-- Bed ribs (structural) -->
-          <g stroke="#0a3388" stroke-width="2">
-            <line x1="200" y1="210" x2="200" y2="300"/>
-            <line x1="260" y1="210" x2="260" y2="300"/>
-            <line x1="320" y1="210" x2="320" y2="300"/>
-            <line x1="380" y1="210" x2="380" y2="300"/>
+          <!-- DUMP BED (clearly tipped up, OPEN TOP with a pile of dirt/gravel pouring out the back) -->
+          <!-- Outer side wall of the tipped bed (big parallelogram tilted up at the front) -->
+          <path d="M 130 382
+                   L 156 178
+                   L 446 188
+                   L 458 298
+                   Q 460 318 458 338
+                   L 456 382 Z"
+                fill="#b45520" stroke="#5a1f08" stroke-width="3" stroke-linejoin="round"/>
+          <!-- Reinforcement ridges along the side wall -->
+          <g stroke="#6a2a10" stroke-width="2.5" opacity="0.85">
+            <line x1="196" y1="192" x2="196" y2="378"/>
+            <line x1="256" y1="196" x2="256" y2="378"/>
+            <line x1="316" y1="200" x2="316" y2="378"/>
+            <line x1="376" y1="204" x2="376" y2="378"/>
+            <line x1="436" y1="208" x2="436" y2="300"/>
           </g>
-          <!-- Hinge pin (bottom back) -->
-          <circle cx="140" cy="380" r="8" fill="#2a2a2a" stroke="#000" stroke-width="1.5"/>
-          <!-- Hydraulic ram (holds bed up) -->
-          <line x1="260" y1="375" x2="320" y2="280" stroke="#888" stroke-width="12" stroke-linecap="round"/>
-          <line x1="260" y1="375" x2="320" y2="280" stroke="#ddd" stroke-width="5" stroke-linecap="round"/>
+          <!-- Top rail (thick beam) -->
+          <path d="M 130 382 L 156 178 L 170 174 L 146 380 Z" fill="#8a3e18" stroke="#3a1408" stroke-width="1.5"/>
+          <path d="M 156 178 L 446 188 L 450 196 L 160 188 Z" fill="#d46830" stroke="#3a1408" stroke-width="1.5"/>
+          <!-- OPEN TOP: peek inside to see piled material (gravel/rock heap) -->
+          <path d="M 162 192
+                   Q 200 200 250 190
+                   Q 310 178 370 192
+                   Q 420 204 448 200
+                   L 448 220
+                   Q 420 232 370 220
+                   Q 310 212 250 220
+                   Q 200 228 162 222 Z"
+                fill="#7a5a38" stroke="#3a2a18" stroke-width="1.5" stroke-linejoin="round"/>
+          <!-- Rock chunks visible on the pile -->
+          <g fill="#8a7048" stroke="#3a2a18" stroke-width="1">
+            <ellipse cx="205" cy="200" rx="8" ry="5"/>
+            <ellipse cx="270" cy="192" rx="10" ry="6"/>
+            <ellipse cx="338" cy="198" rx="9" ry="5"/>
+            <ellipse cx="398" cy="204" rx="8" ry="5"/>
+          </g>
+          <!-- Tailgate (at the BACK, bottom-left): tilted outward (open), spilling load -->
+          <path d="M 128 382 L 132 205 L 160 178 L 146 378 Z"
+                fill="#8a3e18" stroke="#3a1408" stroke-width="2.5" stroke-linejoin="round"/>
+          <!-- Dirt/gravel CASCADING out the back -->
+          <path d="M 132 385 Q 105 390 85 402 Q 70 412 80 420 L 152 418 L 150 385 Z"
+                fill="#7a5a38" stroke="#3a2a18" stroke-width="1.5"/>
+          <g fill="#6a4828">
+            <circle cx="92" cy="405" r="4"/>
+            <circle cx="104" cy="412" r="5"/>
+            <circle cx="118" cy="408" r="4"/>
+            <circle cx="132" cy="414" r="4"/>
+            <circle cx="85" cy="416" r="3"/>
+          </g>
+          <!-- Hinge pivot at back-bottom (where bed pivots to tilt) -->
+          <circle cx="140" cy="380" r="9" fill="#2a2a2a" stroke="#000" stroke-width="2"/>
+          <circle cx="140" cy="380" r="3" fill="#ffcb05"/>
+          <!-- Telescoping hydraulic ram (prominent, visible under the bed) -->
+          <line x1="270" y1="378" x2="340" y2="272" stroke="#1a1a1a" stroke-width="18" stroke-linecap="round"/>
+          <line x1="270" y1="378" x2="340" y2="272" stroke="#7a7a7a" stroke-width="14" stroke-linecap="round"/>
+          <line x1="270" y1="378" x2="340" y2="272" stroke="#ddd" stroke-width="7" stroke-linecap="round"/>
+          <circle cx="270" cy="378" r="7" fill="#1a1a1a"/>
+          <circle cx="340" cy="272" r="6" fill="#1a1a1a"/>
 
           <!-- Cab at front -->
           <path d="M 465 360 L 475 225 Q 480 208 500 206 L 640 206 Q 660 208 665 225 L 680 330 Q 684 345 680 360 Z"
