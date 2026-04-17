@@ -48,7 +48,10 @@
   .topbar a:hover { opacity: 1; }
   .topbar .title {
     font-family: 'Playfair Display', Georgia, serif;
-    font-weight: 800; font-size: 18px;
+    font-weight: 800; font-size: clamp(14px, 3.4vw, 18px);
+    white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+    max-width: 68vw;
   }
 
   .label-row {
@@ -57,20 +60,27 @@
   }
 
   .vehicles {
-    display: grid; grid-template-columns: repeat(5, 1fr);
-    gap: 8px; padding: 4px 12px 6px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px; padding: 4px 10px 6px;
+    max-width: 1400px; margin: 0 auto; width: 100%;
+  }
+  @media (min-width: 720px) {
+    .vehicles { grid-template-columns: repeat(8, 1fr); }
   }
   .vehicle-card {
-    aspect-ratio: 1; min-height: 72px;
+    aspect-ratio: 5 / 6;
+    min-height: 80px;
     background: rgba(255,255,255,0.07);
     border: 3px solid rgba(255,255,255,0.10);
     border-radius: 16px;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    cursor: pointer; padding: 4px; position: relative; gap: 3px;
-    transition: transform .2s, background .2s, border-color .2s;
+    cursor: pointer; padding: 8px 4px 6px; position: relative; gap: 4px;
+    transition: transform .2s, background .2s, border-color .2s, box-shadow .2s;
   }
   .vehicle-card:active { transform: scale(.94); }
+  .vehicle-card:hover { background: rgba(255,255,255,0.12); }
   .vehicle-card.selected {
     border-color: var(--accent);
     background: rgba(255,203,5,0.18);
@@ -78,18 +88,32 @@
   }
   .vehicle-card.selected::after {
     content: '✓'; position: absolute;
-    top: 4px; right: 6px;
+    top: 5px; right: 6px;
     background: var(--green); color: #000;
     width: 20px; height: 20px; border-radius: 50%;
-    font-size: 14px; font-weight: 900;
+    font-size: 13px; font-weight: 900;
     display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   }
-  .vehicle-card .v-icon { width: 56px; height: 38px; flex-shrink: 0; }
-  .vehicle-card .v-cn { font-size: 14px; font-weight: 700; line-height: 1.1; }
+  .vehicle-card .v-icon {
+    width: 82%;
+    max-width: 120px;
+    height: auto; aspect-ratio: 10/6;
+    flex-shrink: 0;
+  }
+  .vehicle-card .v-cn {
+    font-size: clamp(12px, 3.4vw, 18px);
+    font-weight: 800; line-height: 1.1;
+    letter-spacing: 0.02em;
+  }
   .vehicle-card .v-en {
     font-family: 'Inter', sans-serif;
-    font-size: 10px; opacity: 0.6; line-height: 1;
+    font-size: clamp(9px, 2.2vw, 12px);
+    opacity: 0.62; line-height: 1;
     letter-spacing: 0.05em; font-style: italic;
+  }
+  @media (min-width: 720px) {
+    .vehicle-card { aspect-ratio: 4 / 5; }
   }
 
   .stage {
@@ -173,11 +197,111 @@
     display: flex; align-items: flex-end; justify-content: center;
     overflow: hidden;
   }
+
+  /* ============ Full-width road with edge-to-edge lane lines ============ */
+  .road-layer {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 17%;
+    background: linear-gradient(to bottom,
+      #4a3420 0%, #2e2010 30%, #1a1208 100%);
+    border-top: 3px solid rgba(255,255,255,0.18);
+    z-index: 1; pointer-events: none;
+  }
+  .road-layer::before {
+    /* Top curb stripe */
+    content: ''; position: absolute; left: 0; right: 0; top: 0;
+    height: 6px;
+    background: repeating-linear-gradient(to right,
+      rgba(255,255,255,0.18) 0 8px,
+      rgba(0,0,0,0.25) 8px 16px);
+    opacity: 0.7;
+  }
+  .road-layer::after {
+    /* Full-width animated lane dashes */
+    content: ''; position: absolute; left: 0; right: 0; top: 48%;
+    height: 9px; transform: translateY(-50%);
+    background-image: repeating-linear-gradient(to right,
+      var(--accent) 0 60px,
+      transparent 60px 120px);
+    background-size: 120px 100%;
+    background-repeat: repeat-x;
+    opacity: 0.92;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+  }
+  .stage.running .road-layer::after {
+    animation: laneFlow 0.55s linear infinite;
+  }
+  @keyframes laneFlow {
+    from { background-position: 0 0; }
+    to   { background-position: -120px 0; }
+  }
+
+  /* ============ Roadside decorations (buildings, lamp posts, signs) ============ */
+  .scene-deco {
+    position: absolute; left: 0; right: 0; bottom: 17%;
+    height: 80%; pointer-events: none; z-index: 1;
+  }
+  .buildings {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    height: 26%;
+    background-image:
+      linear-gradient(to top, #1a1a28 0%, #1a1a28 calc(50% - 1px), transparent 50%),
+      linear-gradient(to top, #161621 0%, #161621 30%, transparent 30%);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    opacity: 0.65;
+  }
+  .buildings svg {
+    width: 100%; height: 100%;
+    display: block;
+  }
+  .lamp-post {
+    position: absolute; bottom: 0;
+    width: 4px; height: 38%;
+    background: linear-gradient(to bottom, #2a2a2a 0%, #1a1a1a 100%);
+  }
+  .lamp-post::before {
+    content: ''; position: absolute; top: -12px; left: -16px;
+    width: 36px; height: 14px;
+    border-radius: 4px 4px 2px 2px;
+    background: linear-gradient(to bottom, #3a3a3a 0%, #1a1a1a 100%);
+    border: 1px solid #0a0a0a;
+  }
+  .lamp-post::after {
+    /* glow */
+    content: ''; position: absolute; top: 0; left: -30px;
+    width: 64px; height: 30px;
+    background: radial-gradient(ellipse, rgba(255,220,130,0.45) 0%, transparent 70%);
+    opacity: 0.85;
+  }
+  .road-sign {
+    position: absolute; bottom: 24%;
+    width: 60px; height: 40px;
+    background: #1a4a9a;
+    border: 2px solid #111;
+    border-radius: 3px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px; font-weight: 800; color: #fff;
+    letter-spacing: 0.08em;
+  }
+  .road-sign::before {
+    content: ''; position: absolute; bottom: -28px; left: 50%;
+    transform: translateX(-50%);
+    width: 3px; height: 28px;
+    background: #1a1a1a;
+  }
+
+  /* ============ Truck SVG ============ */
   #hybridTruck {
     width: 100%; max-width: 1100px;
     height: auto; display: block; max-height: 100%;
     filter: drop-shadow(0 -6px 20px rgba(0,0,0,0.4));
     transform-origin: center bottom;
+    position: relative; z-index: 2;
+    /* Pull truck down so wheels kiss the CSS road top */
+    margin-bottom: -2%;
   }
   .result.show #hybridTruck {
     animation: truckAppear .65s cubic-bezier(.34,1.56,.50,1) both;
@@ -188,12 +312,28 @@
     100% { opacity: 1; transform: scale(1) translateY(0); }
   }
 
-  .stage.running .road-dashes {
-    animation: dashFlow 0.55s linear infinite;
+  /* ============ Obstacles (monster truck crushes them) ============ */
+  .obstacle {
+    position: absolute;
+    bottom: 13%;
+    left: 100%;
+    width: 44px;
+    height: 52px;
+    z-index: 3;
+    display: none;
+    will-change: transform;
   }
-  @keyframes dashFlow {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-90px); }
+  .primary-monster.show .obstacle { display: block; }
+  .obstacle svg { width: 100%; height: 100%; display: block; }
+  .obstacle-a { animation: obstacleRun 5.2s linear infinite; }
+  .obstacle-b { animation: obstacleRun 5.2s linear infinite 1.8s; }
+  .obstacle-c { animation: obstacleRun 5.2s linear infinite 3.6s; }
+  @keyframes obstacleRun {
+    0%   { transform: translateX(0)       rotate(0)   scale(1); opacity: 1; }
+    44%  { transform: translateX(-52vw)   rotate(0)   scale(1); opacity: 1; }
+    50%  { transform: translateX(-54vw)   rotate(60deg) scale(0.4); opacity: 0.55; }
+    56%  { transform: translateX(-56vw)   rotate(180deg) scale(0.1); opacity: 0; }
+    100% { transform: translateX(-110vw)  rotate(180deg) scale(0);   opacity: 0; }
   }
 
   /* ==== Flashing police lights ==== */
@@ -215,6 +355,21 @@
   .primary-loader    .chassis-loader    { display: inline; }
   .primary-crane     .chassis-crane     { display: inline; }
   .primary-excavator .chassis-excavator { display: inline; }
+  .primary-dumptruck .chassis-dumptruck { display: inline; }
+  .primary-bulldozer .chassis-bulldozer { display: inline; }
+  .primary-ambulance .chassis-ambulance { display: inline; }
+  /* New chassis: show standard police overlay when police selected */
+  .primary-dumptruck.has-police .chassis-dumptruck .attach-police { display: inline; }
+  .primary-bulldozer.has-police .chassis-bulldozer .attach-police { display: inline; }
+  .primary-ambulance.has-police .chassis-ambulance .attach-police { display: inline; }
+  /* New chassis standard/monster wheels */
+  .primary-dumptruck .chassis-dumptruck .attach-standard-wheels { display: inline; }
+  .primary-bulldozer .chassis-bulldozer .tracks-base { display: inline; }
+  .primary-ambulance .chassis-ambulance .attach-standard-wheels { display: inline; }
+  .primary-dumptruck.has-monster .chassis-dumptruck .attach-monster-wheels { display: inline; }
+  .primary-dumptruck.has-monster .chassis-dumptruck .attach-standard-wheels { display: none; }
+  .primary-ambulance.has-monster .chassis-ambulance .attach-monster-wheels { display: inline; }
+  .primary-ambulance.has-monster .chassis-ambulance .attach-standard-wheels { display: none; }
 
   /* Each chassis has native attachment slots that light up when that addon is selected (non-primary) */
   [class*="attach-"] { display: none; }
@@ -426,6 +581,61 @@
     <div class="v-cn">怪兽车</div>
     <div class="v-en">Monster</div>
   </div>
+
+  <div class="vehicle-card" data-vehicle="dumptruck">
+    <svg class="v-icon" viewBox="0 0 100 60">
+      <rect x="40" y="28" width="20" height="14" rx="2" fill="#ffb020"/>
+      <rect x="42" y="20" width="14" height="10" rx="1.5" fill="#ffb020"/>
+      <rect x="44" y="22" width="10" height="6" fill="#3a6090" opacity=".7"/>
+      <!-- tilting bed -->
+      <path d="M 4 12 L 40 12 L 44 42 L 4 42 Z" fill="#2060cc"/>
+      <path d="M 6 16 L 38 16 L 40 40 L 6 40 Z" fill="#1a4a9a" opacity="0.6"/>
+      <circle cx="22" cy="48" r="8" fill="#1a1a1a"/><circle cx="22" cy="48" r="3" fill="#666"/>
+      <circle cx="52" cy="48" r="8" fill="#1a1a1a"/><circle cx="52" cy="48" r="3" fill="#666"/>
+      <circle cx="72" cy="48" r="8" fill="#1a1a1a"/><circle cx="72" cy="48" r="3" fill="#666"/>
+    </svg>
+    <div class="v-cn">翻斗车</div>
+    <div class="v-en">Dump Truck</div>
+  </div>
+
+  <div class="vehicle-card" data-vehicle="bulldozer">
+    <svg class="v-icon" viewBox="0 0 100 60">
+      <rect x="18" y="40" width="64" height="10" rx="3" fill="#2a2a2a"/>
+      <circle cx="24" cy="45" r="3" fill="#555"/>
+      <circle cx="38" cy="45" r="3" fill="#555"/>
+      <circle cx="52" cy="45" r="3" fill="#555"/>
+      <circle cx="66" cy="45" r="3" fill="#555"/>
+      <circle cx="78" cy="45" r="3" fill="#555"/>
+      <rect x="34" y="22" width="32" height="18" rx="2" fill="#ffc820"/>
+      <rect x="40" y="14" width="22" height="10" rx="1.5" fill="#ffc820"/>
+      <rect x="42" y="16" width="18" height="6" fill="#3a6090" opacity=".7"/>
+      <!-- dozer blade -->
+      <path d="M 4 28 L 30 32 L 30 48 L 4 50 Z" fill="#e0b020"/>
+      <path d="M 4 28 L 30 32" stroke="#a08000" stroke-width="1"/>
+      <line x1="30" y1="36" x2="40" y2="34" stroke="#5a5a5a" stroke-width="2.5"/>
+    </svg>
+    <div class="v-cn">推土机</div>
+    <div class="v-en">Bulldozer</div>
+  </div>
+
+  <div class="vehicle-card" data-vehicle="ambulance">
+    <svg class="v-icon" viewBox="0 0 100 60">
+      <rect x="12" y="14" width="76" height="28" rx="3" fill="#fafafa"/>
+      <rect x="12" y="32" width="76" height="10" fill="#e02020"/>
+      <path d="M 12 14 L 36 14 L 32 30 L 12 30 Z" fill="#fafafa"/>
+      <rect x="14" y="16" width="18" height="12" fill="#3a6090" opacity="0.7"/>
+      <rect x="50" y="4" width="14" height="4" rx="1" fill="#222"/>
+      <rect x="52" y="6" width="4" height="2" fill="#fff"/>
+      <rect x="60" y="6" width="4" height="2" fill="#e02020"/>
+      <!-- red cross -->
+      <rect x="58" y="18" width="14" height="4" fill="#e02020"/>
+      <rect x="63" y="13" width="4" height="14" fill="#e02020"/>
+      <circle cx="28" cy="48" r="8" fill="#1a1a1a"/><circle cx="28" cy="48" r="3" fill="#666"/>
+      <circle cx="72" cy="48" r="8" fill="#1a1a1a"/><circle cx="72" cy="48" r="3" fill="#666"/>
+    </svg>
+    <div class="v-cn">救护车</div>
+    <div class="v-en">Ambulance</div>
+  </div>
 </div>
 
 <!-- ============================ STAGE ============================ -->
@@ -442,6 +652,90 @@
       <div class="en" id="resultEn"></div>
     </div>
     <div class="truck-scene">
+    <!-- Distant skyline / buildings / signs / lamp posts -->
+    <div class="scene-deco">
+      <div class="buildings">
+        <svg viewBox="0 0 1200 110" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
+          <g fill="#12121c">
+            <rect x="0" y="50" width="65" height="60"/>
+            <rect x="55" y="30" width="70" height="80"/>
+            <rect x="130" y="55" width="50" height="55"/>
+            <rect x="180" y="20" width="80" height="90"/>
+            <rect x="250" y="45" width="55" height="65"/>
+            <rect x="300" y="35" width="60" height="75"/>
+            <rect x="360" y="58" width="52" height="52"/>
+            <rect x="410" y="25" width="75" height="85"/>
+            <rect x="480" y="52" width="45" height="58"/>
+            <rect x="520" y="32" width="65" height="78"/>
+            <rect x="580" y="48" width="55" height="62"/>
+            <rect x="630" y="18" width="72" height="92"/>
+            <rect x="700" y="52" width="50" height="58"/>
+            <rect x="748" y="40" width="60" height="70"/>
+            <rect x="805" y="56" width="48" height="54"/>
+            <rect x="850" y="28" width="70" height="82"/>
+            <rect x="918" y="50" width="55" height="60"/>
+            <rect x="972" y="36" width="62" height="74"/>
+            <rect x="1032" y="54" width="50" height="56"/>
+            <rect x="1080" y="22" width="76" height="88"/>
+            <rect x="1154" y="48" width="46" height="62"/>
+          </g>
+          <!-- scattered lit windows -->
+          <g fill="#f5d070" opacity="0.55">
+            <rect x="68" y="46" width="4" height="5"/><rect x="78" y="56" width="4" height="5"/>
+            <rect x="195" y="38" width="4" height="5"/><rect x="222" y="56" width="4" height="5"/>
+            <rect x="315" y="50" width="4" height="5"/><rect x="335" y="68" width="4" height="5"/>
+            <rect x="432" y="40" width="4" height="5"/><rect x="462" y="60" width="4" height="5"/>
+            <rect x="540" y="48" width="4" height="5"/><rect x="568" y="72" width="4" height="5"/>
+            <rect x="648" y="34" width="4" height="5"/><rect x="678" y="58" width="4" height="5"/>
+            <rect x="762" y="54" width="4" height="5"/><rect x="788" y="72" width="4" height="5"/>
+            <rect x="868" y="42" width="4" height="5"/><rect x="898" y="62" width="4" height="5"/>
+            <rect x="990" y="50" width="4" height="5"/><rect x="1012" y="68" width="4" height="5"/>
+            <rect x="1098" y="38" width="4" height="5"/><rect x="1124" y="60" width="4" height="5"/>
+          </g>
+        </svg>
+      </div>
+      <!-- Lamp posts at varied positions -->
+      <div class="lamp-post" style="left: 8%;"></div>
+      <div class="lamp-post" style="left: 92%;"></div>
+      <!-- Road signs -->
+      <div class="road-sign" style="left: 18%;">50</div>
+      <div class="road-sign" style="right: 14%; background: #d23a1a;">STOP</div>
+    </div>
+
+    <!-- Full-width road with edge-to-edge animated lane lines -->
+    <div class="road-layer"></div>
+
+    <!-- Crushable obstacles (shown only when monster primary) -->
+    <div class="obstacle obstacle-a">
+      <svg viewBox="0 0 44 52" xmlns="http://www.w3.org/2000/svg">
+        <!-- Traffic cone -->
+        <path d="M 22 4 L 34 46 L 10 46 Z" fill="#ff6a20" stroke="#000" stroke-width="1.5"/>
+        <rect x="8" y="42" width="28" height="6" rx="1.5" fill="#1a1a1a"/>
+        <rect x="14" y="22" width="16" height="4" fill="#fff"/>
+        <rect x="12" y="32" width="20" height="4" fill="#fff"/>
+      </svg>
+    </div>
+    <div class="obstacle obstacle-b">
+      <svg viewBox="0 0 44 52" xmlns="http://www.w3.org/2000/svg">
+        <!-- Oil barrel -->
+        <ellipse cx="22" cy="10" rx="16" ry="4" fill="#7a2010" stroke="#000" stroke-width="1.5"/>
+        <rect x="6" y="10" width="32" height="38" fill="#c83020" stroke="#000" stroke-width="1.5"/>
+        <ellipse cx="22" cy="48" rx="16" ry="4" fill="#7a2010" stroke="#000" stroke-width="1.5"/>
+        <rect x="6" y="18" width="32" height="3" fill="#7a2010"/>
+        <rect x="6" y="36" width="32" height="3" fill="#7a2010"/>
+        <text x="22" y="34" text-anchor="middle" font-size="6" font-weight="900" fill="#fff">OIL</text>
+      </svg>
+    </div>
+    <div class="obstacle obstacle-c">
+      <svg viewBox="0 0 44 52" xmlns="http://www.w3.org/2000/svg">
+        <!-- Wooden crate -->
+        <rect x="4" y="10" width="36" height="38" fill="#a06030" stroke="#000" stroke-width="1.5"/>
+        <path d="M 4 10 L 40 10 M 4 48 L 40 48 M 4 10 L 4 48 M 40 10 L 40 48" stroke="#5a2810" stroke-width="1"/>
+        <path d="M 4 10 L 40 48 M 40 10 L 4 48" stroke="#5a2810" stroke-width="1.5"/>
+        <rect x="4" y="8" width="36" height="4" fill="#8a4020"/>
+      </svg>
+    </div>
+
     <svg id="hybridTruck" viewBox="0 0 900 540" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">
 
       <defs>
@@ -1181,28 +1475,298 @@
       </g>
 
       <!-- =====================================================================
-           ROAD (drawn LAST — covers below wheels/tracks at y=458)
+           CHASSIS 6: DUMP TRUCK (翻斗车)
+           Heavy truck with cab + tilting dump bed + 3-axle chassis
            ===================================================================== -->
-      <rect x="-20" y="458" width="940" height="90" fill="url(#roadGrad)"/>
-      <rect x="-20" y="456" width="940" height="3" fill="rgba(255,255,255,0.15)"/>
-      <!-- Shadows under wheels -->
-      <ellipse cx="250" cy="467" rx="60" ry="6" fill="rgba(0,0,0,0.45)"/>
-      <ellipse cx="660" cy="467" rx="60" ry="6" fill="rgba(0,0,0,0.45)"/>
-      <!-- Lane dashes (animated) -->
-      <g class="road-dashes">
-        <rect x="-60" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
-        <rect x="30"  y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
-        <rect x="120" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
-        <rect x="210" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
-        <rect x="300" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
-        <rect x="390" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
-        <rect x="480" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
-        <rect x="570" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
-        <rect x="660" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
-        <rect x="750" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
-        <rect x="840" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
-        <rect x="930" y="492" width="54" height="8" rx="1.5" fill="#ffcb05" opacity="0.9"/>
+      <g class="chassis chassis-dumptruck">
+        <g class="truck-bounce">
+          <!-- Wheels (3-axle style, 3 visible from side) -->
+          <g class="attach-standard-wheels">
+            <circle cx="165" cy="405" r="42" fill="#0a0a0a"/>
+            <circle cx="165" cy="405" r="25" fill="#666"/>
+            <g stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"><line x1="165" y1="383" x2="165" y2="427"/><line x1="144" y1="393" x2="186" y2="417"/><line x1="186" y1="393" x2="144" y2="417"/></g>
+            <circle cx="165" cy="405" r="8" fill="#2a2a2a"/>
+
+            <circle cx="260" cy="405" r="42" fill="#0a0a0a"/>
+            <circle cx="260" cy="405" r="25" fill="#666"/>
+            <g stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"><line x1="260" y1="383" x2="260" y2="427"/><line x1="239" y1="393" x2="281" y2="417"/><line x1="281" y1="393" x2="239" y2="417"/></g>
+            <circle cx="260" cy="405" r="8" fill="#2a2a2a"/>
+
+            <circle cx="720" cy="405" r="42" fill="#0a0a0a"/>
+            <circle cx="720" cy="405" r="25" fill="#666"/>
+            <g stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"><line x1="720" y1="383" x2="720" y2="427"/><line x1="699" y1="393" x2="741" y2="417"/><line x1="741" y1="393" x2="699" y2="417"/></g>
+            <circle cx="720" cy="405" r="8" fill="#2a2a2a"/>
+          </g>
+
+          <!-- Monster wheel swap -->
+          <g class="attach-monster-wheels">
+            <circle cx="180" cy="395" r="72" fill="#0a0a0a"/>
+            <circle cx="180" cy="395" r="46" fill="#222"/>
+            <circle cx="180" cy="395" r="30" fill="#aaa"/>
+            <g fill="#111"><path d="M 110 395 L 124 384 L 128 408 L 112 418 Z"/><path d="M 180 325 L 195 330 L 192 348 L 176 344 Z"/></g>
+            <circle cx="720" cy="395" r="72" fill="#0a0a0a"/>
+            <circle cx="720" cy="395" r="46" fill="#222"/>
+            <circle cx="720" cy="395" r="30" fill="#aaa"/>
+            <g fill="#111"><path d="M 650 395 L 664 384 L 668 408 L 652 418 Z"/><path d="M 720 325 L 735 330 L 732 348 L 716 344 Z"/></g>
+          </g>
+
+          <!-- Chassis frame -->
+          <rect x="130" y="382" width="630" height="10" rx="2" fill="#1a1a1a"/>
+
+          <!-- Dump bed (tilted slightly for drama) -->
+          <path d="M 130 380 L 140 195 L 440 195 L 450 300 Q 452 320 450 340 L 450 382 Z"
+                fill="#2060cc" stroke="#0a1a3a" stroke-width="3" stroke-linejoin="round"/>
+          <!-- Bed inner lining -->
+          <path d="M 148 208 L 432 208 L 440 295 L 160 300 Z" fill="#1a4aaa" opacity="0.5"/>
+          <!-- Bed ribs (structural) -->
+          <g stroke="#0a3388" stroke-width="2">
+            <line x1="200" y1="210" x2="200" y2="300"/>
+            <line x1="260" y1="210" x2="260" y2="300"/>
+            <line x1="320" y1="210" x2="320" y2="300"/>
+            <line x1="380" y1="210" x2="380" y2="300"/>
+          </g>
+          <!-- Hinge pin (bottom back) -->
+          <circle cx="140" cy="380" r="8" fill="#2a2a2a" stroke="#000" stroke-width="1.5"/>
+          <!-- Hydraulic ram (holds bed up) -->
+          <line x1="260" y1="375" x2="320" y2="280" stroke="#888" stroke-width="12" stroke-linecap="round"/>
+          <line x1="260" y1="375" x2="320" y2="280" stroke="#ddd" stroke-width="5" stroke-linecap="round"/>
+
+          <!-- Cab at front -->
+          <path d="M 465 360 L 475 225 Q 480 208 500 206 L 640 206 Q 660 208 665 225 L 680 330 Q 684 345 680 360 Z"
+                fill="#ffb020" stroke="#1a1a1a" stroke-width="3" stroke-linejoin="round"/>
+          <!-- Windshield -->
+          <path d="M 493 215 L 485 335 L 645 335 L 645 215 Z" fill="#1e3650" opacity="0.85"/>
+          <line x1="565" y1="215" x2="565" y2="335" stroke="#d08000" stroke-width="2"/>
+          <!-- Front grille -->
+          <rect x="680" y="345" width="25" height="30" fill="#121212"/>
+          <g stroke="#3a3a3a" stroke-width="1"><line x1="682" y1="352" x2="703" y2="352"/><line x1="682" y1="358" x2="703" y2="358"/><line x1="682" y1="364" x2="703" y2="364"/></g>
+          <!-- Headlight -->
+          <circle cx="695" cy="330" r="8" fill="#fff2c8"/>
+          <circle cx="695" cy="330" r="4" fill="#fff"/>
+          <!-- Exhaust stack -->
+          <rect x="655" y="160" width="10" height="52" fill="#7a7a7a" rx="2"/>
+          <circle cx="660" cy="160" r="6" fill="#2a2a2a"/>
+          <!-- Mudflap -->
+          <rect x="125" y="380" width="12" height="40" rx="2" fill="#1a1a1a"/>
+
+          <!-- Attach: police overlay -->
+          <g class="attach-police">
+            <rect x="500" y="190" width="100" height="18" rx="2" fill="#141414"/>
+            <rect class="flash-red"  x="506" y="193" width="42" height="12" rx="1.5" fill="#3a0c18"/>
+            <rect class="flash-blue" x="552" y="193" width="42" height="12" rx="1.5" fill="#0a1040"/>
+            <rect x="470" y="350" width="210" height="12" fill="#0050cc"/>
+            <text x="494" y="359" font-family="Impact" font-size="10" font-weight="900" fill="#fff" letter-spacing="1.5">POLICE</text>
+            <text x="595" y="360" font-family="'PingFang SC'" font-size="12" font-weight="900" fill="#fff" letter-spacing="3">警察</text>
+          </g>
+        </g>
       </g>
+
+      <!-- =====================================================================
+           CHASSIS 7: BULLDOZER (推土机)
+           Tracked vehicle with massive front blade + ripper at back
+           ===================================================================== -->
+      <g class="chassis chassis-bulldozer">
+        <g class="tracks-base">
+          <!-- Track body -->
+          <rect x="180" y="395" width="540" height="48" rx="24" fill="#111"/>
+          <rect x="195" y="402" width="510" height="30" rx="12" fill="#2a2a2a"/>
+          <!-- End drums (bigger in back, smaller in front) -->
+          <circle cx="210" cy="420" r="22" fill="#333" stroke="#111" stroke-width="2"/>
+          <circle cx="210" cy="420" r="10" fill="#555"/>
+          <circle cx="690" cy="420" r="22" fill="#333" stroke="#111" stroke-width="2"/>
+          <circle cx="690" cy="420" r="10" fill="#555"/>
+          <!-- Support rollers -->
+          <g fill="#4a4a4a" stroke="#111" stroke-width="1">
+            <circle cx="290" cy="432" r="8"/>
+            <circle cx="370" cy="432" r="8"/>
+            <circle cx="450" cy="432" r="8"/>
+            <circle cx="530" cy="432" r="8"/>
+            <circle cx="610" cy="432" r="8"/>
+          </g>
+          <!-- Track shoes -->
+          <g fill="#1a1a1a">
+            <rect x="220" y="397" width="10" height="4"/><rect x="240" y="397" width="10" height="4"/>
+            <rect x="260" y="397" width="10" height="4"/><rect x="280" y="397" width="10" height="4"/>
+            <rect x="300" y="397" width="10" height="4"/><rect x="320" y="397" width="10" height="4"/>
+            <rect x="340" y="397" width="10" height="4"/><rect x="360" y="397" width="10" height="4"/>
+            <rect x="380" y="397" width="10" height="4"/><rect x="400" y="397" width="10" height="4"/>
+            <rect x="420" y="397" width="10" height="4"/><rect x="440" y="397" width="10" height="4"/>
+            <rect x="460" y="397" width="10" height="4"/><rect x="480" y="397" width="10" height="4"/>
+            <rect x="500" y="397" width="10" height="4"/><rect x="520" y="397" width="10" height="4"/>
+            <rect x="540" y="397" width="10" height="4"/><rect x="560" y="397" width="10" height="4"/>
+            <rect x="580" y="397" width="10" height="4"/><rect x="600" y="397" width="10" height="4"/>
+            <rect x="620" y="397" width="10" height="4"/><rect x="640" y="397" width="10" height="4"/>
+            <rect x="660" y="397" width="10" height="4"/>
+          </g>
+        </g>
+
+        <!-- Main body -->
+        <path d="M 250 395 L 260 290 Q 265 275 285 273 L 570 273 Q 590 275 595 290 L 605 395 Z"
+              fill="url(#loaderGrad)" stroke="#1a1a1a" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Operator cab -->
+        <path d="M 350 273 L 355 185 Q 360 172 375 170 L 490 170 Q 508 172 512 185 L 520 273 Z"
+              fill="url(#loaderGrad)" stroke="#1a1a1a" stroke-width="3" stroke-linejoin="round"/>
+        <rect x="365" y="185" width="140" height="80" fill="#1e3650" opacity="0.85"/>
+        <line x1="435" y1="185" x2="435" y2="265" stroke="#f5cf38" stroke-width="2"/>
+        <!-- Exhaust stacks -->
+        <rect x="520" y="145" width="11" height="50" fill="#6a6a6a" rx="2"/>
+        <circle cx="525" cy="145" r="6" fill="#2a2a2a"/>
+        <!-- Grille/radiator -->
+        <rect x="550" y="305" width="50" height="50" rx="2" fill="#1a1a1a"/>
+        <g stroke="#3a3a3a" stroke-width="1">
+          <line x1="555" y1="315" x2="595" y2="315"/>
+          <line x1="555" y1="325" x2="595" y2="325"/>
+          <line x1="555" y1="335" x2="595" y2="335"/>
+          <line x1="555" y1="345" x2="595" y2="345"/>
+        </g>
+        <!-- Headlights (2) -->
+        <circle cx="600" cy="295" r="6" fill="#fff2c8"/>
+        <circle cx="570" cy="295" r="6" fill="#fff2c8"/>
+
+        <!-- MASSIVE DOZER BLADE at front -->
+        <path d="M 600 280
+                 L 750 300
+                 L 855 360
+                 L 855 420
+                 L 730 420
+                 L 620 375 Z"
+              fill="url(#loaderGrad)" stroke="#1a1a1a" stroke-width="3" stroke-linejoin="round"/>
+        <!-- Blade inner ribs -->
+        <path d="M 620 310 L 840 370" stroke="#c08000" stroke-width="2" fill="none"/>
+        <path d="M 620 340 L 845 395" stroke="#c08000" stroke-width="2" fill="none"/>
+        <!-- Blade cutting edge highlight -->
+        <path d="M 730 420 L 855 420" stroke="#ffd048" stroke-width="4"/>
+        <!-- Hydraulic arms to blade -->
+        <line x1="605" y1="300" x2="720" y2="330" stroke="#888" stroke-width="12" stroke-linecap="round"/>
+        <line x1="605" y1="300" x2="720" y2="330" stroke="#ddd" stroke-width="5" stroke-linecap="round"/>
+        <line x1="605" y1="340" x2="720" y2="380" stroke="#888" stroke-width="10" stroke-linecap="round"/>
+        <line x1="605" y1="340" x2="720" y2="380" stroke="#ddd" stroke-width="4" stroke-linecap="round"/>
+        <!-- Pivot joints -->
+        <circle cx="605" cy="300" r="8" fill="#2a2a2a" stroke="#000" stroke-width="1.5"/>
+        <circle cx="720" cy="330" r="7" fill="#2a2a2a" stroke="#000" stroke-width="1.5"/>
+
+        <!-- Ripper at back (for breaking ground) -->
+        <g>
+          <rect x="170" y="340" width="60" height="20" rx="2" fill="url(#loaderGrad)" stroke="#1a1a1a" stroke-width="2"/>
+          <path d="M 180 350 L 175 395 L 185 395 Z" fill="#888" stroke="#000" stroke-width="1.5"/>
+          <path d="M 210 350 L 205 395 L 215 395 Z" fill="#888" stroke="#000" stroke-width="1.5"/>
+        </g>
+
+        <!-- Attach: police overlay -->
+        <g class="attach-police">
+          <rect x="395" y="154" width="100" height="16" rx="2" fill="#141414"/>
+          <rect class="flash-red"  x="400" y="157" width="42" height="10" rx="1.5" fill="#3a0c18"/>
+          <rect class="flash-blue" x="446" y="157" width="42" height="10" rx="1.5" fill="#0a1040"/>
+          <rect x="260" y="360" width="340" height="14" fill="#0050cc"/>
+          <text x="300" y="371" font-family="Impact" font-size="12" font-weight="900" fill="#fff" letter-spacing="2">POLICE</text>
+          <text x="470" y="372" font-family="'PingFang SC'" font-size="14" font-weight="900" fill="#fff" letter-spacing="4">警察</text>
+        </g>
+      </g>
+
+      <!-- =====================================================================
+           CHASSIS 8: AMBULANCE (救护车)
+           White van with red cross, roof lights, siren
+           ===================================================================== -->
+      <g class="chassis chassis-ambulance">
+        <g class="truck-bounce">
+          <!-- Wheels -->
+          <g class="attach-standard-wheels">
+            <circle cx="240" cy="408" r="44" fill="#0a0a0a"/>
+            <circle cx="240" cy="408" r="26" fill="#808080"/>
+            <g stroke="#1a1a1a" stroke-width="4.5" stroke-linecap="round">
+              <line x1="240" y1="385" x2="240" y2="431"/>
+              <line x1="217" y1="395" x2="263" y2="421"/>
+              <line x1="263" y1="395" x2="217" y2="421"/>
+            </g>
+            <circle cx="240" cy="408" r="8" fill="#1a1a1a"/>
+
+            <circle cx="680" cy="408" r="44" fill="#0a0a0a"/>
+            <circle cx="680" cy="408" r="26" fill="#808080"/>
+            <g stroke="#1a1a1a" stroke-width="4.5" stroke-linecap="round">
+              <line x1="680" y1="385" x2="680" y2="431"/>
+              <line x1="657" y1="395" x2="703" y2="421"/>
+              <line x1="703" y1="395" x2="657" y2="421"/>
+            </g>
+            <circle cx="680" cy="408" r="8" fill="#1a1a1a"/>
+          </g>
+
+          <!-- Monster wheel swap -->
+          <g class="attach-monster-wheels">
+            <circle cx="240" cy="395" r="72" fill="#0a0a0a"/>
+            <circle cx="240" cy="395" r="46" fill="#222"/>
+            <circle cx="240" cy="395" r="30" fill="#aaa"/>
+            <g fill="#111"><path d="M 168 395 L 184 384 L 188 408 L 172 418 Z"/></g>
+            <circle cx="680" cy="395" r="72" fill="#0a0a0a"/>
+            <circle cx="680" cy="395" r="46" fill="#222"/>
+            <circle cx="680" cy="395" r="30" fill="#aaa"/>
+            <g fill="#111"><path d="M 608 395 L 624 384 L 628 408 L 612 418 Z"/></g>
+          </g>
+
+          <!-- VAN BODY (higher/boxier than sedan) -->
+          <path d="M 115 400
+                   L 115 220
+                   Q 120 200 140 198
+                   L 780 198
+                   Q 820 200 828 220
+                   L 835 400 Z"
+                fill="#fafafa" stroke="#1a1a1a" stroke-width="3" stroke-linejoin="round"/>
+          <!-- Front section (cab, slightly angled) -->
+          <path d="M 828 220 L 845 260 L 850 400 L 828 400 Z"
+                fill="#fafafa" stroke="#1a1a1a" stroke-width="3" stroke-linejoin="round"/>
+          <!-- Windshield & windows -->
+          <path d="M 145 210 L 140 270 L 200 270 L 200 210 Z" fill="#0a1628" opacity="0.85"/>
+          <path d="M 215 210 L 215 270 L 475 270 L 475 210 Z" fill="#0a1628" opacity="0.85"/>
+          <path d="M 490 210 L 490 270 L 645 270 L 645 210 Z" fill="#0a1628" opacity="0.85"/>
+          <path d="M 760 210 L 755 270 L 820 270 L 820 210 Z" fill="#0a1628" opacity="0.85"/>
+          <!-- Pillars -->
+          <rect x="200" y="205" width="15" height="72" fill="#fafafa"/>
+          <rect x="475" y="205" width="15" height="72" fill="#fafafa"/>
+          <rect x="645" y="205" width="15" height="72" fill="#fafafa"/>
+          <rect x="740" y="205" width="20" height="72" fill="#fafafa"/>
+          <!-- Red horizontal stripe -->
+          <rect x="115" y="320" width="735" height="22" fill="#e02020"/>
+          <rect x="115" y="342" width="735" height="3" fill="#a01010"/>
+
+          <!-- BIG RED CROSS (iconic ambulance symbol) -->
+          <g>
+            <rect x="340" y="285" width="100" height="28" fill="#e02020"/>
+            <rect x="376" y="249" width="28" height="100" fill="#e02020"/>
+          </g>
+
+          <!-- AMBULANCE text -->
+          <text x="510" y="308" font-family="Impact, 'Arial Black'" font-size="30" font-weight="900" fill="#e02020" letter-spacing="2">AMBULANCE</text>
+          <!-- 救护 text -->
+          <text x="150" y="300" font-family="'PingFang SC','Microsoft YaHei'" font-size="30" font-weight="900" fill="#e02020" letter-spacing="4">救护</text>
+
+          <!-- Emergency light bar -->
+          <rect x="365" y="168" width="170" height="24" rx="3" fill="#131313"/>
+          <rect x="365" y="164" width="170" height="4" rx="2" fill="#2a2a2a"/>
+          <rect class="flash-red"  x="372" y="173" width="72" height="14" rx="1.5" fill="#3a0c18"/>
+          <rect class="flash-blue" x="455" y="173" width="72" height="14" rx="1.5" fill="#0a1040"/>
+
+          <!-- Door lines -->
+          <line x1="470" y1="345" x2="470" y2="400" stroke="rgba(0,0,0,0.25)" stroke-width="1.5"/>
+          <!-- Door handle -->
+          <rect x="650" y="355" width="26" height="4" rx="2" fill="#1a1a1a"/>
+          <!-- Headlight -->
+          <ellipse cx="840" cy="320" rx="12" ry="8" fill="#fff2c8"/>
+          <ellipse cx="840" cy="320" rx="5" ry="4" fill="#fff"/>
+          <!-- Front grille -->
+          <rect x="826" y="340" width="22" height="40" fill="#121212"/>
+          <!-- Tail light -->
+          <rect x="118" y="345" width="12" height="24" rx="2" fill="#e02020"/>
+
+          <!-- Attach: police overlay (swaps siren configuration slightly) -->
+          <g class="attach-police">
+            <rect x="170" y="362" width="200" height="14" fill="#0050cc"/>
+            <text x="210" y="373" font-family="Impact" font-size="12" font-weight="900" fill="#fff" letter-spacing="2">POLICE+RESCUE</text>
+          </g>
+        </g>
+      </g>
+
+      <!-- Ground shadows under each wheel (sits on road) -->
+      <ellipse cx="250" cy="458" rx="62" ry="8" fill="rgba(0,0,0,0.50)"/>
+      <ellipse cx="660" cy="458" rx="62" ry="8" fill="rgba(0,0,0,0.50)"/>
     </svg>
     </div>
   </div>
@@ -1222,13 +1786,25 @@
   'use strict';
 
   // Order = chassis priority when multiple selected
-  const CHASSIS_PRIORITY = ['monster', 'excavator', 'loader', 'crane', 'police'];
+  const CHASSIS_PRIORITY = [
+    'monster',     // always wins: giant wheels + flames
+    'excavator',   // tracked + arm
+    'bulldozer',   // tracked + front blade
+    'loader',      // articulated with bucket
+    'crane',       // boom + outriggers
+    'dumptruck',   // tilting bed
+    'ambulance',   // van (emergency)
+    'police'       // sedan (emergency)
+  ];
   const NAMES = {
     police:    { cn: '警察',   en: 'Police' },
     loader:    { cn: '装载机', en: 'Loader' },
     crane:     { cn: '吊车',   en: 'Crane' },
     excavator: { cn: '挖掘机', en: 'Digger' },
-    monster:   { cn: '怪兽',   en: 'Monster' }
+    monster:   { cn: '怪兽',   en: 'Monster' },
+    dumptruck: { cn: '翻斗',   en: 'Dump' },
+    bulldozer: { cn: '推土',   en: 'Dozer' },
+    ambulance: { cn: '救护',   en: 'Ambulance' }
   };
 
   const selected = new Set();
