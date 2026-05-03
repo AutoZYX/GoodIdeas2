@@ -43,15 +43,17 @@
   .topbar {
     display: flex; align-items: center; justify-content: space-between;
     padding: 14px 18px 6px; font-size: 14px; opacity: 0.85;
+    min-width: 0;
   }
-  .topbar a { color: inherit; opacity: 0.7; text-decoration: none; }
+  .topbar a { color: inherit; opacity: 0.7; text-decoration: none; flex: 0 0 auto; }
   .topbar a:hover { opacity: 1; }
   .topbar .title {
     font-family: 'Playfair Display', Georgia, serif;
     font-weight: 800; font-size: clamp(14px, 3.4vw, 18px);
     white-space: nowrap;
     overflow: hidden; text-overflow: ellipsis;
-    max-width: 68vw;
+    max-width: calc(100vw - 130px);
+    min-width: 0;
   }
 
   .label-row {
@@ -96,10 +98,14 @@
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
   }
   .vehicle-card .v-icon {
-    width: 82%;
+    width: 96%;
     max-width: 120px;
     height: auto; aspect-ratio: 10/6;
     flex-shrink: 0;
+  }
+  .vehicle-card img.v-icon {
+    object-fit: contain;
+    filter: drop-shadow(0 8px 12px rgba(0,0,0,0.30));
   }
   .vehicle-card .v-cn {
     font-size: clamp(12px, 3.4vw, 18px);
@@ -113,7 +119,8 @@
     letter-spacing: 0.05em; font-style: italic;
   }
   @media (min-width: 720px) {
-    .vehicle-card { aspect-ratio: 4 / 5; }
+    .vehicle-card { aspect-ratio: 4 / 5; padding: 10px 6px 8px; }
+    .vehicle-card .v-icon { width: 100%; max-width: 142px; }
   }
 
   .stage {
@@ -167,6 +174,7 @@
 
   .result-name {
     padding: 16px 16px 6px; text-align: center; z-index: 4;
+    position: relative;
   }
   .result-name .cn {
     font-family: 'Playfair Display', Georgia, "Noto Serif SC", serif;
@@ -329,6 +337,111 @@
   .road-sign.highway { background: #1a7a3a; font-size: 10px; }
 
   /* ============ Truck SVG ============ */
+  .asset-vehicle-stack {
+    position: absolute;
+    left: 50%;
+    bottom: 16%;
+    width: min(86vw, 880px);
+    height: min(48vh, 380px);
+    transform: translateX(-50%);
+    z-index: 2;
+    pointer-events: none;
+    display: none;
+  }
+  .asset-vehicle {
+    position: absolute;
+    left: var(--asset-x, 50%);
+    bottom: var(--asset-drop, -22%);
+    width: var(--asset-width, 92%);
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
+    transform: translateX(-50%);
+    display: none;
+    filter:
+      drop-shadow(0 18px 18px rgba(0,0,0,0.45))
+      drop-shadow(0 4px 0 rgba(0,0,0,0.18));
+  }
+  .asset-ground-shadow {
+    position: absolute;
+    left: 50%;
+    bottom: 1%;
+    width: min(58vw, 620px);
+    height: 30px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(0,0,0,0.48) 0%, rgba(0,0,0,0.18) 45%, transparent 74%);
+    display: none;
+  }
+  .asset-feature-chip {
+    position: absolute;
+    top: 10%;
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.92);
+    color: #111;
+    font-size: clamp(12px, 2.4vw, 15px);
+    font-weight: 900;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.22);
+    display: none;
+  }
+  .asset-chip-police { left: 12%; }
+  .asset-chip-loader { left: 30%; }
+  .asset-chip-crane { right: 30%; }
+  .asset-chip-excavator { right: 12%; }
+  .primary-monster .asset-vehicle-stack,
+  .primary-loader .asset-vehicle-stack,
+  .primary-crane .asset-vehicle-stack,
+  .primary-excavator .asset-vehicle-stack { display: block; }
+  .primary-monster .asset-monster,
+  .primary-loader .asset-loader,
+  .primary-crane .asset-crane,
+  .primary-excavator .asset-excavator,
+  .primary-monster .asset-ground-shadow,
+  .primary-loader .asset-ground-shadow,
+  .primary-crane .asset-ground-shadow,
+  .primary-excavator .asset-ground-shadow { display: block; }
+  .primary-monster .asset-monster { --asset-drop: -20%; --asset-width: 84%; }
+  .primary-loader .asset-loader { --asset-drop: -27%; --asset-width: 90%; }
+  .primary-crane .asset-crane { --asset-drop: -29%; --asset-width: 98%; }
+  .primary-excavator .asset-excavator { --asset-drop: -19%; --asset-width: 88%; }
+  @media (max-width: 640px) {
+    .asset-vehicle-stack {
+      width: 100%;
+      height: min(42vh, 300px);
+      bottom: 17%;
+    }
+    .primary-monster .asset-monster { --asset-drop: -18%; --asset-width: 86%; }
+    .primary-loader .asset-loader { --asset-drop: -22%; --asset-width: 55%; --asset-x: 42%; }
+    .primary-crane .asset-crane { --asset-drop: -24%; --asset-width: 86%; }
+    .primary-excavator .asset-excavator { --asset-drop: -16%; --asset-width: 78%; }
+    .asset-feature-chip { top: 8%; font-size: 11px; padding: 5px 8px; }
+  }
+  .primary-monster #hybridTruck,
+  .primary-loader #hybridTruck,
+  .primary-crane #hybridTruck,
+  .primary-excavator #hybridTruck { display: none; }
+  .primary-monster.has-police .asset-chip-police,
+  .primary-loader.has-police .asset-chip-police,
+  .primary-crane.has-police .asset-chip-police,
+  .primary-excavator.has-police .asset-chip-police,
+  .primary-monster.has-loader .asset-chip-loader,
+  .primary-crane.has-loader .asset-chip-loader,
+  .primary-excavator.has-loader .asset-chip-loader,
+  .primary-monster.has-crane .asset-chip-crane,
+  .primary-loader.has-crane .asset-chip-crane,
+  .primary-excavator.has-crane .asset-chip-crane,
+  .primary-monster.has-excavator .asset-chip-excavator,
+  .primary-loader.has-excavator .asset-chip-excavator,
+  .primary-crane.has-excavator .asset-chip-excavator { display: block; }
+  .result.show .asset-vehicle-stack {
+    animation: assetTruckAppear .65s cubic-bezier(.34,1.56,.50,1) both;
+  }
+  @keyframes assetTruckAppear {
+    0%   { opacity: 0; transform: translateX(-50%) scale(.5) translateY(30px); }
+    60%  { opacity: 1; transform: translateX(-50%) scale(1.04) translateY(-2px); }
+    100% { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); }
+  }
   #hybridTruck {
     width: 100%; max-width: 1100px;
     height: auto; display: block; max-height: 100%;
@@ -557,78 +670,31 @@
 <!-- ============================ VEHICLE CARDS ============================ -->
 <div class="vehicles" id="vehicleCards">
   <div class="vehicle-card" data-vehicle="police">
-    <svg class="v-icon" viewBox="0 0 100 60">
-      <rect x="10" y="22" width="80" height="20" rx="4" fill="#f0f0f0"/>
-      <rect x="10" y="32" width="80" height="10" fill="#111"/>
-      <path d="M 18 22 L 30 12 L 70 12 L 82 22 Z" fill="#f0f0f0"/>
-      <path d="M 22 20 L 32 14 L 68 14 L 78 20 Z" fill="#223a6a" opacity="0.8"/>
-      <rect x="38" y="6" width="24" height="8" rx="1.5" fill="#222"/>
-      <rect x="40" y="8" width="10" height="4" fill="#ff2040"/>
-      <rect x="50" y="8" width="10" height="4" fill="#2060ff"/>
-      <circle cx="28" cy="46" r="8" fill="#1a1a1a"/><circle cx="28" cy="46" r="3" fill="#666"/>
-      <circle cx="72" cy="46" r="8" fill="#1a1a1a"/><circle cx="72" cy="46" r="3" fill="#666"/>
-    </svg>
+    <img class="v-icon" src="assets/generated-demo/police-us.png" alt="Police car">
     <div class="v-cn">警车</div>
     <div class="v-en">Police</div>
   </div>
 
   <div class="vehicle-card" data-vehicle="loader">
-    <svg class="v-icon" viewBox="0 0 100 60">
-      <rect x="46" y="20" width="32" height="22" rx="2" fill="#ffc820"/>
-      <rect x="50" y="12" width="22" height="10" rx="2" fill="#ffc820"/>
-      <rect x="52" y="14" width="18" height="6" fill="#3a6090" opacity=".7"/>
-      <path d="M 44 32 L 18 36 L 14 46 L 32 48 L 44 42 Z" fill="#ffaa00"/>
-      <path d="M 14 46 L 6 48 L 4 52 L 14 52 Z" fill="#c08000"/>
-      <circle cx="30" cy="48" r="8" fill="#1a1a1a"/><circle cx="30" cy="48" r="3" fill="#666"/>
-      <circle cx="70" cy="48" r="8" fill="#1a1a1a"/><circle cx="70" cy="48" r="3" fill="#666"/>
-    </svg>
+    <img class="v-icon" src="assets/generated-demo/wheel-loader.png" alt="Wheel loader">
     <div class="v-cn">装载机</div>
     <div class="v-en">Loader</div>
   </div>
 
   <div class="vehicle-card" data-vehicle="crane">
-    <svg class="v-icon" viewBox="0 0 100 60">
-      <rect x="10" y="30" width="70" height="14" rx="2" fill="#ffaa20"/>
-      <rect x="18" y="22" width="18" height="10" rx="1.5" fill="#ffaa20"/>
-      <path d="M 46 32 L 94 8 L 97 14 L 48 38 Z" fill="#ffd040"/>
-      <line x1="94" y1="12" x2="94" y2="30" stroke="#333" stroke-width="1.2"/>
-      <path d="M 91 30 L 97 30 L 97 36 Q 94 38 91 36 Z" fill="#888"/>
-      <circle cx="24" cy="48" r="7" fill="#1a1a1a"/><circle cx="24" cy="48" r="3" fill="#666"/>
-      <circle cx="60" cy="48" r="7" fill="#1a1a1a"/><circle cx="60" cy="48" r="3" fill="#666"/>
-    </svg>
+    <img class="v-icon" src="assets/generated-demo/mobile-crane.png" alt="Mobile crane">
     <div class="v-cn">吊车</div>
     <div class="v-en">Crane</div>
   </div>
 
   <div class="vehicle-card" data-vehicle="excavator">
-    <svg class="v-icon" viewBox="0 0 100 60">
-      <rect x="20" y="42" width="60" height="10" rx="2" fill="#3a3a3a"/>
-      <circle cx="26" cy="47" r="4" fill="#555"/>
-      <circle cx="50" cy="47" r="4" fill="#555"/>
-      <circle cx="74" cy="47" r="4" fill="#555"/>
-      <rect x="30" y="28" width="38" height="14" rx="2" fill="#ff8800"/>
-      <rect x="36" y="20" width="24" height="10" rx="1.5" fill="#ff8800"/>
-      <path d="M 48 23 L 20 6 L 14 12 L 46 30 Z" fill="#ff9a00"/>
-      <path d="M 18 9 L 6 26 L 12 30 L 22 14 Z" fill="#ff9a00"/>
-      <path d="M 6 26 L 2 36 L 10 40 L 14 30 Z" fill="#c06020"/>
-    </svg>
+    <img class="v-icon" src="assets/generated-demo/excavator.png" alt="Excavator">
     <div class="v-cn">挖掘机</div>
     <div class="v-en">Excavator</div>
   </div>
 
   <div class="vehicle-card" data-vehicle="monster">
-    <svg class="v-icon" viewBox="0 0 100 60">
-      <rect x="22" y="18" width="56" height="16" rx="2" fill="#d83020"/>
-      <rect x="28" y="10" width="30" height="10" rx="2" fill="#d83020"/>
-      <rect x="30" y="12" width="26" height="6" fill="#3a6090" opacity=".7"/>
-      <path d="M 30 30 Q 38 24 44 28 Q 50 22 58 28 L 58 34 L 30 34 Z" fill="#ffc000"/>
-      <circle cx="24" cy="48" r="13" fill="#0a0a0a"/>
-      <circle cx="24" cy="48" r="7" fill="#333"/>
-      <circle cx="24" cy="48" r="3" fill="#aaa"/>
-      <circle cx="76" cy="48" r="13" fill="#0a0a0a"/>
-      <circle cx="76" cy="48" r="7" fill="#333"/>
-      <circle cx="76" cy="48" r="3" fill="#aaa"/>
-    </svg>
+    <img class="v-icon" src="assets/generated-demo/monster-truck.png" alt="Monster truck">
     <div class="v-cn">怪兽车</div>
     <div class="v-en">Monster</div>
   </div>
@@ -872,6 +938,21 @@
 
     <!-- Full-width road with edge-to-edge animated lane lines -->
     <div class="road-layer"></div>
+
+    <!-- Professional PNG vehicle assets generated from the Pro workflow.
+         The hand-drawn SVG below remains as fallback for vehicles that do
+         not yet have generated artwork. -->
+    <div class="asset-vehicle-stack" aria-hidden="true">
+      <div class="asset-ground-shadow"></div>
+      <img class="asset-vehicle asset-monster" src="assets/generated-demo/monster-truck.png" alt="">
+      <img class="asset-vehicle asset-loader" src="assets/generated-demo/wheel-loader.png" alt="">
+      <img class="asset-vehicle asset-crane" src="assets/generated-demo/mobile-crane.png" alt="">
+      <img class="asset-vehicle asset-excavator" src="assets/generated-demo/excavator.png" alt="">
+      <div class="asset-feature-chip asset-chip-police">🚨 Police</div>
+      <div class="asset-feature-chip asset-chip-loader">🪣 Loader</div>
+      <div class="asset-feature-chip asset-chip-crane">🏗️ Crane</div>
+      <div class="asset-feature-chip asset-chip-excavator">⛏️ Digger</div>
+    </div>
 
     <!-- Crushable obstacles (shown only when monster primary) -->
     <div class="obstacle obstacle-a">
@@ -2204,6 +2285,23 @@
     updateStatus();
   }
 
+  function bootFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const combo = params.get('combo');
+    if (!combo) return;
+    combo.split(',').map(v => v.trim().toLowerCase()).forEach(v => {
+      const card = document.querySelector(`.vehicle-card[data-vehicle="${v}"]`);
+      if (!card || selected.has(v)) return;
+      selected.add(v);
+      card.classList.add('selected');
+    });
+    updateStatus();
+    if (selected.size >= 2) {
+      clearTimeout(autoTimer);
+      setTimeout(combine, 120);
+    }
+  }
+
   // === Combine chime ===
   let audioCtx = null;
   function playCombineSfx() {
@@ -2237,6 +2335,7 @@
   cards.forEach(card => card.addEventListener('click', () => pickCard(card)));
   resetBtn.addEventListener('click', reset);
   updateStatus();
+  bootFromUrl();
 
   let lastTouch = 0;
   document.addEventListener('touchend', e => {

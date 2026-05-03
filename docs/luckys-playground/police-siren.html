@@ -201,7 +201,7 @@
   /* Car stage */
   .car-wrap {
     width: 100%;
-    max-width: 640px;
+    max-width: 760px;
     position: relative;
     margin-bottom: 5%;
     z-index: 2;
@@ -215,6 +215,19 @@
   body.us #car-us { display: block; }
   body.uk #car-uk { display: block; }
   body.cn #car-cn { display: block; }
+  .asset-car {
+    width: 112%;
+    height: auto;
+    margin-left: -6%;
+    margin-bottom: var(--asset-car-drop, -28%);
+    display: none;
+    filter: drop-shadow(0 18px 22px rgba(0,0,0,0.55));
+  }
+  body.us #asset-car-us { display: block; --asset-car-drop: -32%; }
+  body.cn #asset-car-cn { display: block; --asset-car-drop: -28%; }
+  body.us #car-us,
+  body.cn #car-cn { display: none; }
+  body.on .asset-car { animation: carDrive 0.35s ease-in-out infinite; }
 
   /* Halo behind car */
   .halo {
@@ -406,6 +419,8 @@
 
   <div class="car-wrap">
     <div class="halo"></div>
+    <img id="asset-car-us" class="asset-car" src="assets/generated-demo/police-us.png" alt="US police car">
+    <img id="asset-car-cn" class="asset-car" src="assets/generated-demo/police-cn.png" alt="Chinese police car">
 
     <!-- ======================== USA POLICE CAR (Crown Vic B&W) ======================== -->
     <svg id="car-us" class="car" viewBox="0 0 600 310" xmlns="http://www.w3.org/2000/svg">
@@ -941,6 +956,12 @@
     if (running) startSiren();
   }
 
+  function bootFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const country = (params.get('country') || '').trim().toLowerCase();
+    if (['us', 'uk', 'cn'].includes(country)) setCountry(country);
+  }
+
   function cycleMode() {
     const modes = SIREN_MODES[currentCountry];
     currentModeIdx = (currentModeIdx + 1) % modes.length;
@@ -977,6 +998,7 @@
   }, { passive: false });
 
   updateModeLabel();
+  bootFromUrl();
 })();
 </script>
 </body>
