@@ -395,9 +395,21 @@
     background: radial-gradient(ellipse, rgba(0,0,0,0.48) 0%, rgba(0,0,0,0.18) 45%, transparent 74%);
     display: none;
   }
-  .asset-feature-chip {
+  .asset-module-strip {
     position: absolute;
-    top: 10%;
+    left: 50%;
+    top: 16%;
+    width: min(92%, 760px);
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 7px;
+    flex-wrap: wrap;
+    z-index: 7;
+    pointer-events: none;
+  }
+  .asset-feature-chip {
     padding: 7px 10px;
     border-radius: 999px;
     background: rgba(255,255,255,0.92);
@@ -406,6 +418,9 @@
     font-weight: 900;
     box-shadow: 0 8px 18px rgba(0,0,0,0.22);
     display: none;
+    align-items: center;
+    line-height: 1;
+    white-space: nowrap;
   }
   .asset-module {
     position: absolute;
@@ -424,36 +439,20 @@
     transform: translateX(-50%);
   }
   .asset-module-loader {
-    right: 11%;
-    bottom: 15%;
-    width: 22%;
+    right: 4%;
+    bottom: -6%;
+    width: 24%;
     transform: rotate(-2deg);
   }
   .asset-module-crane {
-    right: 14%;
-    top: 6%;
-    width: 34%;
-  }
-  .asset-module-excavator {
-    right: 9%;
-    top: 13%;
+    right: 10%;
+    top: 10%;
     width: 30%;
   }
-  .asset-module-dozer {
-    right: 5%;
-    bottom: 8%;
+  .asset-module-excavator {
+    right: 7%;
+    top: 18%;
     width: 24%;
-    transform: rotate(-1deg);
-  }
-  .asset-module-dumptruck {
-    left: 4%;
-    top: 31%;
-    width: 20%;
-  }
-  .asset-module-ambulance {
-    left: 5%;
-    top: 14%;
-    width: 18%;
   }
   .asset-module-wheel {
     bottom: 3%;
@@ -463,25 +462,14 @@
   .asset-module-wheel.rear { left: 29%; }
   .asset-module-wheel.front { right: 20%; }
   .has-police .asset-module-police,
-  .has-loader .asset-module-loader,
   .has-crane .asset-module-crane,
   .has-excavator .asset-module-excavator,
-  .has-bulldozer .asset-module-dozer,
-  .has-dumptruck .asset-module-dumptruck,
-  .has-ambulance .asset-module-ambulance,
   .has-monster .asset-module-wheel { display: block; }
   .primary-police .asset-module-police,
   .primary-loader .asset-module-loader,
   .primary-crane .asset-module-crane,
   .primary-excavator .asset-module-excavator,
-  .primary-bulldozer .asset-module-dozer,
-  .primary-dumptruck .asset-module-dumptruck,
-  .primary-ambulance .asset-module-ambulance,
   .primary-monster .asset-module-wheel { display: none; }
-  .asset-chip-police { left: 12%; }
-  .asset-chip-loader { left: 30%; }
-  .asset-chip-crane { right: 30%; }
-  .asset-chip-excavator { right: 12%; }
   .primary-monster .asset-vehicle-stack,
   .primary-loader .asset-vehicle-stack,
   .primary-crane .asset-vehicle-stack,
@@ -524,14 +512,12 @@
     .primary-bulldozer .asset-bulldozer { --asset-drop: -20%; --asset-width: 86%; }
     .primary-ambulance .asset-ambulance { --asset-drop: -27%; --asset-width: 82%; }
     .asset-module-police { top: 34%; width: 22%; }
-    .asset-module-loader { right: 11%; bottom: 17%; width: 24%; }
-    .asset-module-crane { right: 12%; top: 8%; width: 36%; }
-    .asset-module-excavator { right: 8%; top: 14%; width: 32%; }
-    .asset-module-dozer { right: 4%; bottom: 10%; width: 25%; }
-    .asset-module-dumptruck { left: 3%; top: 33%; width: 21%; }
-    .asset-module-ambulance { left: 4%; top: 18%; width: 19%; }
+    .asset-module-strip { top: 16%; gap: 5px; }
+    .asset-feature-chip { font-size: 11px; padding: 5px 8px; }
+    .asset-module-loader { right: 3%; bottom: -3%; width: 24%; }
+    .asset-module-crane { right: 8%; top: 13%; width: 31%; }
+    .asset-module-excavator { right: 6%; top: 20%; width: 25%; }
     .asset-module-wheel { width: 18%; bottom: 5%; }
-    .asset-feature-chip { top: 8%; font-size: 11px; padding: 5px 8px; }
   }
   .primary-monster #hybridTruck,
   .primary-loader #hybridTruck,
@@ -543,7 +529,11 @@
   .result.show.has-police:not(.primary-police) .asset-chip-police,
   .result.show.has-loader:not(.primary-loader) .asset-chip-loader,
   .result.show.has-crane:not(.primary-crane) .asset-chip-crane,
-  .result.show.has-excavator:not(.primary-excavator) .asset-chip-excavator { display: block; }
+  .result.show.has-excavator:not(.primary-excavator) .asset-chip-excavator,
+  .result.show.has-bulldozer:not(.primary-bulldozer) .asset-chip-dozer,
+  .result.show.has-dumptruck:not(.primary-dumptruck) .asset-chip-dumptruck,
+  .result.show.has-ambulance:not(.primary-ambulance) .asset-chip-ambulance,
+  .result.show.has-monster:not(.primary-monster) .asset-chip-monster { display: inline-flex; }
   .result.show .asset-vehicle-stack {
     animation: assetTruckAppear .65s cubic-bezier(.34,1.56,.50,1) both;
   }
@@ -598,16 +588,16 @@
   .obstacle-e { animation: obstacleRun 6s linear infinite 4.8s; }
 
   /* Phase breakdown:
-     The obstacle starts at the right edge. Around 30vw leftward travel it
+     The obstacle starts at the right edge. Around 42vw leftward travel it
      reaches the vehicle front wheel / blade, then collapses forward.
   */
   @keyframes obstacleRun {
     0%   { transform: translateX(0) translateY(0) rotate(0) scale(1);        opacity: 1; }
-    28%  { transform: translateX(-28vw) translateY(0) rotate(0) scale(1);    opacity: 1; }
-    32%  { transform: translateX(-32vw) translateY(0) rotate(0) scale(1);    opacity: 1; }
-    36%  { transform: translateX(-36vw) translateY(18px) rotate(28deg) scale(0.8, 0.35); opacity: 0.8; }
-    41%  { transform: translateX(-41vw) translateY(22px) rotate(78deg) scale(0.4, 0.15); opacity: 0.35; }
-    45%  { transform: translateX(-45vw) translateY(24px) rotate(180deg) scale(0.1, 0.05); opacity: 0; }
+    36%  { transform: translateX(-36vw) translateY(0) rotate(0) scale(1);    opacity: 1; }
+    42%  { transform: translateX(-42vw) translateY(0) rotate(0) scale(1);    opacity: 1; }
+    47%  { transform: translateX(-47vw) translateY(18px) rotate(28deg) scale(0.8, 0.35); opacity: 0.8; }
+    53%  { transform: translateX(-53vw) translateY(22px) rotate(78deg) scale(0.4, 0.15); opacity: 0.35; }
+    58%  { transform: translateX(-58vw) translateY(24px) rotate(180deg) scale(0.1, 0.05); opacity: 0; }
     100% { transform: translateX(-110vw) rotate(180deg) scale(0);            opacity: 0; }
   }
 
@@ -1029,15 +1019,18 @@
       <img class="asset-module asset-module-loader" src="assets/lucky-playground-assets-final-50-v2/loader-bucket-module.png" alt="">
       <img class="asset-module asset-module-crane" src="assets/lucky-playground-assets-final-50-v2/crane-hook-module.png" alt="">
       <img class="asset-module asset-module-excavator" src="assets/lucky-playground-assets-final-50-v2/excavator-arm-module.png" alt="">
-      <img class="asset-module asset-module-dozer" src="assets/lucky-playground-assets-final-50-v2/loader-bucket-module.png" alt="">
-      <img class="asset-module asset-module-dumptruck" src="assets/lucky-playground-assets-final-50-v2/dump-truck.png" alt="">
-      <img class="asset-module asset-module-ambulance" src="assets/lucky-playground-assets-final-50-v2/ambulance.png" alt="">
       <img class="asset-module asset-module-wheel rear" src="assets/lucky-playground-assets-final-50-v2/monster-wheel-module.png" alt="">
       <img class="asset-module asset-module-wheel front" src="assets/lucky-playground-assets-final-50-v2/monster-wheel-module.png" alt="">
-      <div class="asset-feature-chip asset-chip-police">🚨 Police</div>
-      <div class="asset-feature-chip asset-chip-loader">🪣 Loader</div>
-      <div class="asset-feature-chip asset-chip-crane">🏗️ Crane</div>
-      <div class="asset-feature-chip asset-chip-excavator">⛏️ Digger</div>
+      <div class="asset-module-strip" aria-hidden="true">
+        <div class="asset-feature-chip asset-chip-police">🚨 警灯</div>
+        <div class="asset-feature-chip asset-chip-loader">🪣 铲装</div>
+        <div class="asset-feature-chip asset-chip-crane">🏗 吊装</div>
+        <div class="asset-feature-chip asset-chip-excavator">⛏ 挖掘</div>
+        <div class="asset-feature-chip asset-chip-dozer">⚙ 推土</div>
+        <div class="asset-feature-chip asset-chip-dumptruck">⬆ 翻斗</div>
+        <div class="asset-feature-chip asset-chip-ambulance">✚ 救援</div>
+        <div class="asset-feature-chip asset-chip-monster">◎ 巨轮</div>
+      </div>
     </div>
 
     <!-- Crushable obstacles (shown only when monster primary) -->
@@ -2313,10 +2306,18 @@
   function buildName(sel) {
     const sorted = CHASSIS_PRIORITY.filter(v => sel.has(v));
     const count = sorted.length;
-    const prefixCn = count >= 5 ? '终极无敌' : count >= 4 ? '超级' : count >= 3 ? '多功能' : '';
-    const prefixEn = count >= 5 ? 'Ultimate ' : count >= 4 ? 'Super ' : count >= 3 ? 'Multi-' : '';
-    const cn = prefixCn + sorted.map(v => NAMES[v].cn).join('+') + '车';
-    const en = prefixEn + sorted.map(v => NAMES[v].en).join('-') + ' Truck';
+    const primary = primaryOf(sel);
+    if (count >= 5) {
+      return { cn: '终极工程怪兽车', en: 'Ultimate Builder Monster Truck' };
+    }
+    if (count >= 4) {
+      return { cn: '超级多功能工程车', en: 'Super Multi-Tool Builder Truck' };
+    }
+    if (count >= 3) {
+      return { cn: NAMES[primary].cn + '多功能车', en: 'Multi-Tool ' + NAMES[primary].en + ' Truck' };
+    }
+    const cn = sorted.map(v => NAMES[v].cn).join('+') + '车';
+    const en = sorted.map(v => NAMES[v].en).join('-') + ' Truck';
     return { cn, en };
   }
 
