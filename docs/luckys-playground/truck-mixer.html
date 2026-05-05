@@ -167,22 +167,24 @@
 
   .result {
     position: absolute; inset: 0;
-    display: flex; flex-direction: column;
+    display: block;
     opacity: 0; pointer-events: none; z-index: 3;
   }
   .result.show { opacity: 1; pointer-events: auto; }
 
   .result-name {
-    padding: 16px 16px 6px; text-align: center; z-index: 4;
-    position: relative;
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    padding: 14px 16px 32px; text-align: center; z-index: 5;
+    background: linear-gradient(to bottom, rgba(8, 12, 28, 0.76), rgba(8, 12, 28, 0));
+    pointer-events: none;
   }
   .result-name .cn {
     font-family: 'Playfair Display', Georgia, "Noto Serif SC", serif;
     font-size: clamp(22px, 5.6vw, 34px); font-weight: 800;
     letter-spacing: 0.03em;
-    background: linear-gradient(90deg, #ffd670, #ff9a3a);
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: #ffd670;
+    -webkit-text-fill-color: #ffd670;
     line-height: 1.15;
     text-shadow: 0 2px 12px rgba(0,0,0,0.25);
   }
@@ -193,26 +195,44 @@
     color: rgba(255,255,255,0.72);
     margin-top: 4px; letter-spacing: 0.04em;
   }
-  .result.show .result-name { animation: nameAppear .55s .25s both; }
+  .result.show .result-name { opacity: 1; transform: none; }
   @keyframes nameAppear {
     0%   { opacity: 0; transform: translateY(-10px); }
     100% { opacity: 1; transform: translateY(0); }
   }
 
   .truck-scene {
-    flex: 1; min-height: 0;
-    position: relative;
+    position: absolute;
+    inset: 0;
     display: flex; align-items: flex-end; justify-content: center;
     overflow: hidden;
+  }
+  .truck-scene::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("assets/lucky-playground-assets-final-50-v2/construction-road-night.png");
+    background-size: auto 100%;
+    background-position: 0 center;
+    background-repeat: repeat-x;
+    opacity: 0.98;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .stage.running .truck-scene::before {
+    animation: finalSceneFlow 5.4s linear infinite;
+  }
+  @keyframes finalSceneFlow {
+    from { background-position: 0 center; }
+    to   { background-position: -1024px center; }
   }
 
   /* ============ Full-width road with edge-to-edge lane lines ============ */
   .road-layer {
     position: absolute; left: 0; right: 0; bottom: 0;
-    height: 17%;
-    background: linear-gradient(to bottom,
-      #4a3420 0%, #2e2010 30%, #1a1208 100%);
-    border-top: 3px solid rgba(255,255,255,0.18);
+    height: 34%;
+    background: transparent;
+    border-top: 0;
     z-index: 1; pointer-events: none;
   }
   .road-layer::before {
@@ -223,17 +243,18 @@
       rgba(255,255,255,0.18) 0 8px,
       rgba(0,0,0,0.25) 8px 16px);
     opacity: 0.7;
+    display: none;
   }
   .road-layer::after {
     /* Full-width animated lane dashes */
-    content: ''; position: absolute; left: 0; right: 0; top: 48%;
-    height: 9px; transform: translateY(-50%);
+    content: ''; position: absolute; left: 0; right: 0; top: 56%;
+    height: 7px; transform: translateY(-50%);
     background-image: repeating-linear-gradient(to right,
       var(--accent) 0 60px,
       transparent 60px 120px);
     background-size: 120px 100%;
     background-repeat: repeat-x;
-    opacity: 0.92;
+    opacity: 0.48;
     filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
   }
   .stage.running .road-layer::after {
@@ -249,6 +270,7 @@
     position: absolute; left: 0; right: 0; bottom: 17%;
     height: 80%; pointer-events: none; z-index: 1;
     overflow: hidden;
+    display: none;
   }
 
   /* Far layer: distant city skyline (parallax slow) */
@@ -340,9 +362,9 @@
   .asset-vehicle-stack {
     position: absolute;
     left: 50%;
-    bottom: 16%;
+    bottom: 10%;
     width: min(86vw, 880px);
-    height: min(48vh, 380px);
+    height: min(56vh, 460px);
     transform: translateX(-50%);
     z-index: 2;
     pointer-events: none;
@@ -385,6 +407,77 @@
     box-shadow: 0 8px 18px rgba(0,0,0,0.22);
     display: none;
   }
+  .asset-module {
+    position: absolute;
+    display: none;
+    object-fit: contain;
+    pointer-events: none;
+    z-index: 4;
+    filter:
+      drop-shadow(0 12px 12px rgba(0,0,0,0.34))
+      drop-shadow(0 2px 0 rgba(0,0,0,0.18));
+  }
+  .asset-module-police {
+    top: 35%;
+    left: 50%;
+    width: 18%;
+    transform: translateX(-50%);
+  }
+  .asset-module-loader {
+    right: 11%;
+    bottom: 15%;
+    width: 22%;
+    transform: rotate(-2deg);
+  }
+  .asset-module-crane {
+    right: 14%;
+    top: 6%;
+    width: 34%;
+  }
+  .asset-module-excavator {
+    right: 9%;
+    top: 13%;
+    width: 30%;
+  }
+  .asset-module-dozer {
+    right: 5%;
+    bottom: 8%;
+    width: 24%;
+    transform: rotate(-1deg);
+  }
+  .asset-module-dumptruck {
+    left: 4%;
+    top: 31%;
+    width: 20%;
+  }
+  .asset-module-ambulance {
+    left: 5%;
+    top: 14%;
+    width: 18%;
+  }
+  .asset-module-wheel {
+    bottom: 3%;
+    width: 17%;
+    z-index: 5;
+  }
+  .asset-module-wheel.rear { left: 29%; }
+  .asset-module-wheel.front { right: 20%; }
+  .has-police .asset-module-police,
+  .has-loader .asset-module-loader,
+  .has-crane .asset-module-crane,
+  .has-excavator .asset-module-excavator,
+  .has-bulldozer .asset-module-dozer,
+  .has-dumptruck .asset-module-dumptruck,
+  .has-ambulance .asset-module-ambulance,
+  .has-monster .asset-module-wheel { display: block; }
+  .primary-police .asset-module-police,
+  .primary-loader .asset-module-loader,
+  .primary-crane .asset-module-crane,
+  .primary-excavator .asset-module-excavator,
+  .primary-bulldozer .asset-module-dozer,
+  .primary-dumptruck .asset-module-dumptruck,
+  .primary-ambulance .asset-module-ambulance,
+  .primary-monster .asset-module-wheel { display: none; }
   .asset-chip-police { left: 12%; }
   .asset-chip-loader { left: 30%; }
   .asset-chip-crane { right: 30%; }
@@ -392,19 +485,31 @@
   .primary-monster .asset-vehicle-stack,
   .primary-loader .asset-vehicle-stack,
   .primary-crane .asset-vehicle-stack,
-  .primary-excavator .asset-vehicle-stack { display: block; }
+  .primary-excavator .asset-vehicle-stack,
+  .primary-dumptruck .asset-vehicle-stack,
+  .primary-bulldozer .asset-vehicle-stack,
+  .primary-ambulance .asset-vehicle-stack { display: block; }
   .primary-monster .asset-monster,
   .primary-loader .asset-loader,
   .primary-crane .asset-crane,
   .primary-excavator .asset-excavator,
+  .primary-dumptruck .asset-dumptruck,
+  .primary-bulldozer .asset-bulldozer,
+  .primary-ambulance .asset-ambulance,
   .primary-monster .asset-ground-shadow,
   .primary-loader .asset-ground-shadow,
   .primary-crane .asset-ground-shadow,
-  .primary-excavator .asset-ground-shadow { display: block; }
+  .primary-excavator .asset-ground-shadow,
+  .primary-dumptruck .asset-ground-shadow,
+  .primary-bulldozer .asset-ground-shadow,
+  .primary-ambulance .asset-ground-shadow { display: block; }
   .primary-monster .asset-monster { --asset-drop: -20%; --asset-width: 84%; }
   .primary-loader .asset-loader { --asset-drop: -27%; --asset-width: 90%; }
   .primary-crane .asset-crane { --asset-drop: -29%; --asset-width: 98%; }
   .primary-excavator .asset-excavator { --asset-drop: -19%; --asset-width: 88%; }
+  .primary-dumptruck .asset-dumptruck { --asset-drop: -27%; --asset-width: 90%; }
+  .primary-bulldozer .asset-bulldozer { --asset-drop: -24%; --asset-width: 92%; }
+  .primary-ambulance .asset-ambulance { --asset-drop: -31%; --asset-width: 88%; }
   @media (max-width: 640px) {
     .asset-vehicle-stack {
       width: 100%;
@@ -415,25 +520,30 @@
     .primary-loader .asset-loader { --asset-drop: -22%; --asset-width: 55%; --asset-x: 42%; }
     .primary-crane .asset-crane { --asset-drop: -24%; --asset-width: 86%; }
     .primary-excavator .asset-excavator { --asset-drop: -16%; --asset-width: 78%; }
+    .primary-dumptruck .asset-dumptruck { --asset-drop: -23%; --asset-width: 84%; }
+    .primary-bulldozer .asset-bulldozer { --asset-drop: -20%; --asset-width: 86%; }
+    .primary-ambulance .asset-ambulance { --asset-drop: -27%; --asset-width: 82%; }
+    .asset-module-police { top: 34%; width: 22%; }
+    .asset-module-loader { right: 11%; bottom: 17%; width: 24%; }
+    .asset-module-crane { right: 12%; top: 8%; width: 36%; }
+    .asset-module-excavator { right: 8%; top: 14%; width: 32%; }
+    .asset-module-dozer { right: 4%; bottom: 10%; width: 25%; }
+    .asset-module-dumptruck { left: 3%; top: 33%; width: 21%; }
+    .asset-module-ambulance { left: 4%; top: 18%; width: 19%; }
+    .asset-module-wheel { width: 18%; bottom: 5%; }
     .asset-feature-chip { top: 8%; font-size: 11px; padding: 5px 8px; }
   }
   .primary-monster #hybridTruck,
   .primary-loader #hybridTruck,
   .primary-crane #hybridTruck,
-  .primary-excavator #hybridTruck { display: none; }
-  .primary-monster.has-police .asset-chip-police,
-  .primary-loader.has-police .asset-chip-police,
-  .primary-crane.has-police .asset-chip-police,
-  .primary-excavator.has-police .asset-chip-police,
-  .primary-monster.has-loader .asset-chip-loader,
-  .primary-crane.has-loader .asset-chip-loader,
-  .primary-excavator.has-loader .asset-chip-loader,
-  .primary-monster.has-crane .asset-chip-crane,
-  .primary-loader.has-crane .asset-chip-crane,
-  .primary-excavator.has-crane .asset-chip-crane,
-  .primary-monster.has-excavator .asset-chip-excavator,
-  .primary-loader.has-excavator .asset-chip-excavator,
-  .primary-crane.has-excavator .asset-chip-excavator { display: block; }
+  .primary-excavator #hybridTruck,
+  .primary-dumptruck #hybridTruck,
+  .primary-bulldozer #hybridTruck,
+  .primary-ambulance #hybridTruck { display: none; }
+  .result.show.has-police:not(.primary-police) .asset-chip-police,
+  .result.show.has-loader:not(.primary-loader) .asset-chip-loader,
+  .result.show.has-crane:not(.primary-crane) .asset-chip-crane,
+  .result.show.has-excavator:not(.primary-excavator) .asset-chip-excavator { display: block; }
   .result.show .asset-vehicle-stack {
     animation: assetTruckAppear .65s cubic-bezier(.34,1.56,.50,1) both;
   }
@@ -468,35 +578,36 @@
   */
   .obstacle {
     position: absolute;
-    bottom: 13.5%;
+    bottom: 15.5%;
     left: 100%;
-    width: 50px;
-    height: 58px;
+    width: clamp(48px, 8vw, 76px);
+    height: clamp(48px, 8vw, 76px);
     z-index: 3;
     display: none;
     will-change: transform;
     transform-origin: 50% 100%;
   }
   .primary-monster.show .obstacle,
+  .primary-loader.show .obstacle,
   .primary-bulldozer.show .obstacle { display: block; }
-  .obstacle svg { width: 100%; height: 100%; display: block; }
-  .obstacle-a { animation: obstacleRun 5s linear infinite; }
-  .obstacle-b { animation: obstacleRun 5s linear infinite 1.7s; }
-  .obstacle-c { animation: obstacleRun 5s linear infinite 3.4s; }
+  .obstacle img { width: 100%; height: 100%; display: block; object-fit: contain; filter: drop-shadow(0 8px 8px rgba(0,0,0,0.45)); }
+  .obstacle-a { animation: obstacleRun 6s linear infinite; }
+  .obstacle-b { animation: obstacleRun 6s linear infinite 1.2s; }
+  .obstacle-c { animation: obstacleRun 6s linear infinite 2.4s; }
+  .obstacle-d { animation: obstacleRun 6s linear infinite 3.6s; }
+  .obstacle-e { animation: obstacleRun 6s linear infinite 4.8s; }
 
   /* Phase breakdown:
-     0–62%: obstacle travels leftward from right edge to truck front wheel
-            (approximately -62vw, slightly right of scene centre)
-     62–68%: crushed by the wheel/blade — flattens to scale 0, rotates forward
-     68–100%: debris flag; stays invisible as it slides off
+     The obstacle starts at the right edge. Around 30vw leftward travel it
+     reaches the vehicle front wheel / blade, then collapses forward.
   */
   @keyframes obstacleRun {
     0%   { transform: translateX(0) translateY(0) rotate(0) scale(1);        opacity: 1; }
-    55%  { transform: translateX(-55vw) translateY(0) rotate(0) scale(1);    opacity: 1; }
-    62%  { transform: translateX(-62vw) translateY(0) rotate(0) scale(1);    opacity: 1; }   /* front-wheel contact */
-    65%  { transform: translateX(-64vw) translateY(18px) rotate(25deg) scale(0.8, 0.35); opacity: 0.8; }
-    70%  { transform: translateX(-68vw) translateY(22px) rotate(75deg) scale(0.4, 0.15); opacity: 0.35; }
-    74%  { transform: translateX(-72vw) translateY(24px) rotate(180deg) scale(0.1, 0.05); opacity: 0; }
+    28%  { transform: translateX(-28vw) translateY(0) rotate(0) scale(1);    opacity: 1; }
+    32%  { transform: translateX(-32vw) translateY(0) rotate(0) scale(1);    opacity: 1; }
+    36%  { transform: translateX(-36vw) translateY(18px) rotate(28deg) scale(0.8, 0.35); opacity: 0.8; }
+    41%  { transform: translateX(-41vw) translateY(22px) rotate(78deg) scale(0.4, 0.15); opacity: 0.35; }
+    45%  { transform: translateX(-45vw) translateY(24px) rotate(180deg) scale(0.1, 0.05); opacity: 0; }
     100% { transform: translateX(-110vw) rotate(180deg) scale(0);            opacity: 0; }
   }
 
@@ -643,7 +754,7 @@
 
   /* ==== Responsive ==== */
   @media (max-width: 380px) {
-    .vehicle-card .v-icon { width: 46px; height: 30px; }
+    .vehicle-card .v-icon { width: 86%; height: auto; max-height: 42px; }
     .vehicle-card .v-cn { font-size: 12px; }
     .vehicle-card .v-en { font-size: 9px; }
     .btn-reset { font-size: 14px; height: 44px; }
@@ -700,56 +811,19 @@
   </div>
 
   <div class="vehicle-card" data-vehicle="dumptruck">
-    <svg class="v-icon" viewBox="0 0 100 60">
-      <rect x="40" y="28" width="20" height="14" rx="2" fill="#ffb020"/>
-      <rect x="42" y="20" width="14" height="10" rx="1.5" fill="#ffb020"/>
-      <rect x="44" y="22" width="10" height="6" fill="#3a6090" opacity=".7"/>
-      <!-- tilting bed -->
-      <path d="M 4 12 L 40 12 L 44 42 L 4 42 Z" fill="#2060cc"/>
-      <path d="M 6 16 L 38 16 L 40 40 L 6 40 Z" fill="#1a4a9a" opacity="0.6"/>
-      <circle cx="22" cy="48" r="8" fill="#1a1a1a"/><circle cx="22" cy="48" r="3" fill="#666"/>
-      <circle cx="52" cy="48" r="8" fill="#1a1a1a"/><circle cx="52" cy="48" r="3" fill="#666"/>
-      <circle cx="72" cy="48" r="8" fill="#1a1a1a"/><circle cx="72" cy="48" r="3" fill="#666"/>
-    </svg>
+    <img class="v-icon" src="assets/lucky-playground-assets-final-50-v2/dump-truck.png" alt="Dump truck">
     <div class="v-cn">翻斗车</div>
     <div class="v-en">Dump Truck</div>
   </div>
 
   <div class="vehicle-card" data-vehicle="bulldozer">
-    <svg class="v-icon" viewBox="0 0 100 60">
-      <rect x="18" y="40" width="64" height="10" rx="3" fill="#2a2a2a"/>
-      <circle cx="24" cy="45" r="3" fill="#555"/>
-      <circle cx="38" cy="45" r="3" fill="#555"/>
-      <circle cx="52" cy="45" r="3" fill="#555"/>
-      <circle cx="66" cy="45" r="3" fill="#555"/>
-      <circle cx="78" cy="45" r="3" fill="#555"/>
-      <rect x="34" y="22" width="32" height="18" rx="2" fill="#ffc820"/>
-      <rect x="40" y="14" width="22" height="10" rx="1.5" fill="#ffc820"/>
-      <rect x="42" y="16" width="18" height="6" fill="#3a6090" opacity=".7"/>
-      <!-- dozer blade -->
-      <path d="M 4 28 L 30 32 L 30 48 L 4 50 Z" fill="#e0b020"/>
-      <path d="M 4 28 L 30 32" stroke="#a08000" stroke-width="1"/>
-      <line x1="30" y1="36" x2="40" y2="34" stroke="#5a5a5a" stroke-width="2.5"/>
-    </svg>
+    <img class="v-icon" src="assets/lucky-playground-assets-final-50-v2/bulldozer.png" alt="Bulldozer">
     <div class="v-cn">推土机</div>
     <div class="v-en">Bulldozer</div>
   </div>
 
   <div class="vehicle-card" data-vehicle="ambulance">
-    <svg class="v-icon" viewBox="0 0 100 60">
-      <rect x="12" y="14" width="76" height="28" rx="3" fill="#fafafa"/>
-      <rect x="12" y="32" width="76" height="10" fill="#e02020"/>
-      <path d="M 12 14 L 36 14 L 32 30 L 12 30 Z" fill="#fafafa"/>
-      <rect x="14" y="16" width="18" height="12" fill="#3a6090" opacity="0.7"/>
-      <rect x="50" y="4" width="14" height="4" rx="1" fill="#222"/>
-      <rect x="52" y="6" width="4" height="2" fill="#fff"/>
-      <rect x="60" y="6" width="4" height="2" fill="#e02020"/>
-      <!-- red cross -->
-      <rect x="58" y="18" width="14" height="4" fill="#e02020"/>
-      <rect x="63" y="13" width="4" height="14" fill="#e02020"/>
-      <circle cx="28" cy="48" r="8" fill="#1a1a1a"/><circle cx="28" cy="48" r="3" fill="#666"/>
-      <circle cx="72" cy="48" r="8" fill="#1a1a1a"/><circle cx="72" cy="48" r="3" fill="#666"/>
-    </svg>
+    <img class="v-icon" src="assets/lucky-playground-assets-final-50-v2/ambulance.png" alt="Ambulance">
     <div class="v-cn">救护车</div>
     <div class="v-en">Ambulance</div>
   </div>
@@ -948,6 +1022,18 @@
       <img class="asset-vehicle asset-loader" src="assets/generated-demo/wheel-loader.png" alt="">
       <img class="asset-vehicle asset-crane" src="assets/generated-demo/mobile-crane.png" alt="">
       <img class="asset-vehicle asset-excavator" src="assets/generated-demo/excavator.png" alt="">
+      <img class="asset-vehicle asset-dumptruck" src="assets/lucky-playground-assets-final-50-v2/dump-truck.png" alt="">
+      <img class="asset-vehicle asset-bulldozer" src="assets/lucky-playground-assets-final-50-v2/bulldozer.png" alt="">
+      <img class="asset-vehicle asset-ambulance" src="assets/lucky-playground-assets-final-50-v2/ambulance.png" alt="">
+      <img class="asset-module asset-module-police" src="assets/lucky-playground-assets-final-50-v2/police-lightbar-module.png" alt="">
+      <img class="asset-module asset-module-loader" src="assets/lucky-playground-assets-final-50-v2/loader-bucket-module.png" alt="">
+      <img class="asset-module asset-module-crane" src="assets/lucky-playground-assets-final-50-v2/crane-hook-module.png" alt="">
+      <img class="asset-module asset-module-excavator" src="assets/lucky-playground-assets-final-50-v2/excavator-arm-module.png" alt="">
+      <img class="asset-module asset-module-dozer" src="assets/lucky-playground-assets-final-50-v2/loader-bucket-module.png" alt="">
+      <img class="asset-module asset-module-dumptruck" src="assets/lucky-playground-assets-final-50-v2/dump-truck.png" alt="">
+      <img class="asset-module asset-module-ambulance" src="assets/lucky-playground-assets-final-50-v2/ambulance.png" alt="">
+      <img class="asset-module asset-module-wheel rear" src="assets/lucky-playground-assets-final-50-v2/monster-wheel-module.png" alt="">
+      <img class="asset-module asset-module-wheel front" src="assets/lucky-playground-assets-final-50-v2/monster-wheel-module.png" alt="">
       <div class="asset-feature-chip asset-chip-police">🚨 Police</div>
       <div class="asset-feature-chip asset-chip-loader">🪣 Loader</div>
       <div class="asset-feature-chip asset-chip-crane">🏗️ Crane</div>
@@ -956,33 +1042,19 @@
 
     <!-- Crushable obstacles (shown only when monster primary) -->
     <div class="obstacle obstacle-a">
-      <svg viewBox="0 0 44 52" xmlns="http://www.w3.org/2000/svg">
-        <!-- Traffic cone -->
-        <path d="M 22 4 L 34 46 L 10 46 Z" fill="#ff6a20" stroke="#000" stroke-width="1.5"/>
-        <rect x="8" y="42" width="28" height="6" rx="1.5" fill="#1a1a1a"/>
-        <rect x="14" y="22" width="16" height="4" fill="#fff"/>
-        <rect x="12" y="32" width="20" height="4" fill="#fff"/>
-      </svg>
+      <img src="assets/lucky-playground-assets-final-50-v2/traffic-cone.png" alt="">
     </div>
     <div class="obstacle obstacle-b">
-      <svg viewBox="0 0 44 52" xmlns="http://www.w3.org/2000/svg">
-        <!-- Oil barrel -->
-        <ellipse cx="22" cy="10" rx="16" ry="4" fill="#7a2010" stroke="#000" stroke-width="1.5"/>
-        <rect x="6" y="10" width="32" height="38" fill="#c83020" stroke="#000" stroke-width="1.5"/>
-        <ellipse cx="22" cy="48" rx="16" ry="4" fill="#7a2010" stroke="#000" stroke-width="1.5"/>
-        <rect x="6" y="18" width="32" height="3" fill="#7a2010"/>
-        <rect x="6" y="36" width="32" height="3" fill="#7a2010"/>
-        <text x="22" y="34" text-anchor="middle" font-size="6" font-weight="900" fill="#fff">OIL</text>
-      </svg>
+      <img src="assets/lucky-playground-assets-final-50-v2/oil-barrel.png" alt="">
     </div>
     <div class="obstacle obstacle-c">
-      <svg viewBox="0 0 44 52" xmlns="http://www.w3.org/2000/svg">
-        <!-- Wooden crate -->
-        <rect x="4" y="10" width="36" height="38" fill="#a06030" stroke="#000" stroke-width="1.5"/>
-        <path d="M 4 10 L 40 10 M 4 48 L 40 48 M 4 10 L 4 48 M 40 10 L 40 48" stroke="#5a2810" stroke-width="1"/>
-        <path d="M 4 10 L 40 48 M 40 10 L 4 48" stroke="#5a2810" stroke-width="1.5"/>
-        <rect x="4" y="8" width="36" height="4" fill="#8a4020"/>
-      </svg>
+      <img src="assets/lucky-playground-assets-final-50-v2/wooden-crate.png" alt="">
+    </div>
+    <div class="obstacle obstacle-d">
+      <img src="assets/lucky-playground-assets-final-50-v2/road-barrier.png" alt="">
+    </div>
+    <div class="obstacle obstacle-e">
+      <img src="assets/lucky-playground-assets-final-50-v2/rock-pile.png" alt="">
     </div>
 
     <svg id="hybridTruck" viewBox="0 0 900 540" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg">

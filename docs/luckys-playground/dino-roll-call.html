@@ -61,10 +61,12 @@
     background:
       radial-gradient(ellipse at 70% 15%, rgba(255,210,120,0.15) 0%, transparent 55%),
       linear-gradient(to bottom,
-        rgba(50,78,38,0.65) 0%,
-        rgba(32,50,22,0.80) 55%,
-        rgba(86,62,38,0.92) 82%,
-        rgba(40,26,12,1) 100%);
+        rgba(50,78,38,0.10) 0%,
+        rgba(32,50,22,0.18) 55%,
+        rgba(40,26,12,0.30) 100%),
+      url("assets/lucky-playground-assets-final-50-v2/dino-jungle-background.png");
+    background-size: cover, cover, cover;
+    background-position: center, center, center;
     border: 1px solid rgba(255,255,255,0.10);
     overflow: hidden;
     display: flex; flex-direction: column;
@@ -82,13 +84,26 @@
       radial-gradient(ellipse 200px 32px at 45% 100%, rgba(0,0,0,0.38) 0%, transparent 70%),
       radial-gradient(ellipse 160px 28px at 80% 100%, rgba(0,0,0,0.32) 0%, transparent 70%);
     pointer-events: none;
+    z-index: 1;
+  }
+  .display::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 27%;
+    background: url("assets/lucky-playground-assets-final-50-v2/dino-plant-foreground.png") bottom center / auto 100% repeat-x;
+    z-index: 3;
+    pointer-events: none;
   }
 
   /* Ground belt with soil texture */
   .ground { position: absolute; bottom: 0; left: 0; right: 0; height: 18%;
-    background: linear-gradient(to bottom, #6a4a28 0%, #2e1f10 100%);
-    border-top: 2px solid rgba(255,255,255,0.12);
+    background:
+      url("assets/lucky-playground-assets-final-50-v2/dino-ground-layer.png") bottom center / auto 100% repeat-x,
+      linear-gradient(to bottom, rgba(106,74,40,0.7) 0%, rgba(46,31,16,0.9) 100%);
+    border-top: 0;
     box-shadow: inset 0 3px 0 rgba(0,0,0,0.20);
+    z-index: 1;
   }
   .ground::after {
     content: '';
@@ -114,6 +129,7 @@
   .flora { position: absolute; bottom: 14%; pointer-events: none; opacity: 0.60; z-index: 1; }
   .flora.left  { left:  3%;  font-size: 48px; }
   .flora.right { right: 3%;  font-size: 40px; }
+  .flora { display: none; }
 
   /* Name plate (top) */
   .name-plate {
@@ -141,6 +157,14 @@
     max-height: 100%;
     display: none;
     filter: drop-shadow(0 14px 14px rgba(0,0,0,0.55));
+  }
+  .dino svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .dino-asset-svg {
+    overflow: visible;
   }
   .dino.active { display: block; animation: dinoAppear .5s cubic-bezier(.34,1.56,.50,1); }
   .dino.roaring { animation: dinoRoar .55s ease-in-out; }
@@ -276,6 +300,13 @@
     line-height: 1;
   }
   .pick-card .thumb { width: 46px; height: 30px; display: block; }
+  .pick-card .thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 3px 4px rgba(0,0,0,0.35));
+  }
   .pick-card .thumb-name {
     font-size: 9px; font-weight: 600;
     line-height: 1; letter-spacing: 0.01em;
@@ -346,6 +377,55 @@
   // Simple thumb placeholder for letter card (inline SVG built per dino)
   const thumbBox = (innerSvg, fill='#5a6a30') =>
     `<svg viewBox="0 0 100 60" xmlns="http://www.w3.org/2000/svg">${innerSvg}</svg>`;
+
+  const FINAL_ASSET_BASE = 'assets/lucky-playground-assets-final-50-v2/';
+  const DINO_ASSETS = {
+    ankylosaurus: { file: 'ankylosaurus.png', x: 75, y: -64, width: 650, height: 650 },
+    brachiosaurus: { file: 'mamenchisaurus.png', x: 75, y: -148, width: 650, height: 650 },
+    carnotaurus: { file: 'carnotaurus.png', x: 75, y: -119, width: 650, height: 650 },
+    diplodocus: { file: 'diplodocus.png', x: 75, y: -113, width: 650, height: 650 },
+    edmontosaurus: { file: 'edmontosaurus.png', x: 75, y: -118, width: 650, height: 650 },
+    fukuiraptor: { file: 'fukuiraptor.png', x: 75, y: -228, width: 650, height: 650 },
+    gallimimus: { file: 'gallimimus.png', x: 75, y: -187, width: 650, height: 650 },
+    herrerasaurus: { file: 'herrerasaurus.png', x: 75, y: -94, width: 650, height: 650 },
+    iguanodon: { file: 'iguanodon.png', x: 75, y: -111, width: 650, height: 650 },
+    jingshanosaurus: { file: 'jingshanosaurus.png', x: 75, y: -151, width: 650, height: 650 },
+    kentrosaurus: { file: 'kentrosaurus.png', x: 75, y: -106, width: 650, height: 650 },
+    lambeosaurus: { file: 'lambeosaurus.png', x: 75, y: -129, width: 650, height: 650 },
+    mamenchisaurus: { file: 'mamenchisaurus.png', x: 75, y: -148, width: 650, height: 650 },
+    nodosaurus: { file: 'nodosaurus.png', x: 75, y: -69, width: 650, height: 650 },
+    oviraptor: { file: 'oviraptor.png', x: 75, y: -139, width: 650, height: 650 },
+    pteranodon: { file: 'pteranodon.png', x: 75, y: -132, width: 650, height: 650 },
+    quetzalcoatlus: { file: 'quetzalcoatlus.png', x: 75, y: -179, width: 650, height: 650 },
+    rhamphorhynchus: { file: 'rhamphorhynchus.png', x: 75, y: -140, width: 650, height: 650 },
+    stegosaurus: { src: 'assets/generated-demo/stegosaurus.png', x: 75, y: -78, width: 650, height: 650 },
+    tyrannosaurus: { src: 'assets/generated-demo/trex.png', x: 75, y: -130, width: 650, height: 650 },
+    utahraptor: { file: 'utahraptor.png', x: 75, y: -122, width: 650, height: 650 },
+    velociraptor: { file: 'velociraptor.png', x: 75, y: -136, width: 650, height: 650 },
+    wuerhosaurus: { file: 'wuerhosaurus.png', x: 75, y: -89, width: 650, height: 650 },
+    xenoceratops: { file: 'xenoceratops.png', x: 75, y: -145, width: 650, height: 650 },
+    yutyrannus: { file: 'yutyrannus.png', x: 75, y: -134, width: 650, height: 650 },
+    zuniceratops: { file: 'zuniceratops.png', x: 75, y: -133, width: 650, height: 650 }
+  };
+
+  function dinoAssetSrc(asset) {
+    return asset.src || FINAL_ASSET_BASE + asset.file;
+  }
+
+  function renderDinoArt(d) {
+    const asset = DINO_ASSETS[d.id];
+    if (!asset) return d.big;
+    return `<svg class="dino-asset-svg" viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg">
+      <image href="${dinoAssetSrc(asset)}" x="${asset.x}" y="${asset.y}"
+             width="${asset.width}" height="${asset.height}" preserveAspectRatio="xMidYMax meet"/>
+    </svg>`;
+  }
+
+  function renderDinoThumb(d) {
+    const asset = DINO_ASSETS[d.id];
+    if (!asset) return d.thumb;
+    return `<img src="${dinoAssetSrc(asset)}" alt="">`;
+  }
 
   // =========================================================================
   // DINOSAUR CATALOG — A to Z
@@ -1406,7 +1486,7 @@
     const wrap = document.createElement('div');
     wrap.className = 'dino';
     wrap.id = 'dino-' + d.id;
-    wrap.innerHTML = d.big;
+    wrap.innerHTML = renderDinoArt(d);
     dinoStage.appendChild(wrap);
 
     const card = document.createElement('button');
@@ -1415,7 +1495,7 @@
     card.setAttribute('aria-label', d.cn + ' ' + d.en);
     card.innerHTML =
       `<div class="pick-letter">${d.letter}</div>` +
-      `<div class="thumb">${d.thumb}</div>` +
+      `<div class="thumb">${renderDinoThumb(d)}</div>` +
       `<div class="thumb-name">${d.cn}</div>`;
     card.addEventListener('click', () => showDino(i, true));
     picker.appendChild(card);

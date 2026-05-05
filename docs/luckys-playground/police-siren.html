@@ -104,6 +104,28 @@
     align-items: flex-end;
     justify-content: center;
   }
+  .scene::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("assets/lucky-playground-assets-final-50-v2/police-road-night.png");
+    background-size: auto 100%;
+    background-position: 0 center;
+    background-repeat: repeat-x;
+    z-index: 0;
+    pointer-events: none;
+    transition: filter .4s, opacity .4s;
+  }
+  body.day .scene::before {
+    background-image: url("assets/lucky-playground-assets-final-50-v2/police-road-day.png");
+  }
+  body.on .scene::before {
+    animation: policeSceneFlow 4.6s linear infinite;
+  }
+  @keyframes policeSceneFlow {
+    from { background-position: 0 center; }
+    to   { background-position: -1024px center; }
+  }
 
   /* Stars (night) */
   .stars {
@@ -119,6 +141,7 @@
       radial-gradient(1px 1px at 50% 6%,  #fff, transparent);
     opacity: 0.85;
     transition: opacity .5s;
+    display: none;
   }
   body.day .stars { opacity: 0; }
 
@@ -133,6 +156,7 @@
     background: #fff8d6;
     box-shadow: 0 0 36px rgba(255,248,214,0.5);
     transition: all .6s;
+    display: none;
   }
   body.day .celestial {
     background: #ffd54a;
@@ -147,6 +171,7 @@
     height: 80px;
     pointer-events: none;
     opacity: 0.6;
+    display: none;
   }
   body.day .skyline { opacity: 0.35; }
 
@@ -158,6 +183,7 @@
     height: 22%;
     background: linear-gradient(to bottom, #2a2420 0%, #1a1a1a 100%);
     border-top: 2px solid #3a3530;
+    display: none;
   }
   body.day .road {
     background: linear-gradient(to bottom, #5c5448 0%, #3c3832 100%);
@@ -216,17 +242,24 @@
   body.uk #car-uk { display: block; }
   body.cn #car-cn { display: block; }
   .asset-car {
-    width: 112%;
+    width: var(--asset-car-width, 112%);
     height: auto;
-    margin-left: -6%;
+    margin-left: var(--asset-car-left, -6%);
     margin-bottom: var(--asset-car-drop, -28%);
     display: none;
     filter: drop-shadow(0 18px 22px rgba(0,0,0,0.55));
   }
   body.us #asset-car-us { display: block; --asset-car-drop: -32%; }
   body.cn #asset-car-cn { display: block; --asset-car-drop: -28%; }
+  body.uk #asset-car-uk {
+    display: block;
+    --asset-car-width: 82%;
+    --asset-car-left: 9%;
+    --asset-car-drop: -32%;
+  }
   body.us #car-us,
-  body.cn #car-cn { display: none; }
+  body.cn #car-cn,
+  body.uk #car-uk { display: none; }
   body.on .asset-car { animation: carDrive 0.35s ease-in-out infinite; }
 
   /* Halo behind car */
@@ -421,6 +454,7 @@
     <div class="halo"></div>
     <img id="asset-car-us" class="asset-car" src="assets/generated-demo/police-us.png" alt="US police car">
     <img id="asset-car-cn" class="asset-car" src="assets/generated-demo/police-cn.png" alt="Chinese police car">
+    <img id="asset-car-uk" class="asset-car" src="assets/lucky-playground-assets-final-50-v2/police-uk.png" alt="UK police car">
 
     <!-- ======================== USA POLICE CAR (Crown Vic B&W) ======================== -->
     <svg id="car-us" class="car" viewBox="0 0 600 310" xmlns="http://www.w3.org/2000/svg">
