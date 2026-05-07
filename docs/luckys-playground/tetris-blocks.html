@@ -164,9 +164,11 @@
     border-radius: 14px;
     overflow: hidden;
     border: 2px solid rgba(255, 255, 255, 0.72);
-    background:
-      linear-gradient(180deg, rgba(16, 27, 37, 0.86), rgba(16, 30, 36, 0.94)),
-      repeating-linear-gradient(0deg, transparent 0 8px, rgba(255, 255, 255, 0.04) 8px 9px);
+    background-image:
+      linear-gradient(180deg, rgba(9, 17, 28, 0.24), rgba(9, 17, 28, 0.56)),
+      var(--scene-image);
+    background-position: center;
+    background-size: cover;
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.34), 0 18px 42px rgba(0, 0, 0, 0.28);
   }
 
@@ -495,7 +497,7 @@
       <div class="panel tips">
         <div><kbd>←</kbd><kbd>→</kbd>移动，<kbd>↑</kbd>旋转，<kbd>↓</kbd>加速。</div>
         <div><kbd>Space</kbd>直接落下，<kbd>P</kbd>暂停。手机上用下方按钮。</div>
-        <div>每个方块都从现有工程车和恐龙资产里抽取一张图片。</div>
+        <div>每个完整方块都从现有工程车和恐龙资产里抽取一张图片。</div>
       </div>
 
       <div class="panel">
@@ -527,22 +529,22 @@
   const DEMO = "assets/generated-demo/";
 
   const assets = [
-    { name: "Monster Truck", src: `${DEMO}monster-truck.png`, type: "vehicle" },
-    { name: "推土机", src: `${FINAL}bulldozer.png`, type: "vehicle" },
-    { name: "挖掘机", src: `${DEMO}excavator.png`, type: "vehicle" },
-    { name: "吊车", src: `${DEMO}mobile-crane.png`, type: "vehicle" },
-    { name: "装载机", src: `${DEMO}wheel-loader.png`, type: "vehicle" },
-    { name: "翻斗车", src: `${FINAL}dump-truck.png`, type: "vehicle" },
-    { name: "英国警车", src: `${FINAL}police-uk.png`, type: "vehicle" },
-    { name: "救护车", src: `${FINAL}ambulance.png`, type: "vehicle" },
-    { name: "霸王龙", src: `${DEMO}trex.png`, type: "dino" },
-    { name: "三角龙", src: `${DEMO}triceratops.png`, type: "dino" },
-    { name: "剑龙", src: `${DEMO}stegosaurus.png`, type: "dino" },
-    { name: "甲龙", src: `${FINAL}ankylosaurus.png`, type: "dino" },
-    { name: "伶盗龙", src: `${FINAL}velociraptor.png`, type: "dino" },
-    { name: "羽王龙", src: `${FINAL}yutyrannus.png`, type: "dino" },
-    { name: "马门溪龙", src: `${FINAL}mamenchisaurus.png`, type: "dino" },
-    { name: "翼龙", src: `${FINAL}pteranodon.png`, type: "dino" }
+    { name: "Monster Truck", src: `${DEMO}monster-truck.png`, type: "vehicle", shapes: ["I", "L", "J"], zoom: 1.26 },
+    { name: "推土机", src: `${FINAL}bulldozer.png`, type: "vehicle", shapes: ["I", "L", "O"], zoom: 1.22 },
+    { name: "挖掘机", src: `${DEMO}excavator.png`, type: "vehicle", shapes: ["L", "J", "T"], zoom: 1.18 },
+    { name: "吊车", src: `${DEMO}mobile-crane.png`, type: "vehicle", shapes: ["I", "L", "T"], zoom: 1.18 },
+    { name: "装载机", src: `${DEMO}wheel-loader.png`, type: "vehicle", shapes: ["L", "J", "O"], zoom: 1.2 },
+    { name: "翻斗车", src: `${FINAL}dump-truck.png`, type: "vehicle", shapes: ["I", "O", "J"], zoom: 1.18 },
+    { name: "英国警车", src: `${FINAL}police-uk.png`, type: "vehicle", shapes: ["I", "O", "T"], zoom: 1.16 },
+    { name: "救护车", src: `${FINAL}ambulance.png`, type: "vehicle", shapes: ["I", "O", "J"], zoom: 1.16 },
+    { name: "霸王龙", src: `${DEMO}trex.png`, type: "dino", shapes: ["T", "L", "J"], zoom: 1.34 },
+    { name: "三角龙", src: `${DEMO}triceratops.png`, type: "dino", shapes: ["O", "T", "Z"], zoom: 1.26 },
+    { name: "剑龙", src: `${DEMO}stegosaurus.png`, type: "dino", shapes: ["S", "Z", "T"], zoom: 1.28 },
+    { name: "甲龙", src: `${FINAL}ankylosaurus.png`, type: "dino", shapes: ["O", "S", "Z"], zoom: 1.24 },
+    { name: "伶盗龙", src: `${FINAL}velociraptor.png`, type: "dino", shapes: ["T", "L", "S"], zoom: 1.36 },
+    { name: "羽王龙", src: `${FINAL}yutyrannus.png`, type: "dino", shapes: ["T", "J", "L"], zoom: 1.34 },
+    { name: "马门溪龙", src: `${FINAL}mamenchisaurus.png`, type: "dino", shapes: ["I", "S", "Z"], zoom: 1.3 },
+    { name: "翼龙", src: `${FINAL}pteranodon.png`, type: "dino", shapes: ["I", "T", "S"], zoom: 1.32 }
   ];
 
   const shapes = [
@@ -554,6 +556,11 @@
     { key: "J", color: "#356ed8", matrix: [[1, 0, 0], [1, 1, 1], [0, 0, 0]] },
     { key: "L", color: "#de7b32", matrix: [[0, 0, 1], [1, 1, 1], [0, 0, 0]] }
   ];
+  const shapeByKey = new Map(shapes.map((shape) => [shape.key, shape]));
+  const sceneSources = {
+    city: `${FINAL}police-road-night.png`,
+    nature: `${FINAL}dino-jungle-background.png`
+  };
 
   const boardCanvas = document.getElementById("board");
   const nextCanvas = document.getElementById("next");
@@ -567,16 +574,20 @@
   const pauseBtn = document.getElementById("pauseBtn");
 
   const images = new Map();
-  assets.forEach((asset) => {
+  [...assets.map((asset) => asset.src), ...Object.values(sceneSources)].forEach((src) => {
     const image = new Image();
     image.onload = () => draw();
-    image.src = asset.src;
-    images.set(asset.src, image);
+    image.src = src;
+    images.set(src, image);
   });
 
   let board = makeBoard();
   let current = null;
   let next = null;
+  let nextPieceId = 1;
+  const requestedScene = new URLSearchParams(window.location.search).get("scene");
+  let activeScene = sceneSources[requestedScene] ? requestedScene : (document.body.dataset.scene || "city");
+  document.body.dataset.scene = activeScene;
   let score = 0;
   let lineCount = 0;
   let level = 1;
@@ -601,17 +612,23 @@
   }
 
   function makePiece() {
-    const shape = randomItem(shapes);
     const asset = randomItem(assets);
+    const shape = shapeByKey.get(randomItem(asset.shapes)) || randomItem(shapes);
     const matrix = cloneMatrix(shape.matrix);
     return {
+      id: nextPieceId += 1,
       key: shape.key,
       matrix,
       asset,
       color: shape.color,
       x: Math.floor(COLS / 2) - Math.ceil(matrix[0].length / 2),
-      y: -1
+      y: getSpawnY(matrix)
     };
+  }
+
+  function getSpawnY(matrix) {
+    const firstFilledRow = matrix.findIndex((row) => row.some(Boolean));
+    return firstFilledRow > 0 ? -firstFilledRow : 0;
   }
 
   function resizeCanvas() {
@@ -677,7 +694,8 @@
           board[py][px] = {
             asset: current.asset,
             color: current.color,
-            key: current.key
+            key: current.key,
+            groupId: current.id
           };
         }
       });
@@ -705,7 +723,7 @@
   function spawnNext() {
     current = next || makePiece();
     current.x = Math.floor(COLS / 2) - Math.ceil(current.matrix[0].length / 2);
-    current.y = -1;
+    current.y = getSpawnY(current.matrix);
     next = makePiece();
     if (collide(current)) {
       isOver = true;
@@ -788,7 +806,7 @@
 
   function drawGrid(ctx, width, height, size) {
     ctx.save();
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.055)";
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
     ctx.lineWidth = 1;
     for (let x = 1; x < COLS; x += 1) {
       ctx.beginPath();
@@ -805,60 +823,138 @@
     ctx.restore();
   }
 
-  function drawTile(ctx, gridX, gridY, tile, size, alpha = 1) {
-    const x = gridX * size;
-    const y = gridY * size;
-    const pad = Math.max(2.2, size * 0.07);
-    const radius = Math.max(5, size * 0.18);
+  function drawBoardBackground(ctx, width, height) {
+    ctx.save();
+    const image = images.get(sceneSources[activeScene]);
+    if (image && image.complete && image.naturalWidth) {
+      const box = fitCover(image.naturalWidth, image.naturalHeight, width, height);
+      const drawX = (width - box.width) / 2;
+      const drawY = (height - box.height) / 2;
+      ctx.drawImage(image, drawX, drawY, box.width, box.height);
+    } else {
+      ctx.fillStyle = activeScene === "nature" ? "#244b35" : "#13233a";
+      ctx.fillRect(0, 0, width, height);
+    }
+    ctx.fillStyle = activeScene === "nature" ? "rgba(11, 36, 24, 0.44)" : "rgba(9, 17, 29, 0.52)";
+    ctx.fillRect(0, 0, width, height);
+    ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
+    ctx.fillRect(0, 0, width, height);
+    ctx.restore();
+  }
+
+  function collectBoardGroups() {
+    const groups = new Map();
+    board.forEach((row, y) => {
+      row.forEach((tile, x) => {
+        if (!tile) return;
+        const id = tile.groupId || `${tile.asset.src}-${x}-${y}`;
+        if (!groups.has(id)) {
+          groups.set(id, {
+            asset: tile.asset,
+            color: tile.color,
+            key: tile.key,
+            cells: []
+          });
+        }
+        groups.get(id).cells.push({ x, y });
+      });
+    });
+    return [...groups.values()];
+  }
+
+  function drawCellGroup(ctx, cells, tile, size, alpha = 1) {
+    const visibleCells = cells.filter((cell) => cell.y >= 0);
+    if (!visibleCells.length) return;
+    const minX = Math.min(...visibleCells.map((cell) => cell.x));
+    const maxX = Math.max(...visibleCells.map((cell) => cell.x));
+    const minY = Math.min(...visibleCells.map((cell) => cell.y));
+    const maxY = Math.max(...visibleCells.map((cell) => cell.y));
+    const groupX = minX * size;
+    const groupY = minY * size;
+    const groupW = (maxX - minX + 1) * size;
+    const groupH = (maxY - minY + 1) * size;
+    const pad = Math.max(1.6, size * 0.045);
+    const radius = Math.max(5, size * 0.16);
+
     ctx.save();
     ctx.globalAlpha = alpha;
-    roundedRect(ctx, x + pad, y + pad, size - pad * 2, size - pad * 2, radius);
+    ctx.shadowColor = "rgba(0, 0, 0, 0.32)";
+    ctx.shadowBlur = size * 0.16;
+    ctx.shadowOffsetY = size * 0.06;
+    beginCellsPath(ctx, visibleCells, size, pad, radius);
+    ctx.fillStyle = "rgba(0, 0, 0, 0.28)";
+    ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    beginCellsPath(ctx, visibleCells, size, pad, radius);
     ctx.clip();
-    const bg = ctx.createLinearGradient(x, y, x + size, y + size);
-    bg.addColorStop(0, lighten(tile.color, 0.14));
+
+    const bg = ctx.createLinearGradient(groupX, groupY, groupX + groupW, groupY + groupH);
+    bg.addColorStop(0, lighten(tile.color, 0.18));
     bg.addColorStop(1, tile.color);
     ctx.fillStyle = bg;
-    ctx.fillRect(x + pad, y + pad, size - pad * 2, size - pad * 2);
+    ctx.fillRect(groupX, groupY, groupW, groupH);
 
     const image = images.get(tile.asset.src);
     if (image && image.complete && image.naturalWidth) {
-      const box = fitContain(image.naturalWidth, image.naturalHeight, size - pad * 3.4, size - pad * 3.4);
-      const drawX = x + (size - box.width) / 2;
-      const drawY = y + (size - box.height) / 2;
+      const zoom = (tile.asset.zoom || 1.2) * (tile.asset.type === "dino" ? 1.14 : 1.1);
+      const box = fitContain(
+        image.naturalWidth,
+        image.naturalHeight,
+        Math.max(size, groupW - pad * 2) * zoom,
+        Math.max(size, groupH - pad * 2) * zoom
+      );
+      const drawX = groupX + (groupW - box.width) / 2;
+      const drawY = groupY + (groupH - box.height) / 2;
       ctx.drawImage(image, drawX, drawY, box.width, box.height);
     } else {
-      ctx.fillStyle = "rgba(255,255,255,0.8)";
-      ctx.font = `${Math.floor(size * 0.44)}px system-ui`;
+      ctx.fillStyle = "rgba(255,255,255,0.86)";
+      ctx.font = `800 ${Math.floor(Math.min(groupW, groupH) * 0.42)}px system-ui`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(tile.key, x + size / 2, y + size / 2);
+      ctx.fillText(tile.key, groupX + groupW / 2, groupY + groupH / 2);
     }
 
+    const shine = ctx.createLinearGradient(groupX, groupY, groupX, groupY + groupH);
+    shine.addColorStop(0, "rgba(255, 255, 255, 0.34)");
+    shine.addColorStop(0.48, "rgba(255, 255, 255, 0)");
+    shine.addColorStop(1, "rgba(0, 0, 0, 0.2)");
+    ctx.fillStyle = shine;
+    ctx.fillRect(groupX, groupY, groupW, groupH);
     ctx.restore();
+
     ctx.save();
     ctx.globalAlpha = alpha;
-    roundedRect(ctx, x + pad, y + pad, size - pad * 2, size - pad * 2, radius);
-    ctx.lineWidth = Math.max(1, size * 0.035);
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.72)";
+    beginCellsPath(ctx, visibleCells, size, pad, radius);
+    ctx.lineWidth = Math.max(1.1, size * 0.04);
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.62)";
     ctx.stroke();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = "rgba(24, 33, 43, 0.1)";
+    visibleCells.forEach((cell) => {
+      roundedRect(ctx, cell.x * size + pad, cell.y * size + pad, size - pad * 2, size - pad * 2, radius);
+      ctx.stroke();
+    });
     ctx.restore();
   }
 
   function drawPiece(ctx, piece, size, alpha = 1) {
+    const cells = [];
     piece.matrix.forEach((row, y) => {
       row.forEach((value, x) => {
         if (!value) return;
         const gridX = piece.x + x;
         const gridY = piece.y + y;
-        if (gridY >= 0) {
-          drawTile(ctx, gridX, gridY, {
-            asset: piece.asset,
-            color: piece.color,
-            key: piece.key
-          }, size, alpha);
-        }
+        cells.push({ x: gridX, y: gridY });
       });
     });
+    drawCellGroup(ctx, cells, {
+      asset: piece.asset,
+      color: piece.color,
+      key: piece.key
+    }, size, alpha);
   }
 
   function drawGhost() {
@@ -876,15 +972,10 @@
     const height = boardCanvas.clientHeight;
     if (!width || !height) return;
     boardCtx.clearRect(0, 0, width, height);
-    boardCtx.fillStyle = "rgba(8, 17, 27, 0.58)";
-    boardCtx.fillRect(0, 0, width, height);
+    drawBoardBackground(boardCtx, width, height);
     drawGrid(boardCtx, width, height, cellSize);
 
-    board.forEach((row, y) => {
-      row.forEach((tile, x) => {
-        if (tile) drawTile(boardCtx, x, y, tile, cellSize);
-      });
-    });
+    collectBoardGroups().forEach((group) => drawCellGroup(boardCtx, group.cells, group, cellSize));
 
     drawGhost();
     if (current) drawPiece(boardCtx, current, cellSize);
@@ -938,9 +1029,28 @@
     };
   }
 
-  function roundedRect(ctx, x, y, width, height, radius) {
-    const r = Math.min(radius, width / 2, height / 2);
+  function fitCover(imageW, imageH, boxW, boxH) {
+    const scale = Math.max(boxW / imageW, boxH / imageH);
+    return {
+      width: imageW * scale,
+      height: imageH * scale
+    };
+  }
+
+  function beginCellsPath(ctx, cells, size, pad, radius) {
     ctx.beginPath();
+    cells.forEach((cell) => {
+      roundedRectPath(ctx, cell.x * size + pad, cell.y * size + pad, size - pad * 2, size - pad * 2, radius);
+    });
+  }
+
+  function roundedRect(ctx, x, y, width, height, radius) {
+    ctx.beginPath();
+    roundedRectPath(ctx, x, y, width, height, radius);
+  }
+
+  function roundedRectPath(ctx, x, y, width, height, radius) {
+    const r = Math.min(radius, width / 2, height / 2);
     ctx.moveTo(x + r, y);
     ctx.arcTo(x + width, y, x + width, y + height, r);
     ctx.arcTo(x + width, y + height, x, y + height, r);
@@ -1000,12 +1110,18 @@
   document.querySelectorAll("[data-scene]").forEach((button) => {
     if (!button.classList.contains("pill")) return;
     button.addEventListener("click", () => {
-      document.body.dataset.scene = button.dataset.scene;
-      document.querySelectorAll(".pill[data-scene]").forEach((item) => {
-        item.setAttribute("aria-pressed", String(item === button));
-      });
+      activeScene = button.dataset.scene;
+      document.body.dataset.scene = activeScene;
+      syncSceneButtons();
+      draw();
     });
   });
+
+  function syncSceneButtons() {
+    document.querySelectorAll(".pill[data-scene]").forEach((item) => {
+      item.setAttribute("aria-pressed", String(item.dataset.scene === activeScene));
+    });
+  }
 
   function update(time = 0) {
     const delta = time - lastTime;
@@ -1026,6 +1142,7 @@
   }
 
   window.addEventListener("resize", resizeCanvas);
+  syncSceneButtons();
   resetGame();
   resizeCanvas();
   requestAnimationFrame(update);
