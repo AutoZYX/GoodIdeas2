@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Lucky Blocks · 工程车恐龙方块</title>
+<style>
+  :root {
+    color-scheme: light;
+    --ink: #18212b;
+    --muted: #5d6a76;
+    --paper: #f5f0e8;
+    --panel: rgba(255, 253, 247, 0.88);
+    --panel-strong: rgba(255, 253, 247, 0.96);
+    --line: rgba(24, 33, 43, 0.16);
+    --shadow: 0 24px 70px rgba(28, 36, 46, 0.24);
+    --accent: #d65135;
+    --accent-2: #286d82;
+    --scene-image: url("assets/lucky-playground-assets-final-50-v2/police-road-night.png");
+    --scene-tint: linear-gradient(135deg, rgba(12, 26, 46, 0.78), rgba(24, 54, 72, 0.42));
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100svh;
+    font-family: ui-rounded, "SF Pro Rounded", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    background: #14212d;
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  body[data-scene="nature"] {
+    --scene-image: url("assets/lucky-playground-assets-final-50-v2/dino-jungle-background.png");
+    --scene-tint: linear-gradient(135deg, rgba(21, 58, 40, 0.72), rgba(89, 112, 45, 0.36));
+    --accent: #287753;
+    --accent-2: #b27022;
+  }
+
+  button, a { font: inherit; }
+
+  .page {
+    min-height: 100svh;
+    position: relative;
+    isolation: isolate;
+    padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
+  }
+
+  .page::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background-image: var(--scene-tint), var(--scene-image);
+    background-position: center;
+    background-size: cover;
+    transform: scale(1.04);
+  }
+
+  .page::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(circle at 18% 12%, rgba(255, 255, 255, 0.28), transparent 22rem),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(11, 18, 28, 0.22));
+    pointer-events: none;
+  }
+
+  .topbar {
+    width: min(1180px, 100%);
+    margin: 0 auto 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    color: white;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.32);
+  }
+
+  .back {
+    color: white;
+    text-decoration: none;
+    font-size: 0.95rem;
+    opacity: 0.92;
+  }
+
+  .title h1 {
+    margin: 0;
+    font-size: clamp(1.9rem, 4.6vw, 3.4rem);
+    line-height: 1.04;
+    letter-spacing: 0;
+  }
+
+  .title p {
+    margin: 6px 0 0;
+    color: rgba(255, 255, 255, 0.86);
+    font-size: clamp(0.92rem, 2vw, 1.05rem);
+  }
+
+  .scene-toggle,
+  .control-row,
+  .actions,
+  .mobile-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .scene-toggle {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .pill,
+  .icon-button {
+    border: 1px solid rgba(255, 255, 255, 0.48);
+    background: rgba(255, 255, 255, 0.18);
+    color: white;
+    border-radius: 999px;
+    min-height: 42px;
+    padding: 0 15px;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .pill[aria-pressed="true"] {
+    background: rgba(255, 255, 255, 0.92);
+    color: #173142;
+    border-color: rgba(255, 255, 255, 0.95);
+  }
+
+  .game-shell {
+    width: min(1180px, 100%);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(300px, 520px) minmax(250px, 1fr);
+    gap: 18px;
+    align-items: start;
+  }
+
+  .arena {
+    position: relative;
+    min-width: 0;
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    border-radius: 18px;
+    padding: clamp(10px, 2vw, 16px);
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .board-wrap {
+    position: relative;
+    width: min(100%, 440px, calc((100svh - 168px) / 2));
+    max-width: 100%;
+    margin: 0 auto;
+    aspect-ratio: 1 / 2;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.72);
+    background:
+      linear-gradient(180deg, rgba(16, 27, 37, 0.86), rgba(16, 30, 36, 0.94)),
+      repeating-linear-gradient(0deg, transparent 0 8px, rgba(255, 255, 255, 0.04) 8px 9px);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.34), 0 18px 42px rgba(0, 0, 0, 0.28);
+  }
+
+  #board {
+    width: 100%;
+    height: 100%;
+    display: block;
+    touch-action: none;
+  }
+
+  .game-over {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    color: white;
+    text-align: center;
+    background: rgba(10, 17, 26, 0.76);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease;
+  }
+
+  .game-over.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .game-over h2 {
+    margin: 0 0 12px;
+    font-size: clamp(2rem, 7vw, 3.2rem);
+  }
+
+  .game-over p {
+    margin: 0 0 18px;
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .side {
+    display: grid;
+    grid-template-rows: auto;
+    gap: 14px;
+    min-width: 0;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid rgba(255, 255, 255, 0.58);
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 16px 42px rgba(0, 0, 0, 0.16);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .stat {
+    min-height: 72px;
+    border-radius: 12px;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.62);
+    padding: 10px;
+  }
+
+  .stat span {
+    display: block;
+    color: var(--muted);
+    font-size: 0.78rem;
+    margin-bottom: 6px;
+  }
+
+  .stat strong {
+    display: block;
+    font-size: clamp(1.35rem, 3vw, 1.8rem);
+    line-height: 1;
+    color: var(--accent-2);
+  }
+
+  .next-panel {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 14px;
+    align-items: center;
+  }
+
+  #next {
+    width: 120px;
+    height: 120px;
+    display: block;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: rgba(23, 33, 43, 0.9);
+  }
+
+  .piece-name {
+    margin: 0 0 6px;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+
+  .asset-name {
+    margin: 0;
+    color: var(--ink);
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1.2;
+  }
+
+  .tips {
+    display: grid;
+    gap: 10px;
+    color: var(--muted);
+    line-height: 1.55;
+    font-size: 0.96rem;
+  }
+
+  .tips kbd {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.8em;
+    height: 1.8em;
+    padding: 0 0.45em;
+    margin: 0 0.08em;
+    color: var(--ink);
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-weight: 800;
+    box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.08);
+  }
+
+  .actions {
+    justify-content: stretch;
+  }
+
+  .action-button {
+    flex: 1;
+    min-height: 46px;
+    border: 0;
+    border-radius: 12px;
+    color: white;
+    background: var(--accent);
+    cursor: pointer;
+    font-weight: 800;
+    box-shadow: 0 12px 22px rgba(0, 0, 0, 0.16);
+  }
+
+  .action-button.secondary {
+    color: var(--ink);
+    background: var(--panel-strong);
+    border: 1px solid var(--line);
+  }
+
+  .mobile-controls {
+    display: none;
+    width: min(440px, 100%);
+    margin: 12px auto 0;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .icon-button {
+    width: 58px;
+    height: 52px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    font-size: 1.5rem;
+    font-weight: 900;
+    touch-action: manipulation;
+    user-select: none;
+  }
+
+  .icon-button.wide {
+    width: 82px;
+    font-size: 1.2rem;
+  }
+
+  .asset-strip {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .asset-strip img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    padding: 4px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.62);
+    border: 1px solid var(--line);
+  }
+
+  @media (max-width: 860px) {
+    .page {
+      padding-left: 12px;
+      padding-right: 12px;
+      padding-bottom: calc(92px + env(safe-area-inset-bottom));
+    }
+    .topbar { align-items: flex-start; flex-direction: column; }
+    .scene-toggle { justify-content: flex-start; }
+    .game-shell { grid-template-columns: 1fr; }
+    .arena {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      overflow: hidden;
+    }
+    .side { grid-template-rows: auto; }
+    .tips { display: none; }
+    .mobile-controls {
+      display: flex;
+      position: fixed;
+      z-index: 20;
+      left: 12px;
+      right: auto;
+      bottom: max(10px, env(safe-area-inset-bottom));
+      width: 330px;
+      max-width: none;
+      gap: 6px;
+      padding: 8px;
+      margin: 0;
+      transform: none;
+      border: 1px solid rgba(255, 255, 255, 0.36);
+      border-radius: 20px;
+      background: rgba(12, 21, 32, 0.58);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .mobile-controls .icon-button {
+      flex: 1 1 0;
+      width: auto;
+      min-width: 0;
+      max-width: 62px;
+    }
+    .mobile-controls .icon-button.wide {
+      flex: 1.25 1 0;
+      width: auto;
+      max-width: 82px;
+    }
+    .board-wrap {
+      width: min(100%, 420px, calc((100svh - 245px) / 2));
+      min-width: min(100%, 280px);
+      margin: 0;
+    }
+    .stats { grid-template-columns: repeat(3, 1fr); }
+    .asset-strip { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 480px) {
+    .topbar { margin-bottom: 10px; }
+    .title h1 { font-size: 1.8rem; }
+    .title p { font-size: 0.88rem; }
+    .pill { min-height: 38px; padding: 0 12px; font-size: 0.9rem; }
+    .arena { border-radius: 14px; padding: 8px; }
+    .panel { padding: 12px; border-radius: 14px; }
+    .stat { min-height: 62px; padding: 8px; }
+    .stat strong { font-size: 1.28rem; }
+    .next-panel { grid-template-columns: 92px 1fr; }
+    #next { width: 92px; height: 92px; }
+    .asset-name { font-size: 1.05rem; }
+    .icon-button { height: 48px; font-size: 1.28rem; }
+    .icon-button.wide { font-size: 1rem; }
+  }
+</style>
+</head>
+<body data-scene="city">
+<main class="page">
+  <header class="topbar">
+    <div class="title">
+      <a class="back" href="./">← Playground</a>
+      <h1>工程车恐龙方块</h1>
+      <p>把 Monster Truck、工程车和恐龙装进俄罗斯方块。</p>
+    </div>
+    <div class="scene-toggle" aria-label="背景选择">
+      <button class="pill" type="button" data-scene="city" aria-pressed="true">城市道路</button>
+      <button class="pill" type="button" data-scene="nature" aria-pressed="false">恐龙自然</button>
+    </div>
+  </header>
+
+  <section class="game-shell" aria-label="工程车恐龙俄罗斯方块游戏">
+    <div class="arena">
+      <div class="board-wrap">
+        <canvas id="board" width="400" height="800" aria-label="俄罗斯方块棋盘"></canvas>
+        <div class="game-over" id="gameOver">
+          <div>
+            <h2>Game Over</h2>
+            <p>方块堆到顶了，重新开一局。</p>
+            <button class="action-button" type="button" data-action="restart">重新开始</button>
+          </div>
+        </div>
+      </div>
+      <div class="mobile-controls" aria-label="手机控制按钮">
+        <button class="icon-button" type="button" data-action="left" aria-label="向左">◀</button>
+        <button class="icon-button" type="button" data-action="rotate" aria-label="旋转">⟳</button>
+        <button class="icon-button" type="button" data-action="right" aria-label="向右">▶</button>
+        <button class="icon-button" type="button" data-action="down" aria-label="向下">▼</button>
+        <button class="icon-button wide" type="button" data-action="drop" aria-label="直接落下">落下</button>
+      </div>
+    </div>
+
+    <aside class="side">
+      <div class="panel stats" aria-label="得分信息">
+        <div class="stat"><span>分数</span><strong id="score">0</strong></div>
+        <div class="stat"><span>消行</span><strong id="lines">0</strong></div>
+        <div class="stat"><span>等级</span><strong id="level">1</strong></div>
+      </div>
+
+      <div class="panel next-panel">
+        <canvas id="next" width="160" height="160" aria-label="下一块预览"></canvas>
+        <div>
+          <p class="piece-name">下一块</p>
+          <p class="asset-name" id="nextName">准备中</p>
+        </div>
+      </div>
+
+      <div class="panel tips">
+        <div><kbd>←</kbd><kbd>→</kbd>移动，<kbd>↑</kbd>旋转，<kbd>↓</kbd>加速。</div>
+        <div><kbd>Space</kbd>直接落下，<kbd>P</kbd>暂停。手机上用下方按钮。</div>
+        <div>每个方块都从现有工程车和恐龙资产里抽取一张图片。</div>
+      </div>
+
+      <div class="panel">
+        <div class="actions">
+          <button class="action-button secondary" type="button" data-action="pause" id="pauseBtn">暂停</button>
+          <button class="action-button" type="button" data-action="restart">重新开始</button>
+        </div>
+      </div>
+
+      <div class="panel asset-strip" aria-label="素材示例">
+        <img src="assets/generated-demo/monster-truck.png" alt="Monster Truck">
+        <img src="assets/lucky-playground-assets-final-50-v2/bulldozer.png" alt="推土机">
+        <img src="assets/generated-demo/excavator.png" alt="挖掘机">
+        <img src="assets/generated-demo/mobile-crane.png" alt="吊车">
+        <img src="assets/lucky-playground-assets-final-50-v2/dump-truck.png" alt="翻斗车">
+        <img src="assets/generated-demo/trex.png" alt="霸王龙">
+        <img src="assets/generated-demo/triceratops.png" alt="三角龙">
+        <img src="assets/lucky-playground-assets-final-50-v2/velociraptor.png" alt="伶盗龙">
+      </div>
+    </aside>
+  </section>
+</main>
+
+<script>
+(() => {
+  const COLS = 10;
+  const ROWS = 20;
+  const FINAL = "assets/lucky-playground-assets-final-50-v2/";
+  const DEMO = "assets/generated-demo/";
+
+  const assets = [
+    { name: "Monster Truck", src: `${DEMO}monster-truck.png`, type: "vehicle" },
+    { name: "推土机", src: `${FINAL}bulldozer.png`, type: "vehicle" },
+    { name: "挖掘机", src: `${DEMO}excavator.png`, type: "vehicle" },
+    { name: "吊车", src: `${DEMO}mobile-crane.png`, type: "vehicle" },
+    { name: "装载机", src: `${DEMO}wheel-loader.png`, type: "vehicle" },
+    { name: "翻斗车", src: `${FINAL}dump-truck.png`, type: "vehicle" },
+    { name: "英国警车", src: `${FINAL}police-uk.png`, type: "vehicle" },
+    { name: "救护车", src: `${FINAL}ambulance.png`, type: "vehicle" },
+    { name: "霸王龙", src: `${DEMO}trex.png`, type: "dino" },
+    { name: "三角龙", src: `${DEMO}triceratops.png`, type: "dino" },
+    { name: "剑龙", src: `${DEMO}stegosaurus.png`, type: "dino" },
+    { name: "甲龙", src: `${FINAL}ankylosaurus.png`, type: "dino" },
+    { name: "伶盗龙", src: `${FINAL}velociraptor.png`, type: "dino" },
+    { name: "羽王龙", src: `${FINAL}yutyrannus.png`, type: "dino" },
+    { name: "马门溪龙", src: `${FINAL}mamenchisaurus.png`, type: "dino" },
+    { name: "翼龙", src: `${FINAL}pteranodon.png`, type: "dino" }
+  ];
+
+  const shapes = [
+    { key: "I", color: "#39a6d8", matrix: [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]] },
+    { key: "O", color: "#e0aa35", matrix: [[1, 1], [1, 1]] },
+    { key: "T", color: "#9b69d1", matrix: [[0, 1, 0], [1, 1, 1], [0, 0, 0]] },
+    { key: "S", color: "#40a867", matrix: [[0, 1, 1], [1, 1, 0], [0, 0, 0]] },
+    { key: "Z", color: "#d94b4b", matrix: [[1, 1, 0], [0, 1, 1], [0, 0, 0]] },
+    { key: "J", color: "#356ed8", matrix: [[1, 0, 0], [1, 1, 1], [0, 0, 0]] },
+    { key: "L", color: "#de7b32", matrix: [[0, 0, 1], [1, 1, 1], [0, 0, 0]] }
+  ];
+
+  const boardCanvas = document.getElementById("board");
+  const nextCanvas = document.getElementById("next");
+  const boardCtx = boardCanvas.getContext("2d");
+  const nextCtx = nextCanvas.getContext("2d");
+  const scoreEl = document.getElementById("score");
+  const linesEl = document.getElementById("lines");
+  const levelEl = document.getElementById("level");
+  const nextNameEl = document.getElementById("nextName");
+  const gameOverEl = document.getElementById("gameOver");
+  const pauseBtn = document.getElementById("pauseBtn");
+
+  const images = new Map();
+  assets.forEach((asset) => {
+    const image = new Image();
+    image.onload = () => draw();
+    image.src = asset.src;
+    images.set(asset.src, image);
+  });
+
+  let board = makeBoard();
+  let current = null;
+  let next = null;
+  let score = 0;
+  let lineCount = 0;
+  let level = 1;
+  let dropCounter = 0;
+  let dropInterval = 820;
+  let lastTime = 0;
+  let isPaused = false;
+  let isOver = false;
+  let cellSize = 40;
+  let dpr = window.devicePixelRatio || 1;
+
+  function makeBoard() {
+    return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+  }
+
+  function cloneMatrix(matrix) {
+    return matrix.map((row) => row.slice());
+  }
+
+  function randomItem(items) {
+    return items[Math.floor(Math.random() * items.length)];
+  }
+
+  function makePiece() {
+    const shape = randomItem(shapes);
+    const asset = randomItem(assets);
+    const matrix = cloneMatrix(shape.matrix);
+    return {
+      key: shape.key,
+      matrix,
+      asset,
+      color: shape.color,
+      x: Math.floor(COLS / 2) - Math.ceil(matrix[0].length / 2),
+      y: -1
+    };
+  }
+
+  function resizeCanvas() {
+    dpr = window.devicePixelRatio || 1;
+    const boardRect = boardCanvas.getBoundingClientRect();
+    boardCanvas.width = Math.round(boardRect.width * dpr);
+    boardCanvas.height = Math.round(boardRect.height * dpr);
+    boardCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    cellSize = boardRect.width / COLS;
+
+    const nextRect = nextCanvas.getBoundingClientRect();
+    nextCanvas.width = Math.round(nextRect.width * dpr);
+    nextCanvas.height = Math.round(nextRect.height * dpr);
+    nextCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function resetGame() {
+    board = makeBoard();
+    current = makePiece();
+    next = makePiece();
+    score = 0;
+    lineCount = 0;
+    level = 1;
+    dropCounter = 0;
+    dropInterval = 820;
+    lastTime = 0;
+    isPaused = false;
+    isOver = false;
+    gameOverEl.classList.remove("show");
+    pauseBtn.textContent = "暂停";
+    updatePanel();
+    draw();
+  }
+
+  function updatePanel() {
+    scoreEl.textContent = String(score);
+    linesEl.textContent = String(lineCount);
+    levelEl.textContent = String(level);
+    nextNameEl.textContent = next ? `${next.asset.name} · ${next.key}` : "准备中";
+  }
+
+  function collide(piece, offsetX = 0, offsetY = 0, matrix = piece.matrix) {
+    for (let y = 0; y < matrix.length; y += 1) {
+      for (let x = 0; x < matrix[y].length; x += 1) {
+        if (!matrix[y][x]) continue;
+        const px = piece.x + x + offsetX;
+        const py = piece.y + y + offsetY;
+        if (px < 0 || px >= COLS || py >= ROWS) return true;
+        if (py >= 0 && board[py][px]) return true;
+      }
+    }
+    return false;
+  }
+
+  function mergePiece() {
+    current.matrix.forEach((row, y) => {
+      row.forEach((value, x) => {
+        if (!value) return;
+        const py = current.y + y;
+        const px = current.x + x;
+        if (py >= 0 && py < ROWS && px >= 0 && px < COLS) {
+          board[py][px] = {
+            asset: current.asset,
+            color: current.color,
+            key: current.key
+          };
+        }
+      });
+    });
+  }
+
+  function sweepLines() {
+    let cleared = 0;
+    for (let y = ROWS - 1; y >= 0; y -= 1) {
+      if (board[y].every(Boolean)) {
+        board.splice(y, 1);
+        board.unshift(Array(COLS).fill(null));
+        cleared += 1;
+        y += 1;
+      }
+    }
+    if (!cleared) return;
+    const lineScores = [0, 100, 300, 500, 800];
+    score += lineScores[cleared] * level;
+    lineCount += cleared;
+    level = Math.floor(lineCount / 10) + 1;
+    dropInterval = Math.max(130, 820 - (level - 1) * 68);
+  }
+
+  function spawnNext() {
+    current = next || makePiece();
+    current.x = Math.floor(COLS / 2) - Math.ceil(current.matrix[0].length / 2);
+    current.y = -1;
+    next = makePiece();
+    if (collide(current)) {
+      isOver = true;
+      gameOverEl.classList.add("show");
+    }
+    updatePanel();
+  }
+
+  function softDrop() {
+    if (isPaused || isOver) return;
+    current.y += 1;
+    if (collide(current)) {
+      current.y -= 1;
+      lockPiece();
+    } else {
+      score += 1;
+    }
+    dropCounter = 0;
+    updatePanel();
+    draw();
+  }
+
+  function hardDrop() {
+    if (isPaused || isOver) return;
+    let travelled = 0;
+    while (!collide(current, 0, 1)) {
+      current.y += 1;
+      travelled += 1;
+    }
+    score += travelled * 2;
+    lockPiece();
+    updatePanel();
+    draw();
+  }
+
+  function lockPiece() {
+    mergePiece();
+    sweepLines();
+    spawnNext();
+  }
+
+  function move(dx) {
+    if (isPaused || isOver) return;
+    current.x += dx;
+    if (collide(current)) current.x -= dx;
+    draw();
+  }
+
+  function rotatePiece() {
+    if (isPaused || isOver) return;
+    const rotated = rotateMatrix(current.matrix);
+    const kicks = [0, -1, 1, -2, 2];
+    for (const kick of kicks) {
+      if (!collide(current, kick, 0, rotated)) {
+        current.x += kick;
+        current.matrix = rotated;
+        draw();
+        return;
+      }
+    }
+  }
+
+  function rotateMatrix(matrix) {
+    const size = matrix.length;
+    const rotated = Array.from({ length: size }, () => Array(size).fill(0));
+    for (let y = 0; y < size; y += 1) {
+      for (let x = 0; x < size; x += 1) {
+        rotated[x][size - 1 - y] = matrix[y][x];
+      }
+    }
+    return rotated;
+  }
+
+  function togglePause() {
+    if (isOver) return;
+    isPaused = !isPaused;
+    pauseBtn.textContent = isPaused ? "继续" : "暂停";
+    draw();
+  }
+
+  function drawGrid(ctx, width, height, size) {
+    ctx.save();
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.055)";
+    ctx.lineWidth = 1;
+    for (let x = 1; x < COLS; x += 1) {
+      ctx.beginPath();
+      ctx.moveTo(x * size, 0);
+      ctx.lineTo(x * size, height);
+      ctx.stroke();
+    }
+    for (let y = 1; y < ROWS; y += 1) {
+      ctx.beginPath();
+      ctx.moveTo(0, y * size);
+      ctx.lineTo(width, y * size);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  function drawTile(ctx, gridX, gridY, tile, size, alpha = 1) {
+    const x = gridX * size;
+    const y = gridY * size;
+    const pad = Math.max(2.2, size * 0.07);
+    const radius = Math.max(5, size * 0.18);
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    roundedRect(ctx, x + pad, y + pad, size - pad * 2, size - pad * 2, radius);
+    ctx.clip();
+    const bg = ctx.createLinearGradient(x, y, x + size, y + size);
+    bg.addColorStop(0, lighten(tile.color, 0.14));
+    bg.addColorStop(1, tile.color);
+    ctx.fillStyle = bg;
+    ctx.fillRect(x + pad, y + pad, size - pad * 2, size - pad * 2);
+
+    const image = images.get(tile.asset.src);
+    if (image && image.complete && image.naturalWidth) {
+      const box = fitContain(image.naturalWidth, image.naturalHeight, size - pad * 3.4, size - pad * 3.4);
+      const drawX = x + (size - box.width) / 2;
+      const drawY = y + (size - box.height) / 2;
+      ctx.drawImage(image, drawX, drawY, box.width, box.height);
+    } else {
+      ctx.fillStyle = "rgba(255,255,255,0.8)";
+      ctx.font = `${Math.floor(size * 0.44)}px system-ui`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(tile.key, x + size / 2, y + size / 2);
+    }
+
+    ctx.restore();
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    roundedRect(ctx, x + pad, y + pad, size - pad * 2, size - pad * 2, radius);
+    ctx.lineWidth = Math.max(1, size * 0.035);
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.72)";
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function drawPiece(ctx, piece, size, alpha = 1) {
+    piece.matrix.forEach((row, y) => {
+      row.forEach((value, x) => {
+        if (!value) return;
+        const gridX = piece.x + x;
+        const gridY = piece.y + y;
+        if (gridY >= 0) {
+          drawTile(ctx, gridX, gridY, {
+            asset: piece.asset,
+            color: piece.color,
+            key: piece.key
+          }, size, alpha);
+        }
+      });
+    });
+  }
+
+  function drawGhost() {
+    if (!current || isPaused || isOver) return;
+    const ghost = {
+      ...current,
+      matrix: current.matrix
+    };
+    while (!collide(ghost, 0, 1)) ghost.y += 1;
+    drawPiece(boardCtx, ghost, cellSize, 0.25);
+  }
+
+  function draw() {
+    const width = boardCanvas.clientWidth;
+    const height = boardCanvas.clientHeight;
+    if (!width || !height) return;
+    boardCtx.clearRect(0, 0, width, height);
+    boardCtx.fillStyle = "rgba(8, 17, 27, 0.58)";
+    boardCtx.fillRect(0, 0, width, height);
+    drawGrid(boardCtx, width, height, cellSize);
+
+    board.forEach((row, y) => {
+      row.forEach((tile, x) => {
+        if (tile) drawTile(boardCtx, x, y, tile, cellSize);
+      });
+    });
+
+    drawGhost();
+    if (current) drawPiece(boardCtx, current, cellSize);
+
+    if (isPaused && !isOver) {
+      boardCtx.save();
+      boardCtx.fillStyle = "rgba(8, 17, 27, 0.62)";
+      boardCtx.fillRect(0, 0, width, height);
+      boardCtx.fillStyle = "white";
+      boardCtx.textAlign = "center";
+      boardCtx.textBaseline = "middle";
+      boardCtx.font = `800 ${Math.max(28, width * 0.12)}px system-ui`;
+      boardCtx.fillText("PAUSED", width / 2, height / 2);
+      boardCtx.restore();
+    }
+
+    drawNext();
+  }
+
+  function drawNext() {
+    const width = nextCanvas.clientWidth;
+    const height = nextCanvas.clientHeight;
+    if (!width || !height) return;
+    nextCtx.clearRect(0, 0, width, height);
+    nextCtx.fillStyle = "rgba(11, 19, 30, 0.92)";
+    nextCtx.fillRect(0, 0, width, height);
+    if (!next) return;
+    const matrix = next.matrix;
+    const size = Math.min(width, height) / 4.8;
+    const filledRows = matrix.filter((row) => row.some(Boolean));
+    const minY = matrix.findIndex((row) => row.some(Boolean));
+    const maxY = minY + filledRows.length - 1;
+    const filledXs = [];
+    matrix.forEach((row) => row.forEach((value, x) => value && filledXs.push(x)));
+    const minX = Math.min(...filledXs);
+    const maxX = Math.max(...filledXs);
+    const shapeW = (maxX - minX + 1) * size;
+    const shapeH = (maxY - minY + 1) * size;
+    nextCtx.save();
+    nextCtx.translate((width - shapeW) / 2 - minX * size, (height - shapeH) / 2 - minY * size);
+    const preview = { ...next, x: 0, y: 0 };
+    drawPiece(nextCtx, preview, size);
+    nextCtx.restore();
+  }
+
+  function fitContain(imageW, imageH, boxW, boxH) {
+    const scale = Math.min(boxW / imageW, boxH / imageH);
+    return {
+      width: imageW * scale,
+      height: imageH * scale
+    };
+  }
+
+  function roundedRect(ctx, x, y, width, height, radius) {
+    const r = Math.min(radius, width / 2, height / 2);
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + width, y, x + width, y + height, r);
+    ctx.arcTo(x + width, y + height, x, y + height, r);
+    ctx.arcTo(x, y + height, x, y, r);
+    ctx.arcTo(x, y, x + width, y, r);
+    ctx.closePath();
+  }
+
+  function lighten(hex, amount) {
+    const color = hex.replace("#", "");
+    const num = parseInt(color, 16);
+    const r = Math.min(255, Math.floor((num >> 16) + 255 * amount));
+    const g = Math.min(255, Math.floor(((num >> 8) & 255) + 255 * amount));
+    const b = Math.min(255, Math.floor((num & 255) + 255 * amount));
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
+  function handleAction(action) {
+    if (action === "left") move(-1);
+    if (action === "right") move(1);
+    if (action === "down") softDrop();
+    if (action === "rotate") rotatePiece();
+    if (action === "drop") hardDrop();
+    if (action === "pause") togglePause();
+    if (action === "restart") resetGame();
+  }
+
+  document.addEventListener("keydown", (event) => {
+    const keys = ["ArrowLeft", "ArrowRight", "ArrowDown", "ArrowUp", " ", "Spacebar"];
+    if (keys.includes(event.key)) event.preventDefault();
+    if (event.key === "ArrowLeft") handleAction("left");
+    if (event.key === "ArrowRight") handleAction("right");
+    if (event.key === "ArrowDown") handleAction("down");
+    if (event.key === "ArrowUp") handleAction("rotate");
+    if (event.key === " " || event.key === "Spacebar") handleAction("drop");
+    if (event.key.toLowerCase() === "p") handleAction("pause");
+  });
+
+  document.querySelectorAll("[data-action]").forEach((button) => {
+    let repeatTimer = null;
+    const action = button.dataset.action;
+    const repeatable = ["left", "right", "down"].includes(action);
+    const stop = () => {
+      if (repeatTimer) clearInterval(repeatTimer);
+      repeatTimer = null;
+    };
+    button.addEventListener("pointerdown", (event) => {
+      event.preventDefault();
+      handleAction(action);
+      if (repeatable) repeatTimer = setInterval(() => handleAction(action), 120);
+    });
+    button.addEventListener("pointerup", stop);
+    button.addEventListener("pointercancel", stop);
+    button.addEventListener("pointerleave", stop);
+  });
+
+  document.querySelectorAll("[data-scene]").forEach((button) => {
+    if (!button.classList.contains("pill")) return;
+    button.addEventListener("click", () => {
+      document.body.dataset.scene = button.dataset.scene;
+      document.querySelectorAll(".pill[data-scene]").forEach((item) => {
+        item.setAttribute("aria-pressed", String(item === button));
+      });
+    });
+  });
+
+  function update(time = 0) {
+    const delta = time - lastTime;
+    lastTime = time;
+    if (!isPaused && !isOver) {
+      dropCounter += delta;
+      if (dropCounter > dropInterval) {
+        current.y += 1;
+        if (collide(current)) {
+          current.y -= 1;
+          lockPiece();
+        }
+        dropCounter = 0;
+      }
+    }
+    draw();
+    requestAnimationFrame(update);
+  }
+
+  window.addEventListener("resize", resizeCanvas);
+  resetGame();
+  resizeCanvas();
+  requestAnimationFrame(update);
+})();
+</script>
+</body>
+</html>
