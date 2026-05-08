@@ -10,14 +10,14 @@
     --ink: #18212b;
     --muted: rgba(255, 255, 255, 0.7);
     --paper: #f5f0e8;
-    --panel: rgba(8, 18, 30, 0.34);
+    --panel: rgba(8, 18, 30, 0.28);
     --panel-strong: rgba(255, 255, 255, 0.16);
     --line: rgba(255, 255, 255, 0.18);
     --shadow: 0 18px 42px rgba(0, 0, 0, 0.22);
     --accent: #d65135;
     --accent-2: #286d82;
     --scene-image: url("assets/lucky-playground-assets-final-50-v2/police-road-night.png");
-    --scene-tint: linear-gradient(135deg, rgba(12, 26, 46, 0.78), rgba(24, 54, 72, 0.42));
+    --scene-tint: linear-gradient(135deg, rgba(12, 26, 46, 0.58), rgba(24, 54, 72, 0.2));
   }
 
   * { box-sizing: border-box; }
@@ -33,7 +33,7 @@
 
   body[data-scene="nature"] {
     --scene-image: url("assets/lucky-playground-assets-final-50-v2/dino-jungle-background.png");
-    --scene-tint: linear-gradient(135deg, rgba(21, 58, 40, 0.72), rgba(89, 112, 45, 0.36));
+    --scene-tint: linear-gradient(135deg, rgba(21, 58, 40, 0.48), rgba(89, 112, 45, 0.16));
     --accent: #287753;
     --accent-2: #b27022;
   }
@@ -70,7 +70,7 @@
   }
 
   .topbar {
-    width: min(1380px, 100%);
+    width: min(1500px, 100%);
     margin: 0 auto 10px;
     display: flex;
     align-items: center;
@@ -135,11 +135,11 @@
   }
 
   .game-shell {
-    width: min(1380px, 100%);
+    width: min(1500px, 100%);
     margin: 0 auto;
     display: grid;
-    grid-template-columns: minmax(620px, 3fr) minmax(220px, 1fr);
-    gap: 14px;
+    grid-template-columns: minmax(780px, 1fr) minmax(170px, 210px);
+    gap: 12px;
     align-items: start;
   }
 
@@ -157,15 +157,15 @@
 
   .board-wrap {
     position: relative;
-    width: min(100%, 760px);
+    width: min(100%, 1120px, calc((100svh - 118px) * 16 / 9));
     max-width: 100%;
     margin: 0 auto;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 16 / 9;
     border-radius: 8px;
     overflow: hidden;
     border: 2px solid rgba(255, 255, 255, 0.68);
     background-image:
-      linear-gradient(180deg, rgba(9, 17, 28, 0.24), rgba(9, 17, 28, 0.56)),
+      linear-gradient(180deg, rgba(9, 17, 28, 0.1), rgba(9, 17, 28, 0.26)),
       var(--scene-image);
     background-position: center;
     background-size: cover;
@@ -256,18 +256,22 @@
 
   .next-panel {
     display: grid;
-    grid-template-columns: 92px 1fr;
-    gap: 10px;
+    grid-template-columns: 72px 1fr;
+    gap: 8px;
     align-items: center;
   }
 
-  #next {
-    width: 92px;
-    height: 92px;
+  .next-canvas {
+    width: 72px;
+    height: 72px;
     display: block;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.16);
     background: rgba(5, 12, 20, 0.42);
+  }
+
+  .next-panel.mobile-next {
+    display: none;
   }
 
   .piece-name {
@@ -279,7 +283,7 @@
   .asset-name {
     margin: 0;
     color: white;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 800;
     line-height: 1.2;
   }
@@ -372,16 +376,17 @@
   }
 
   @media (min-width: 1180px) {
-    .side { max-width: 310px; }
+    .side { max-width: 210px; }
   }
 
   @media (max-width: 960px) {
     .page {
       padding-left: 12px;
       padding-right: 12px;
-      padding-bottom: calc(92px + env(safe-area-inset-bottom));
+      padding-bottom: calc(88px + env(safe-area-inset-bottom));
     }
     .topbar { align-items: flex-start; flex-direction: column; }
+    .title p { display: none; }
     .scene-toggle { justify-content: flex-start; }
     .game-shell { grid-template-columns: 1fr; }
     .arena {
@@ -391,19 +396,25 @@
       overflow: hidden;
     }
     .side { grid-template-rows: auto; }
+    .desktop-next { display: none; }
+    .next-panel.mobile-next {
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      align-items: center;
+      width: min(100%, 330px);
+      margin: 0 0 8px;
+      background: rgba(8, 18, 30, 0.44);
+    }
     .tips { display: none; }
     .mobile-controls {
       display: flex;
-      position: fixed;
+      position: static;
       z-index: 20;
-      left: 12px;
-      right: auto;
-      bottom: max(10px, env(safe-area-inset-bottom));
-      width: 330px;
+      width: min(330px, 100%);
       max-width: none;
       gap: 6px;
       padding: 8px;
-      margin: 0;
+      margin: 8px 0 0;
       transform: none;
       border: 1px solid rgba(255, 255, 255, 0.36);
       border-radius: 10px;
@@ -416,16 +427,17 @@
       flex: 1 1 0;
       width: auto;
       min-width: 0;
-      max-width: 62px;
+      max-width: 54px;
     }
     .mobile-controls .icon-button.wide {
       flex: 1.25 1 0;
       width: auto;
-      max-width: 82px;
+      max-width: 68px;
     }
     .board-wrap {
-      width: min(100%, 520px);
+      width: min(100%, 420px, calc((100svh - 460px) * 10 / 16));
       min-width: min(100%, 280px);
+      aspect-ratio: 10 / 16;
       margin: 0;
     }
     .stats { grid-template-columns: repeat(3, 1fr); }
@@ -433,15 +445,16 @@
 
   @media (max-width: 480px) {
     .topbar { margin-bottom: 10px; }
-    .title h1 { font-size: 1.8rem; }
-    .title p { font-size: 0.88rem; }
+    .title h1 { font-size: 1.6rem; }
+    .title p { display: none; }
     .pill { min-height: 38px; padding: 0 12px; font-size: 0.9rem; }
     .arena { border-radius: 10px; padding: 8px; }
     .panel { padding: 10px; border-radius: 8px; }
     .stat { min-height: 62px; padding: 8px; }
     .stat strong { font-size: 1.28rem; }
     .next-panel { grid-template-columns: 92px 1fr; }
-    #next { width: 92px; height: 92px; }
+    .next-canvas { width: 70px; height: 70px; }
+    .next-panel.mobile-next { grid-template-columns: 70px 1fr; }
     .asset-name { font-size: 1.05rem; }
     .icon-button { height: 48px; font-size: 1.28rem; }
     .icon-button.wide { font-size: 1rem; }
@@ -464,8 +477,15 @@
 
   <section class="game-shell" aria-label="工程车恐龙俄罗斯方块游戏">
     <div class="arena">
+      <div class="panel next-panel mobile-next">
+        <canvas class="next-canvas" id="nextMobile" width="160" height="160" aria-label="下一块预览"></canvas>
+        <div>
+          <p class="piece-name">下一块</p>
+          <p class="asset-name">准备中</p>
+        </div>
+      </div>
       <div class="board-wrap">
-        <canvas id="board" width="400" height="800" aria-label="俄罗斯方块棋盘"></canvas>
+        <canvas id="board" width="1600" height="900" aria-label="俄罗斯方块棋盘"></canvas>
         <div class="game-over" id="gameOver">
           <div>
             <h2>Game Over</h2>
@@ -490,8 +510,8 @@
         <div class="stat"><span>等级</span><strong id="level">1</strong></div>
       </div>
 
-      <div class="panel next-panel">
-        <canvas id="next" width="160" height="160" aria-label="下一块预览"></canvas>
+      <div class="panel next-panel desktop-next">
+        <canvas class="next-canvas" id="nextDesktop" width="160" height="160" aria-label="下一块预览"></canvas>
         <div>
           <p class="piece-name">下一块</p>
           <p class="asset-name" id="nextName">准备中</p>
@@ -527,8 +547,6 @@
 
 <script>
 (() => {
-  const COLS = 10;
-  const ROWS = 10;
   const FINAL = "assets/lucky-playground-assets-final-50-v2/";
   const DEMO = "assets/generated-demo/";
 
@@ -567,17 +585,20 @@
   };
 
   const boardCanvas = document.getElementById("board");
-  const nextCanvas = document.getElementById("next");
+  const nextCanvases = [...document.querySelectorAll(".next-canvas")];
   const boardCtx = boardCanvas.getContext("2d");
-  const nextCtx = nextCanvas.getContext("2d");
+  const nextViews = nextCanvases.map((canvas) => ({
+    canvas,
+    ctx: canvas.getContext("2d")
+  }));
   const scoreEl = document.getElementById("score");
   const linesEl = document.getElementById("lines");
   const levelEl = document.getElementById("level");
-  const nextNameEl = document.getElementById("nextName");
   const gameOverEl = document.getElementById("gameOver");
   const pauseBtn = document.getElementById("pauseBtn");
 
   const images = new Map();
+  const trimCache = new Map();
   [...assets.map((asset) => asset.src), ...Object.values(sceneSources)].forEach((src) => {
     const image = new Image();
     image.onload = () => draw();
@@ -585,6 +606,8 @@
     images.set(src, image);
   });
 
+  let cols = 16;
+  let rows = 9;
   let board = makeBoard();
   let current = null;
   let next = null;
@@ -604,7 +627,7 @@
   let dpr = window.devicePixelRatio || 1;
 
   function makeBoard() {
-    return Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+    return Array.from({ length: rows }, () => Array(cols).fill(null));
   }
 
   function cloneMatrix(matrix) {
@@ -625,9 +648,23 @@
       matrix,
       asset,
       color: shape.color,
-      x: Math.floor(COLS / 2) - Math.ceil(matrix[0].length / 2),
+      x: Math.floor(cols / 2) - Math.ceil(matrix[0].length / 2),
       y: getSpawnY(matrix)
     };
+  }
+
+  function getBoardConfig() {
+    return window.matchMedia("(max-width: 960px)").matches
+      ? { cols: 10, rows: 16 }
+      : { cols: 16, rows: 9 };
+  }
+
+  function applyBoardConfig() {
+    const config = getBoardConfig();
+    const changed = cols !== config.cols || rows !== config.rows;
+    cols = config.cols;
+    rows = config.rows;
+    return changed;
   }
 
   function getSpawnY(matrix) {
@@ -637,17 +674,24 @@
 
   function resizeCanvas() {
     dpr = window.devicePixelRatio || 1;
+    const changed = applyBoardConfig();
     const boardRect = boardCanvas.getBoundingClientRect();
     boardCanvas.width = Math.round(boardRect.width * dpr);
     boardCanvas.height = Math.round(boardRect.height * dpr);
     boardCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    cellSize = boardRect.width / COLS;
+    cellSize = Math.min(boardRect.width / cols, boardRect.height / rows);
 
-    const nextRect = nextCanvas.getBoundingClientRect();
-    nextCanvas.width = Math.round(nextRect.width * dpr);
-    nextCanvas.height = Math.round(nextRect.height * dpr);
-    nextCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    draw();
+    nextViews.forEach(({ canvas, ctx }) => {
+      const nextRect = canvas.getBoundingClientRect();
+      canvas.width = Math.round(nextRect.width * dpr);
+      canvas.height = Math.round(nextRect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    });
+    if (changed && current) {
+      resetGame();
+    } else {
+      draw();
+    }
   }
 
   function resetGame() {
@@ -672,7 +716,9 @@
     scoreEl.textContent = String(score);
     linesEl.textContent = String(lineCount);
     levelEl.textContent = String(level);
-    nextNameEl.textContent = next ? `${next.asset.name} · ${next.key}` : "准备中";
+    document.querySelectorAll(".next-panel .asset-name").forEach((item) => {
+      item.textContent = next ? `${next.asset.name} · ${next.key}` : "准备中";
+    });
   }
 
   function collide(piece, offsetX = 0, offsetY = 0, matrix = piece.matrix) {
@@ -681,7 +727,7 @@
         if (!matrix[y][x]) continue;
         const px = piece.x + x + offsetX;
         const py = piece.y + y + offsetY;
-        if (px < 0 || px >= COLS || py >= ROWS) return true;
+        if (px < 0 || px >= cols || py >= rows) return true;
         if (py >= 0 && board[py][px]) return true;
       }
     }
@@ -694,7 +740,7 @@
         if (!value) return;
         const py = current.y + y;
         const px = current.x + x;
-        if (py >= 0 && py < ROWS && px >= 0 && px < COLS) {
+        if (py >= 0 && py < rows && px >= 0 && px < cols) {
           board[py][px] = {
             asset: current.asset,
             color: current.color,
@@ -708,10 +754,10 @@
 
   function sweepLines() {
     let cleared = 0;
-    for (let y = ROWS - 1; y >= 0; y -= 1) {
+    for (let y = rows - 1; y >= 0; y -= 1) {
       if (board[y].every(Boolean)) {
         board.splice(y, 1);
-        board.unshift(Array(COLS).fill(null));
+        board.unshift(Array(cols).fill(null));
         cleared += 1;
         y += 1;
       }
@@ -726,7 +772,7 @@
 
   function spawnNext() {
     current = next || makePiece();
-    current.x = Math.floor(COLS / 2) - Math.ceil(current.matrix[0].length / 2);
+    current.x = Math.floor(cols / 2) - Math.ceil(current.matrix[0].length / 2);
     current.y = getSpawnY(current.matrix);
     next = makePiece();
     if (collide(current)) {
@@ -812,13 +858,13 @@
     ctx.save();
     ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
     ctx.lineWidth = 1;
-    for (let x = 1; x < COLS; x += 1) {
+    for (let x = 1; x < cols; x += 1) {
       ctx.beginPath();
       ctx.moveTo(x * size, 0);
       ctx.lineTo(x * size, height);
       ctx.stroke();
     }
-    for (let y = 1; y < ROWS; y += 1) {
+    for (let y = 1; y < rows; y += 1) {
       ctx.beginPath();
       ctx.moveTo(0, y * size);
       ctx.lineTo(width, y * size);
@@ -839,9 +885,9 @@
       ctx.fillStyle = activeScene === "nature" ? "#244b35" : "#13233a";
       ctx.fillRect(0, 0, width, height);
     }
-    ctx.fillStyle = activeScene === "nature" ? "rgba(11, 36, 24, 0.44)" : "rgba(9, 17, 29, 0.52)";
+    ctx.fillStyle = activeScene === "nature" ? "rgba(11, 36, 24, 0.2)" : "rgba(9, 17, 29, 0.28)";
     ctx.fillRect(0, 0, width, height);
-    ctx.fillStyle = "rgba(255, 255, 255, 0.06)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.025)";
     ctx.fillRect(0, 0, width, height);
     ctx.restore();
   }
@@ -901,18 +947,32 @@
     ctx.fillStyle = bg;
     ctx.fillRect(groupX, groupY, groupW, groupH);
 
+    const shine = ctx.createLinearGradient(groupX, groupY, groupX, groupY + groupH);
+    shine.addColorStop(0, "rgba(255, 255, 255, 0.26)");
+    shine.addColorStop(0.48, "rgba(255, 255, 255, 0)");
+    shine.addColorStop(1, "rgba(0, 0, 0, 0.16)");
+    ctx.fillStyle = shine;
+    ctx.fillRect(groupX, groupY, groupW, groupH);
+    ctx.restore();
+
     const image = images.get(tile.asset.src);
+    ctx.save();
+    ctx.globalAlpha = alpha;
     if (image && image.complete && image.naturalWidth) {
-      const zoom = (tile.asset.zoom || 1.2) * (tile.asset.type === "dino" ? 1.14 : 1.1);
+      const trim = getTrimBox(image, tile.asset.src);
+      const imageMargin = tile.asset.type === "vehicle" ? 0.02 : 0.04;
       const box = fitContain(
-        image.naturalWidth,
-        image.naturalHeight,
-        Math.max(size, groupW - pad * 2) * zoom,
-        Math.max(size, groupH - pad * 2) * zoom
+        trim.sw,
+        trim.sh,
+        groupW * (1 - imageMargin),
+        groupH * (1 - imageMargin)
       );
       const drawX = groupX + (groupW - box.width) / 2;
       const drawY = groupY + (groupH - box.height) / 2;
-      ctx.drawImage(image, drawX, drawY, box.width, box.height);
+      ctx.shadowColor = "rgba(0, 0, 0, 0.24)";
+      ctx.shadowBlur = size * 0.08;
+      ctx.shadowOffsetY = size * 0.03;
+      ctx.drawImage(image, trim.sx, trim.sy, trim.sw, trim.sh, drawX, drawY, box.width, box.height);
     } else {
       ctx.fillStyle = "rgba(255,255,255,0.86)";
       ctx.font = `800 ${Math.floor(Math.min(groupW, groupH) * 0.42)}px system-ui`;
@@ -920,13 +980,6 @@
       ctx.textBaseline = "middle";
       ctx.fillText(tile.key, groupX + groupW / 2, groupY + groupH / 2);
     }
-
-    const shine = ctx.createLinearGradient(groupX, groupY, groupX, groupY + groupH);
-    shine.addColorStop(0, "rgba(255, 255, 255, 0.34)");
-    shine.addColorStop(0.48, "rgba(255, 255, 255, 0)");
-    shine.addColorStop(1, "rgba(0, 0, 0, 0.2)");
-    ctx.fillStyle = shine;
-    ctx.fillRect(groupX, groupY, groupW, groupH);
     ctx.restore();
 
     ctx.save();
@@ -1000,12 +1053,16 @@
   }
 
   function drawNext() {
-    const width = nextCanvas.clientWidth;
-    const height = nextCanvas.clientHeight;
+    nextViews.forEach(drawNextView);
+  }
+
+  function drawNextView({ canvas, ctx }) {
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
     if (!width || !height) return;
-    nextCtx.clearRect(0, 0, width, height);
-    nextCtx.fillStyle = "rgba(11, 19, 30, 0.92)";
-    nextCtx.fillRect(0, 0, width, height);
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = "rgba(11, 19, 30, 0.62)";
+    ctx.fillRect(0, 0, width, height);
     if (!next) return;
     const matrix = next.matrix;
     const size = Math.min(width, height) / 4.8;
@@ -1018,11 +1075,11 @@
     const maxX = Math.max(...filledXs);
     const shapeW = (maxX - minX + 1) * size;
     const shapeH = (maxY - minY + 1) * size;
-    nextCtx.save();
-    nextCtx.translate((width - shapeW) / 2 - minX * size, (height - shapeH) / 2 - minY * size);
+    ctx.save();
+    ctx.translate((width - shapeW) / 2 - minX * size, (height - shapeH) / 2 - minY * size);
     const preview = { ...next, x: 0, y: 0 };
-    drawPiece(nextCtx, preview, size);
-    nextCtx.restore();
+    drawPiece(ctx, preview, size);
+    ctx.restore();
   }
 
   function fitContain(imageW, imageH, boxW, boxH) {
@@ -1039,6 +1096,51 @@
       width: imageW * scale,
       height: imageH * scale
     };
+  }
+
+  function getTrimBox(image, key) {
+    if (trimCache.has(key)) return trimCache.get(key);
+    const fallback = { sx: 0, sy: 0, sw: image.naturalWidth, sh: image.naturalHeight };
+    try {
+      const canvas = document.createElement("canvas");
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(image, 0, 0);
+      const { data, width, height } = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      let minX = width;
+      let minY = height;
+      let maxX = -1;
+      let maxY = -1;
+      for (let y = 0; y < height; y += 1) {
+        for (let x = 0; x < width; x += 1) {
+          const alpha = data[(y * width + x) * 4 + 3];
+          if (alpha <= 10) continue;
+          minX = Math.min(minX, x);
+          minY = Math.min(minY, y);
+          maxX = Math.max(maxX, x);
+          maxY = Math.max(maxY, y);
+        }
+      }
+      if (maxX < minX || maxY < minY) {
+        trimCache.set(key, fallback);
+        return fallback;
+      }
+      const padding = 2;
+      const sx = Math.max(0, minX - padding);
+      const sy = Math.max(0, minY - padding);
+      const box = {
+        sx,
+        sy,
+        sw: Math.min(width - sx, maxX - minX + 1 + padding * 2),
+        sh: Math.min(height - sy, maxY - minY + 1 + padding * 2)
+      };
+      trimCache.set(key, box);
+      return box;
+    } catch {
+      trimCache.set(key, fallback);
+      return fallback;
+    }
   }
 
   function beginCellsPath(ctx, cells, size, pad, radius) {
@@ -1147,6 +1249,7 @@
 
   window.addEventListener("resize", resizeCanvas);
   syncSceneButtons();
+  applyBoardConfig();
   resetGame();
   resizeCanvas();
   requestAnimationFrame(update);
