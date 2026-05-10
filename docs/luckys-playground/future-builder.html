@@ -259,6 +259,9 @@
     color: var(--muted);
     font-size: 0.96rem;
     line-height: 1.55;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    word-break: break-all;
   }
 
   .track {
@@ -299,8 +302,9 @@
     top: calc(var(--y) * 1%);
     width: calc(var(--w) * 1%);
     transform: translate(-50%, -50%);
-    transition: transform 0.5s ease, opacity 0.5s ease, filter 0.5s ease;
-    pointer-events: none;
+    transition: transform 0.35s ease, opacity 0.35s ease, filter 0.35s ease;
+    pointer-events: auto;
+    cursor: pointer;
   }
 
   .prop img {
@@ -315,10 +319,72 @@
     filter: saturate(0.55);
   }
 
+  .prop.available img {
+    filter:
+      drop-shadow(0 14px 20px rgba(0, 0, 0, 0.42))
+      drop-shadow(0 0 18px rgba(93, 231, 255, 0.34));
+  }
+
+  .prop.blocked {
+    opacity: 0.56;
+    filter: saturate(0.65);
+  }
+
+  .prop.focus-target {
+    transform: translate(-50%, -50%) scale(1.12);
+  }
+
+  .prop.wrong {
+    animation: wrongShake 0.36s ease;
+  }
+
   .prop.done.bridge-made {
     transform: translate(-50%, -50%) scale(1.02);
     opacity: 1;
     filter: none;
+  }
+
+  .prop-label {
+    position: absolute;
+    left: 50%;
+    bottom: -12px;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    color: var(--text);
+    background: rgba(5, 13, 22, 0.74);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    line-height: 1;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+  }
+
+  .prop-action {
+    position: absolute;
+    right: -4px;
+    top: -8px;
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    background: rgba(6, 15, 24, 0.76);
+    border: 1px solid rgba(93, 231, 255, 0.36);
+    display: grid;
+    place-items: center;
+    box-shadow: 0 0 18px rgba(93, 231, 255, 0.22);
+  }
+
+  .prop-action img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    filter: none;
+  }
+
+  @keyframes wrongShake {
+    0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+    25% { transform: translate(calc(-50% - 7px), -50%) rotate(-3deg); }
+    55% { transform: translate(calc(-50% + 7px), -50%) rotate(3deg); }
   }
 
   .vehicle-runner {
@@ -371,14 +437,17 @@
   }
 
   .side {
+    height: calc(100svh - 110px);
     min-height: 0;
     min-width: 0;
     display: grid;
-    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto minmax(145px, 0.72fr) minmax(210px, 1fr) auto;
     gap: 10px;
+    overflow: hidden;
   }
 
   .panel {
+    min-height: 0;
     min-width: 0;
     max-width: 100%;
     border: 1px solid var(--line);
@@ -413,13 +482,31 @@
     font-size: 0.94rem;
   }
 
+  .energy {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .energy-cell {
+    flex: 1;
+    height: 9px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .energy-cell.on {
+    background: linear-gradient(90deg, var(--yellow), var(--orange));
+    box-shadow: 0 0 14px rgba(255, 140, 58, 0.38);
+  }
+
   .plan-panel {
     padding: 12px;
   }
 
-  .plan-strip {
+  .selected-strip {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 8px;
     min-height: 47px;
     align-items: center;
@@ -449,6 +536,97 @@
     font-size: 0.88rem;
   }
 
+  .selected-vehicle {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 10px;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .selected-vehicle img {
+    width: 72px;
+    height: 50px;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.34));
+  }
+
+  .selected-vehicle b {
+    display: block;
+    font-size: 0.95rem;
+    line-height: 1.2;
+  }
+
+  .selected-vehicle span {
+    display: block;
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.3;
+    margin-top: 3px;
+  }
+
+  .task-panel {
+    min-height: 0;
+    padding: 12px;
+    overflow: auto;
+  }
+
+  .tasks {
+    display: grid;
+    gap: 8px;
+  }
+
+  .task-card {
+    min-width: 0;
+    width: 100%;
+    min-height: 58px;
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    gap: 8px;
+    align-items: center;
+    padding: 7px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.07);
+    text-align: left;
+  }
+
+  .task-card img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+  }
+
+  .task-card b {
+    display: block;
+    font-size: 0.86rem;
+    line-height: 1.15;
+  }
+
+  .task-card span {
+    display: block;
+    color: var(--muted);
+    font-size: 0.72rem;
+    line-height: 1.25;
+    margin-top: 2px;
+  }
+
+  .task-card.done {
+    border-color: rgba(122, 255, 185, 0.46);
+    background: rgba(122, 255, 185, 0.1);
+  }
+
+  .task-card.blocked {
+    opacity: 0.58;
+  }
+
+  .task-state {
+    color: var(--faint);
+    font-size: 0.8rem;
+  }
+
   .vehicle-panel {
     min-height: 0;
     min-width: 0;
@@ -467,7 +645,7 @@
     grid-template-columns: 45% minmax(0, 1fr);
     gap: 8px;
     align-items: center;
-    min-height: 96px;
+    min-height: 88px;
     border: 1px solid var(--line);
     border-radius: 12px;
     color: var(--text);
@@ -491,7 +669,7 @@
 
   .vehicle-card img {
     width: 100%;
-    height: 74px;
+    height: 66px;
     object-fit: contain;
     filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.34));
   }
@@ -563,6 +741,11 @@
     color: var(--danger);
   }
 
+  .status.win {
+    color: var(--green);
+    font-weight: 700;
+  }
+
   .progress {
     display: flex;
     gap: 6px;
@@ -593,6 +776,8 @@
     }
 
     .side {
+      height: auto;
+      overflow: visible;
       grid-template-columns: 1fr;
     }
 
@@ -619,6 +804,15 @@
     .app {
       padding: 8px;
       gap: 8px;
+    }
+
+    .shell,
+    .stage-shell,
+    .stage,
+    .panel,
+    .topbar {
+      width: 100%;
+      max-width: calc(100vw - 16px);
     }
 
     .topbar {
@@ -656,13 +850,19 @@
     .scene-copy {
       top: 52px;
       left: 10px;
-      width: calc(100% - 20px);
+      right: 10px;
+      width: auto;
       padding: 12px;
       border-radius: 12px;
     }
 
+    .scene-copy h2 {
+      font-size: 1.15rem;
+    }
+
     .scene-copy p {
-      font-size: 0.84rem;
+      font-size: 0.8rem;
+      line-height: 1.38;
     }
 
     .prop {
@@ -680,6 +880,7 @@
 
     .mission-panel,
     .plan-panel,
+    .task-panel,
     .vehicle-panel,
     .action-panel {
       padding: 10px;
@@ -777,11 +978,17 @@
         <h2 class="mission-name" id="missionName"></h2>
         <p class="mission-goal" id="missionGoal"></p>
         <div class="progress" id="progressDots" aria-label="任务进度"></div>
+        <div class="energy" id="energyMeter" aria-label="能量"></div>
       </section>
 
       <section class="panel plan-panel">
-        <div class="label">Action Plan</div>
-        <div class="plan-strip" id="planStrip"></div>
+        <div class="label">Selected Vehicle</div>
+        <div class="selected-strip" id="selectedStrip"></div>
+      </section>
+
+      <section class="panel task-panel">
+        <div class="label">Work Orders</div>
+        <div class="tasks" id="taskList"></div>
       </section>
 
       <section class="panel vehicle-panel">
@@ -791,9 +998,9 @@
 
       <section class="panel action-panel">
         <div class="actions-grid">
-          <button class="main-action" type="button" id="runBtn">执行计划</button>
+          <button class="main-action" type="button" id="nextBtn">下一个任务</button>
           <button class="secondary-action" type="button" id="hintBtn">提示</button>
-          <button class="secondary-action" type="button" id="clearBtn">清空</button>
+          <button class="secondary-action" type="button" id="restartBtn">重开</button>
         </div>
         <div class="status" id="status"></div>
       </section>
@@ -806,71 +1013,37 @@
   const BASE = "assets/lucas-future-builder-assets-v1/";
   const isMobile = window.matchMedia("(max-width: 720px)");
 
+  const actionIcons = {
+    push: "icon_push.png",
+    load: "icon_push.png",
+    dig: "icon_dig.png",
+    drill: "icon_dig.png",
+    lift: "icon_lift.png",
+    roll: "icon_roll.png",
+    bridge: "icon_bridge.png",
+    jump: "icon_jump.png"
+  };
+
+  const actionNames = {
+    push: "推开",
+    load: "搬运",
+    dig: "挖掘",
+    drill: "钻开",
+    lift: "吊起",
+    roll: "压平",
+    bridge: "搭桥",
+    jump: "越过"
+  };
+
   const vehicles = [
-    {
-      id: "bulldozer",
-      name: "等离子推土机",
-      short: "推土机",
-      skill: "推开泥块",
-      image: "vehicle_plasma_bulldozer.png",
-      sound: [130, 170, 110]
-    },
-    {
-      id: "loader",
-      name: "AI 装载机",
-      short: "装载机",
-      skill: "搬走石头",
-      image: "vehicle_ai_loader.png",
-      sound: [180, 230, 160]
-    },
-    {
-      id: "excavator",
-      name: "磁悬浮挖掘机",
-      short: "挖掘机",
-      skill: "挖能源块",
-      image: "vehicle_magnetic_excavator.png",
-      sound: [210, 155, 240]
-    },
-    {
-      id: "crane",
-      name: "折叠吊车",
-      short: "吊车",
-      skill: "吊起货箱",
-      image: "vehicle_folding_crane.png",
-      sound: [260, 340, 240]
-    },
-    {
-      id: "roller",
-      name: "月球压路机",
-      short: "压路机",
-      skill: "压平道路",
-      image: "vehicle_lunar_roller.png",
-      sound: [95, 120, 90]
-    },
-    {
-      id: "monster",
-      name: "模块大脚车",
-      short: "大脚车",
-      skill: "越过障碍",
-      image: "vehicle_modular_monster_truck.png",
-      sound: [120, 260, 145]
-    },
-    {
-      id: "drill",
-      name: "隧道钻探车",
-      short: "钻探车",
-      skill: "钻开岩层",
-      image: "vehicle_tunnel_drill.png",
-      sound: [80, 180, 80]
-    },
-    {
-      id: "bridge",
-      name: "自动架桥车",
-      short: "架桥车",
-      skill: "铺设桥板",
-      image: "vehicle_bridge_builder.png",
-      sound: [240, 300, 380]
-    }
+    { id: "bulldozer", name: "等离子推土机", short: "推土机", skill: "推开泥块和路障", image: "vehicle_plasma_bulldozer.png", sound: [130, 170, 110] },
+    { id: "loader", name: "AI 装载机", short: "装载机", skill: "搬走石头和土块", image: "vehicle_ai_loader.png", sound: [180, 230, 160] },
+    { id: "excavator", name: "磁悬浮挖掘机", short: "挖掘机", skill: "挖出能源晶体", image: "vehicle_magnetic_excavator.png", sound: [210, 155, 240] },
+    { id: "crane", name: "折叠吊车", short: "吊车", skill: "吊起货箱和重物", image: "vehicle_folding_crane.png", sound: [260, 340, 240] },
+    { id: "roller", name: "月球压路机", short: "压路机", skill: "压平破损道路", image: "vehicle_lunar_roller.png", sound: [95, 120, 90] },
+    { id: "monster", name: "模块大脚车", short: "大脚车", skill: "跳过坡道障碍", image: "vehicle_modular_monster_truck.png", sound: [120, 260, 145] },
+    { id: "drill", name: "隧道钻探车", short: "钻探车", skill: "钻开硬岩层", image: "vehicle_tunnel_drill.png", sound: [80, 180, 80] },
+    { id: "bridge", name: "自动架桥车", short: "架桥车", skill: "铺设桥板", image: "vehicle_bridge_builder.png", sound: [240, 300, 380] }
   ];
 
   const vehicleMap = Object.fromEntries(vehicles.map((vehicle) => [vehicle.id, vehicle]));
@@ -878,82 +1051,88 @@
   const missions = [
     {
       id: "clean-road",
-      tab: "01 清障",
-      title: "清出未来车道",
-      text: "观察道路上的障碍，给工程车排一个正确的行动顺序。",
-      goal: "先推开泥块，再装走石头，最后压平裂缝。",
-      bg: "bg_future_construction_city_16x9.png",
-      mobileBg: "bg_future_construction_city_mobile_9x16.png",
-      sequence: ["bulldozer", "loader", "roller"],
+      tab: "01 车道",
+      title: "修复磁悬浮车道",
+      text: "选车，再点目标。错误会消耗能量。",
+      goal: "把安全锥、泥块、石堆和裂缝都处理掉。",
+      bg: "bg_magnetic_road_lab_16x9.png",
+      energy: 5,
       props: [
-        { id: "mud", image: "prop_mud_block.png", x: 37, y: 70, w: 12, wm: 18, step: 0 },
-        { id: "rock", image: "prop_rock_pile.png", x: 55, y: 70, w: 12, wm: 18, step: 1 },
-        { id: "road", image: "prop_cracked_road.png", x: 73, y: 73, w: 14, wm: 20, step: 2 }
+        { id: "cone", label: "安全锥", image: "prop_safety_cone_future.png", x: 27, y: 71, w: 7, wm: 12, action: "push", vehicles: ["bulldozer", "loader"], doneText: "安全锥被移到路边。" },
+        { id: "mud", label: "泥块", image: "prop_mud_block.png", x: 42, y: 70, w: 11, wm: 17, action: "push", vehicles: ["bulldozer", "loader"], doneText: "泥块被推开了。" },
+        { id: "rock", label: "石堆", image: "prop_rock_pile.png", x: 57, y: 70, w: 11, wm: 17, action: "load", vehicles: ["loader"], doneText: "装载机把石头搬走了。" },
+        { id: "road", label: "裂缝", image: "prop_cracked_road.png", x: 74, y: 73, w: 13, wm: 19, action: "roll", vehicles: ["roller"], needs: ["mud", "rock"], doneText: "路面被压平了。" }
       ],
-      success: "车道修好了。Lucas 的工程队可以继续前进。"
+      success: "磁悬浮车道重新开放。"
     },
     {
       id: "energy-mine",
       tab: "02 能源",
       title: "打开能源矿区",
-      text: "矿区里有岩层、晶体和货箱，需要不同车辆接力完成。",
-      goal: "钻开岩层，挖出能源晶体，再用吊车把货箱吊走。",
+      text: "先打开入口，再处理岩层、晶体和货箱。",
+      goal: "推开路障，钻开岩层，挖出晶体，吊走货箱。",
       bg: "bg_energy_mine_16x9.png",
-      sequence: ["drill", "excavator", "crane"],
+      energy: 5,
       props: [
-        { id: "rock", image: "prop_rock_pile.png", x: 36, y: 68, w: 14, wm: 20, step: 0 },
-        { id: "crystal", image: "prop_energy_crystal.png", x: 55, y: 66, w: 11, wm: 16, step: 1 },
-        { id: "cargo", image: "prop_cargo_box.png", x: 73, y: 68, w: 12, wm: 18, step: 2 }
+        { id: "barrier", label: "路障", image: "prop_traffic_barrier_future.png", x: 28, y: 70, w: 11, wm: 18, action: "push", vehicles: ["bulldozer"], doneText: "入口路障被推开。" },
+        { id: "rock", label: "岩层", image: "prop_rock_pile.png", x: 43, y: 68, w: 13, wm: 19, action: "drill", vehicles: ["drill"], needs: ["barrier"], doneText: "岩层被钻开。" },
+        { id: "crystal", label: "晶体", image: "prop_energy_crystal.png", x: 59, y: 66, w: 10, wm: 15, action: "dig", vehicles: ["excavator"], needs: ["rock"], doneText: "能源晶体被挖出来。" },
+        { id: "cargo", label: "货箱", image: "prop_cargo_box.png", x: 75, y: 68, w: 11, wm: 17, action: "lift", vehicles: ["crane"], needs: ["crystal"], doneText: "货箱被吊到安全区。" }
       ],
-      success: "能源晶体安全取出，货箱也被吊走了。"
+      success: "能源矿区顺利开工。"
     },
     {
       id: "lunar-bridge",
-      tab: "03 月球桥",
+      tab: "03 月桥",
       title: "月球基地断桥",
-      text: "基地车道中间有缺口，先搭桥，再确认桥面平整。",
-      goal: "架桥车铺桥板，吊车固定桥板，压路机压平通道。",
+      text: "月球通道断了，先修关键结构。",
+      goal: "铺桥、吊货、压路，最后让大脚车完成通过测试。",
       bg: "bg_lunar_builder_base_16x9.png",
       mobileBg: "bg_lunar_builder_base_mobile_9x16.png",
-      sequence: ["bridge", "crane", "roller"],
+      energy: 6,
       props: [
-        { id: "gap", image: "prop_bridge_gap.png", x: 42, y: 71, w: 16, wm: 22, step: 0, finalImage: "prop_bridge_piece.png", finalClass: "bridge-made" },
-        { id: "cargo", image: "prop_cargo_box.png", x: 61, y: 67, w: 11, wm: 16, step: 1 },
-        { id: "road", image: "prop_cracked_road.png", x: 76, y: 73, w: 13, wm: 19, step: 2 }
+        { id: "gap", label: "缺口", image: "prop_bridge_gap.png", finalImage: "prop_bridge_piece.png", finalClass: "bridge-made", x: 37, y: 72, w: 15, wm: 21, action: "bridge", vehicles: ["bridge"], doneText: "桥板铺好了。" },
+        { id: "cargo", label: "货箱", image: "prop_cargo_box.png", x: 55, y: 67, w: 10, wm: 16, action: "lift", vehicles: ["crane"], doneText: "补给货箱被吊走。" },
+        { id: "road", label: "桥面", image: "prop_cracked_road.png", x: 70, y: 73, w: 12, wm: 18, action: "roll", vehicles: ["roller"], needs: ["gap"], doneText: "桥面被压平。" },
+        { id: "ramp", label: "跳台", image: "prop_mini_ramp.png", x: 84, y: 72, w: 12, wm: 18, action: "jump", vehicles: ["monster"], needs: ["road"], doneText: "大脚车完成越障测试。" }
       ],
-      success: "月球桥通车了，基地补给可以准时送达。"
+      success: "月球基地通道恢复通车。"
     },
     {
       id: "magnetic-lab",
-      tab: "04 实验路",
-      title: "磁悬浮道路测试",
-      text: "实验场要先清场，再铺设桥板，最后让大脚车完成通过测试。",
-      goal: "推土机清障，架桥车补路，大脚车通过坡道。",
+      tab: "04 实验",
+      title: "磁悬浮道路实验场",
+      text: "多个目标可先处理，判断材料和车辆。",
+      goal: "清路障、铺桥、修路、跳台测试，再把晶体挖出来。",
       bg: "bg_magnetic_road_lab_16x9.png",
-      sequence: ["bulldozer", "bridge", "monster"],
+      energy: 6,
       props: [
-        { id: "barrier", image: "prop_traffic_barrier_future.png", x: 34, y: 70, w: 12, wm: 19, step: 0 },
-        { id: "gap", image: "prop_bridge_gap.png", x: 55, y: 72, w: 15, wm: 21, step: 1, finalImage: "prop_bridge_piece.png", finalClass: "bridge-made" },
-        { id: "ramp", image: "prop_mini_ramp.png", x: 76, y: 72, w: 13, wm: 20, step: 2 }
+        { id: "barrier", label: "隔离栏", image: "prop_traffic_barrier_future.png", x: 25, y: 70, w: 11, wm: 18, action: "push", vehicles: ["bulldozer", "loader"], doneText: "隔离栏被清走。" },
+        { id: "gap", label: "断口", image: "prop_bridge_gap.png", finalImage: "prop_bridge_piece.png", finalClass: "bridge-made", x: 43, y: 72, w: 14, wm: 20, action: "bridge", vehicles: ["bridge"], doneText: "断口被桥板连接。" },
+        { id: "road", label: "路面", image: "prop_cracked_road.png", x: 58, y: 73, w: 12, wm: 18, action: "roll", vehicles: ["roller"], needs: ["gap"], doneText: "实验路面被压平。" },
+        { id: "ramp", label: "坡道", image: "prop_mini_ramp.png", x: 73, y: 72, w: 12, wm: 18, action: "jump", vehicles: ["monster"], needs: ["road"], doneText: "大脚车通过坡道。" },
+        { id: "crystal", label: "样本", image: "prop_energy_crystal.png", x: 86, y: 66, w: 9, wm: 14, action: "dig", vehicles: ["excavator"], doneText: "实验样本被挖出。" }
       ],
-      success: "磁悬浮道路测试完成，大脚车通过了最后一跳。"
+      success: "实验场完成一轮完整测试。"
     },
     {
       id: "grand-build",
       tab: "05 总装",
       title: "超级工程总装线",
-      text: "这一次要综合使用四辆车，顺序错了就会卡住。",
-      goal: "装载机搬开泥块，挖掘机取晶体，吊车吊货箱，压路机收尾。",
-      bg: "bg_future_construction_city_16x9.png",
-      mobileBg: "bg_future_construction_city_mobile_9x16.png",
-      sequence: ["loader", "excavator", "crane", "roller"],
+      text: "综合任务，根据现场状态一步步判断。",
+      goal: "把泥块、岩层、晶体、货箱、缺口、路面和坡道全部处理完。",
+      bg: "bg_energy_mine_16x9.png",
+      energy: 8,
       props: [
-        { id: "mud", image: "prop_mud_block.png", x: 32, y: 70, w: 11, wm: 17, step: 0 },
-        { id: "crystal", image: "prop_energy_crystal.png", x: 49, y: 66, w: 10, wm: 15, step: 1 },
-        { id: "cargo", image: "prop_cargo_box.png", x: 65, y: 67, w: 10, wm: 15, step: 2 },
-        { id: "road", image: "prop_cracked_road.png", x: 80, y: 73, w: 12, wm: 18, step: 3 }
+        { id: "mud", label: "泥块", image: "prop_mud_block.png", x: 23, y: 70, w: 10, wm: 16, action: "push", vehicles: ["bulldozer", "loader"], doneText: "泥块被推开。" },
+        { id: "rock", label: "硬岩", image: "prop_rock_pile.png", x: 36, y: 68, w: 11, wm: 17, action: "drill", vehicles: ["drill"], needs: ["mud"], doneText: "硬岩被钻开。" },
+        { id: "crystal", label: "晶体", image: "prop_energy_crystal.png", x: 49, y: 66, w: 9, wm: 14, action: "dig", vehicles: ["excavator"], needs: ["rock"], doneText: "晶体被挖出。" },
+        { id: "cargo", label: "货箱", image: "prop_cargo_box.png", x: 61, y: 68, w: 9, wm: 14, action: "lift", vehicles: ["crane"], needs: ["crystal"], doneText: "货箱被吊走。" },
+        { id: "gap", label: "缺口", image: "prop_bridge_gap.png", finalImage: "prop_bridge_piece.png", finalClass: "bridge-made", x: 72, y: 72, w: 12, wm: 18, action: "bridge", vehicles: ["bridge"], needs: ["cargo"], doneText: "缺口被修好。" },
+        { id: "road", label: "裂缝", image: "prop_cracked_road.png", x: 83, y: 73, w: 10, wm: 16, action: "roll", vehicles: ["roller"], needs: ["gap"], doneText: "裂缝被压平。" },
+        { id: "ramp", label: "终点坡", image: "prop_mini_ramp.png", x: 92, y: 72, w: 9, wm: 15, action: "jump", vehicles: ["monster"], needs: ["road"], doneText: "大脚车完成终点跳跃。" }
       ],
-      success: "总装线跑通了。每辆车都做了自己最擅长的事。"
+      success: "超级工程总装线跑通。"
     }
   ];
 
@@ -961,25 +1140,30 @@
   const missionTabs = document.getElementById("missionTabs");
   const propsLayer = document.getElementById("propsLayer");
   const vehicleGrid = document.getElementById("vehicleGrid");
-  const planStrip = document.getElementById("planStrip");
+  const selectedStrip = document.getElementById("selectedStrip");
+  const taskList = document.getElementById("taskList");
   const status = document.getElementById("status");
   const progressDots = document.getElementById("progressDots");
+  const energyMeter = document.getElementById("energyMeter");
   const sceneTitle = document.getElementById("sceneTitle");
   const sceneText = document.getElementById("sceneText");
   const missionName = document.getElementById("missionName");
   const missionGoal = document.getElementById("missionGoal");
   const finishBurst = document.getElementById("finishBurst");
-  const runBtn = document.getElementById("runBtn");
-  const clearBtn = document.getElementById("clearBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const restartBtn = document.getElementById("restartBtn");
   const hintBtn = document.getElementById("hintBtn");
   const resetBtn = document.getElementById("resetBtn");
   const soundBtn = document.getElementById("soundBtn");
 
   let missionIndex = 0;
-  let plan = [];
-  let doneSteps = 0;
+  let selectedVehicleId = "bulldozer";
+  let completedTargets = new Set();
   let completed = new Set();
+  let energy = 0;
   let animating = false;
+  let missionComplete = false;
+  let failed = false;
   let soundOn = true;
   let audioContext = null;
 
@@ -994,6 +1178,26 @@
   function setStatus(message, type = "") {
     status.textContent = message;
     status.className = `status ${type}`.trim();
+  }
+
+  function wait(ms) {
+    return new Promise((resolve) => window.setTimeout(resolve, ms));
+  }
+
+  function allowedVehicleNames(target) {
+    return target.vehicles.map((id) => vehicleMap[id].short).join(" / ");
+  }
+
+  function isDone(target) {
+    return completedTargets.has(target.id);
+  }
+
+  function isUnlocked(target) {
+    return !target.needs || target.needs.every((id) => completedTargets.has(id));
+  }
+
+  function getTarget(targetId) {
+    return currentMission().props.find((target) => target.id === targetId);
   }
 
   function playTone(vehicle) {
@@ -1020,6 +1224,29 @@
     }
   }
 
+  function playErrorTone() {
+    if (!soundOn) return;
+    try {
+      audioContext ||= new (window.AudioContext || window.webkitAudioContext)();
+      const now = audioContext.currentTime;
+      const osc = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      osc.type = "square";
+      osc.frequency.setValueAtTime(120, now);
+      osc.frequency.exponentialRampToValueAtTime(70, now + 0.22);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.06, now + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.24);
+      osc.connect(gain);
+      gain.connect(audioContext.destination);
+      osc.start(now);
+      osc.stop(now + 0.26);
+    } catch (error) {
+      soundOn = false;
+      soundBtn.textContent = "静音";
+    }
+  }
+
   function renderTabs() {
     missionTabs.innerHTML = "";
     missions.forEach((mission, index) => {
@@ -1034,76 +1261,125 @@
     });
   }
 
-  function renderVehicles() {
-    vehicleGrid.innerHTML = "";
-    vehicles.forEach((vehicle) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "vehicle-card";
-      if (plan.includes(vehicle.id)) button.classList.add("selected");
-      button.innerHTML = `
-        <img src="${asset(vehicle.image)}" alt="${vehicle.name}" loading="lazy">
+  function renderSelected() {
+    const vehicle = vehicleMap[selectedVehicleId];
+    selectedStrip.innerHTML = `
+      <div class="selected-vehicle">
+        <img src="${asset(vehicle.image)}" alt="${vehicle.name}">
         <span>
           <b>${vehicle.name}</b>
           <span>${vehicle.skill}</span>
         </span>
+      </div>
+    `;
+  }
+
+  function renderVehicles() {
+    vehicleGrid.innerHTML = "";
+    vehicles.forEach((vehicle, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "vehicle-card";
+      if (selectedVehicleId === vehicle.id) button.classList.add("selected");
+      button.innerHTML = `
+        <img src="${asset(vehicle.image)}" alt="${vehicle.name}" loading="lazy">
+        <span>
+          <b>${index + 1}. ${vehicle.name}</b>
+          <span>${vehicle.skill}</span>
+        </span>
       `;
-      button.addEventListener("click", () => addVehicle(vehicle.id));
+      button.addEventListener("click", () => selectVehicle(vehicle.id));
       vehicleGrid.appendChild(button);
     });
   }
 
-  function renderPlan() {
-    planStrip.innerHTML = "";
-    if (!plan.length) {
-      const empty = document.createElement("div");
-      empty.className = "empty-plan";
-      empty.textContent = "点选车辆，排出行动顺序。";
-      planStrip.appendChild(empty);
-      renderVehicles();
-      return;
-    }
-    plan.forEach((vehicleId, index) => {
-      const vehicle = vehicleMap[vehicleId];
-      const token = document.createElement("button");
-      token.type = "button";
-      token.className = "plan-token";
-      token.title = "点击移除";
-      token.innerHTML = `<img src="${asset(vehicle.image)}" alt=""><span>${index + 1}. ${vehicle.short}</span>`;
-      token.addEventListener("click", () => {
-        if (animating) return;
-        plan.splice(index, 1);
-        renderPlan();
-      });
-      planStrip.appendChild(token);
-    });
-    renderVehicles();
+  function targetState(target) {
+    if (isDone(target)) return "done";
+    if (!isUnlocked(target)) return "blocked";
+    return "available";
   }
 
   function renderProps() {
     propsLayer.innerHTML = "";
-    currentMission().props.forEach((prop) => {
+    currentMission().props.forEach((target) => {
+      const state = targetState(target);
       const item = document.createElement("div");
-      item.className = "prop";
-      item.dataset.id = prop.id;
-      item.dataset.step = prop.step;
-      item.style.setProperty("--x", prop.x);
-      item.style.setProperty("--y", prop.y);
-      item.style.setProperty("--w", prop.w);
-      if (prop.wm) item.style.setProperty("--wm", prop.wm);
-      item.innerHTML = `<img src="${asset(prop.image)}" alt="">`;
+      item.className = `prop ${state}`;
+      if (state === "done" && target.finalClass) item.classList.add(target.finalClass);
+      item.dataset.id = target.id;
+      item.tabIndex = 0;
+      item.setAttribute("role", "button");
+      item.setAttribute("aria-label", target.label);
+      item.style.setProperty("--x", target.x);
+      item.style.setProperty("--y", target.y);
+      item.style.setProperty("--w", target.w);
+      if (target.wm) item.style.setProperty("--wm", target.wm);
+      const image = state === "done" && target.finalImage ? target.finalImage : target.image;
+      item.innerHTML = `
+        <img src="${asset(image)}" alt="${target.label}">
+        <span class="prop-action"><img src="${asset(actionIcons[target.action])}" alt=""></span>
+        <span class="prop-label">${target.label}</span>
+      `;
+      item.addEventListener("click", () => tryTarget(target.id));
+      item.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          tryTarget(target.id);
+        }
+      });
       propsLayer.appendChild(item);
+    });
+  }
+
+  function renderTasks() {
+    taskList.innerHTML = "";
+    currentMission().props.forEach((target) => {
+      const state = targetState(target);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `task-card ${state}`;
+      const stateText = state === "done" ? "✓" : state === "blocked" ? "锁" : "点";
+      button.innerHTML = `
+        <img src="${asset(actionIcons[target.action])}" alt="">
+        <span>
+          <b>${target.label} · ${actionNames[target.action]}</b>
+          <span>${state === "blocked" ? "先处理前置目标" : allowedVehicleNames(target)}</span>
+        </span>
+        <span class="task-state">${stateText}</span>
+      `;
+      button.addEventListener("click", () => tryTarget(target.id));
+      taskList.appendChild(button);
     });
   }
 
   function renderProgress() {
     const mission = currentMission();
     progressDots.innerHTML = "";
-    mission.sequence.forEach((_, index) => {
+    mission.props.forEach((target) => {
       const dot = document.createElement("div");
-      dot.className = index < doneSteps ? "dot on" : "dot";
+      dot.className = isDone(target) ? "dot on" : "dot";
       progressDots.appendChild(dot);
     });
+  }
+
+  function renderEnergy() {
+    const mission = currentMission();
+    energyMeter.innerHTML = "";
+    for (let i = 0; i < mission.energy; i += 1) {
+      const cell = document.createElement("div");
+      cell.className = i < energy ? "energy-cell on" : "energy-cell";
+      energyMeter.appendChild(cell);
+    }
+  }
+
+  function renderAll() {
+    renderTabs();
+    renderSelected();
+    renderVehicles();
+    renderProps();
+    renderTasks();
+    renderProgress();
+    renderEnergy();
   }
 
   function applyBackground() {
@@ -1112,167 +1388,180 @@
     stage.style.backgroundImage = `url("${asset(bg)}")`;
   }
 
+  function selectVehicle(vehicleId) {
+    if (animating) return;
+    selectedVehicleId = vehicleId;
+    renderSelected();
+    renderVehicles();
+    const vehicle = vehicleMap[vehicleId];
+    setStatus(`已选择：${vehicle.short}。现在点一下现场目标。`);
+  }
+
+  function flashTarget(targetId, className = "focus-target") {
+    const element = propsLayer.querySelector(`[data-id="${targetId}"]`);
+    if (!element) return;
+    element.classList.add(className);
+    window.setTimeout(() => element.classList.remove(className), 520);
+  }
+
+  async function animateVehicleToTarget(vehicle, target) {
+    const img = document.createElement("img");
+    img.className = "vehicle-runner";
+    img.src = asset(vehicle.image);
+    img.alt = vehicle.name;
+    img.style.setProperty("--target", target.x);
+    img.style.setProperty("--scale", vehicle.id === "crane" || vehicle.id === "bridge" ? "1.06" : "1");
+    stage.appendChild(img);
+    await wait(40);
+    img.classList.add("drive");
+    playTone(vehicle);
+    await wait(1180);
+    completedTargets.add(target.id);
+    setStatus(target.doneText || `${vehicle.short}完成了${target.label}。`, "good");
+    renderProps();
+    renderTasks();
+    renderProgress();
+    await wait(360);
+    img.classList.add("exit");
+    await wait(720);
+    img.remove();
+  }
+
+  async function tryTarget(targetId) {
+    if (animating) return;
+    if (failed) {
+      setStatus("能量用完了。点“重开”再试一次。", "bad");
+      return;
+    }
+    if (missionComplete) {
+      setStatus("这个任务已经完成，可以进入下一个任务。", "win");
+      return;
+    }
+    const target = getTarget(targetId);
+    if (!target) return;
+    if (isDone(target)) {
+      setStatus(`${target.label}已经完成了。`, "good");
+      return;
+    }
+    if (!isUnlocked(target)) {
+      const missing = target.needs.filter((id) => !completedTargets.has(id)).map((id) => getTarget(id).label).join("、");
+      flashTarget(target.id);
+      setStatus(`这里还不能处理。先完成：${missing}。`, "warn");
+      return;
+    }
+    const vehicle = vehicleMap[selectedVehicleId];
+    if (!target.vehicles.includes(vehicle.id)) {
+      energy = Math.max(0, energy - 1);
+      playErrorTone();
+      renderEnergy();
+      flashTarget(target.id, "wrong");
+      if (energy === 0) {
+        failed = true;
+        setStatus(`能量用完了。${target.label}需要 ${allowedVehicleNames(target)}。`, "bad");
+      } else {
+        setStatus(`${vehicle.short}不适合处理${target.label}。试试 ${allowedVehicleNames(target)}。`, "bad");
+      }
+      return;
+    }
+    animating = true;
+    nextBtn.disabled = true;
+    restartBtn.disabled = true;
+    hintBtn.disabled = true;
+    await animateVehicleToTarget(vehicle, target);
+    animating = false;
+    nextBtn.disabled = false;
+    restartBtn.disabled = false;
+    hintBtn.disabled = false;
+    if (currentMission().props.every((item) => completedTargets.has(item.id))) {
+      completeMission();
+    }
+  }
+
+  function completeMission() {
+    missionComplete = true;
+    completed.add(currentMission().id);
+    renderTabs();
+    finishBurst.classList.remove("show");
+    void finishBurst.offsetWidth;
+    finishBurst.classList.add("show");
+    const stars = energy >= currentMission().energy - 1 ? "三星" : energy >= 2 ? "二星" : "一星";
+    setStatus(`${currentMission().success} 获得${stars}。`, "win");
+  }
+
+  function showHint() {
+    if (animating) return;
+    if (failed) {
+      setStatus("能量用完了。点“重开”会恢复现场。", "bad");
+      return;
+    }
+    const next = currentMission().props.find((target) => !isDone(target) && isUnlocked(target));
+    const blocked = currentMission().props.find((target) => !isDone(target));
+    const target = next || blocked;
+    if (!target) {
+      setStatus("任务已经完成。", "win");
+      return;
+    }
+    flashTarget(target.id);
+    setStatus(`提示：${target.label}需要${actionNames[target.action]}，可用 ${allowedVehicleNames(target)}。`, "warn");
+  }
+
+  function resetMission() {
+    if (animating) return;
+    completedTargets = new Set();
+    energy = currentMission().energy;
+    missionComplete = false;
+    failed = false;
+    renderAll();
+    setStatus("现场已重置。选一辆车，再点现场目标。");
+  }
+
+  function nextMission() {
+    if (animating) return;
+    if (!missionComplete) {
+      setStatus("先完成当前任务。也可以直接点上方任务标签切换。", "warn");
+      return;
+    }
+    loadMission((missionIndex + 1) % missions.length);
+  }
+
   function loadMission(index) {
     if (animating) return;
     missionIndex = index;
-    plan = [];
-    doneSteps = 0;
+    completedTargets = new Set();
+    energy = currentMission().energy;
+    missionComplete = false;
+    failed = false;
     const mission = currentMission();
     sceneTitle.textContent = mission.title;
     sceneText.textContent = mission.text;
     missionName.textContent = mission.title;
     missionGoal.textContent = mission.goal;
     applyBackground();
-    renderTabs();
-    renderProps();
-    renderPlan();
-    renderProgress();
-    setStatus("选择合适的车辆，再点击执行计划。", "");
+    renderAll();
+    setStatus("选一辆车，再点击现场目标。");
   }
 
-  function addVehicle(vehicleId) {
-    if (animating) return;
-    const mission = currentMission();
-    if (plan.length >= mission.sequence.length) {
-      setStatus("计划已经排满了，可以先执行或清空重来。", "warn");
-      return;
-    }
-    plan.push(vehicleId);
-    renderPlan();
-    const vehicle = vehicleMap[vehicleId];
-    setStatus(`已加入：${vehicle.short}。`, "");
-  }
-
-  function validatePlan() {
-    const mission = currentMission();
-    if (plan.length < mission.sequence.length) {
-      return {
-        ok: false,
-        message: `还差 ${mission.sequence.length - plan.length} 步。继续选择车辆。`,
-        type: "warn"
-      };
-    }
-    for (let i = 0; i < mission.sequence.length; i += 1) {
-      if (plan[i] !== mission.sequence[i]) {
-        return {
-          ok: false,
-          message: `第 ${i + 1} 步不对。这里更需要 ${vehicleMap[mission.sequence[i]].short}。`,
-          type: "bad"
-        };
-      }
-    }
-    return { ok: true };
-  }
-
-  function markStep(step) {
-    const mission = currentMission();
-    const prop = mission.props.find((item) => item.step === step);
-    const element = propsLayer.querySelector(`[data-step="${step}"]`);
-    if (!prop || !element) return;
-    if (prop.finalImage) {
-      element.querySelector("img").src = asset(prop.finalImage);
-      element.classList.add(prop.finalClass || "");
-    }
-    element.classList.add("done");
-    doneSteps = Math.max(doneSteps, step + 1);
-    renderProgress();
-  }
-
-  function wait(ms) {
-    return new Promise((resolve) => window.setTimeout(resolve, ms));
-  }
-
-  async function animateVehicle(vehicleId, step) {
-    const vehicle = vehicleMap[vehicleId];
-    const prop = currentMission().props.find((item) => item.step === step);
-    const target = prop ? prop.x : 78;
-    const img = document.createElement("img");
-    img.className = "vehicle-runner";
-    img.src = asset(vehicle.image);
-    img.alt = vehicle.name;
-    img.style.setProperty("--target", target);
-    img.style.setProperty("--scale", vehicleId === "crane" || vehicleId === "bridge" ? "1.06" : "1");
-    stage.appendChild(img);
-    await wait(40);
-    img.classList.add("drive");
-    playTone(vehicle);
-    await wait(1180);
-    markStep(step);
-    setStatus(`${vehicle.short}完成了第 ${step + 1} 步。`, "good");
-    await wait(420);
-    img.classList.add("exit");
-    await wait(760);
-    img.remove();
-  }
-
-  async function runPlan() {
-    if (animating) return;
-    const validation = validatePlan();
-    if (!validation.ok) {
-      setStatus(validation.message, validation.type);
-      return;
-    }
-    animating = true;
-    runBtn.disabled = true;
-    clearBtn.disabled = true;
-    hintBtn.disabled = true;
-    doneSteps = 0;
-    renderProps();
-    renderProgress();
-    for (let i = 0; i < plan.length; i += 1) {
-      await animateVehicle(plan[i], i);
-    }
-    completed.add(currentMission().id);
-    renderTabs();
-    finishBurst.classList.remove("show");
-    void finishBurst.offsetWidth;
-    finishBurst.classList.add("show");
-    setStatus(currentMission().success, "good");
-    animating = false;
-    runBtn.disabled = false;
-    clearBtn.disabled = false;
-    hintBtn.disabled = false;
-  }
-
-  function showHint() {
-    if (animating) return;
-    const mission = currentMission();
-    const nextIndex = Math.min(plan.length, mission.sequence.length - 1);
-    const vehicle = vehicleMap[mission.sequence[nextIndex]];
-    setStatus(`提示：第 ${nextIndex + 1} 步可以试试 ${vehicle.short}，它会${vehicle.skill}。`, "warn");
-  }
-
-  function clearPlan() {
-    if (animating) return;
-    plan = [];
-    doneSteps = 0;
-    renderProps();
-    renderPlan();
-    renderProgress();
-    setStatus("计划已清空，可以重新排。", "");
-  }
-
-  function nextMission() {
-    if (animating) return;
-    loadMission((missionIndex + 1) % missions.length);
-  }
-
-  runBtn.addEventListener("click", runPlan);
+  nextBtn.addEventListener("click", nextMission);
   hintBtn.addEventListener("click", showHint);
-  clearBtn.addEventListener("click", clearPlan);
-  resetBtn.addEventListener("click", clearPlan);
+  restartBtn.addEventListener("click", resetMission);
+  resetBtn.addEventListener("click", resetMission);
   soundBtn.addEventListener("click", () => {
     soundOn = !soundOn;
     soundBtn.textContent = soundOn ? "🔊 声音" : "静音";
   });
   finishBurst.addEventListener("animationend", () => finishBurst.classList.remove("show"));
-  stage.addEventListener("dblclick", nextMission);
   isMobile.addEventListener("change", applyBackground);
 
   window.addEventListener("keydown", (event) => {
-    if (event.key === "Enter") runPlan();
-    if (event.key === "Backspace") clearPlan();
-    if (event.key >= "1" && event.key <= "8") addVehicle(vehicles[Number(event.key) - 1].id);
+    if (event.key === "Enter") {
+      showHint();
+    }
+    if (event.key === "Backspace") {
+      resetMission();
+    }
+    if (event.key >= "1" && event.key <= "8") {
+      selectVehicle(vehicles[Number(event.key) - 1].id);
+    }
   });
 
   loadMission(0);
